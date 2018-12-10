@@ -1,0 +1,11 @@
+{% load static %}
+<!doctype html>
+<html>
+	<head>
+		<title>{% block title %}(title missing){% endblock %} | CronTrack</title>
+		<link rel="stylesheet" type="text/css" href="{% static 'crontrack/base.css' %}">
+	</head>
+	<body>
+		{% block content %}{% endblock %}
+	</body>
+</html>
