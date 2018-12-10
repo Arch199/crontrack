@@ -1,0 +1,15 @@
+{% extends 'crontrack/base.html' %}
+
+{% block title %} Register an account {% endblock %}
+
+{% block content %}
+	<div class="center">
+		<h1>CronTrack</h1>
+		<h3>Login</h3>
+		<form method="post">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<input type="submit" value="Register">
+		</form>
+	</div>
+{% endblock %}

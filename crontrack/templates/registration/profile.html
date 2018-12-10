@@ -1,0 +1,15 @@
+{% extends 'crontrack/base.html' %}
+
+{% block title %} {{ user.username }}'s account {% endblock %}
+
+{% block content %}
+	<div class="center">
+		{% if user.is_authenticated %}
+			<p>You are currently logged in as <b>{{ user.username }}</b>.</p>
+			<a href="{% url 'crontrack:logout' %}">Log out</a>
+		{% else %}
+			<p>You are not logged in</p>
+			<a href="{% url 'crontrack:login' %}">Log in</a>
+		{% endif %}
+	</div>
+{% endblock %}
