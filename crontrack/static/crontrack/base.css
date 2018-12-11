@@ -1,3 +1,52 @@
+/* --- Global styles --- */
+body {
+	font-family: Arial, sans-serif;
+	background-color: #303035;
+}
+
+h1, h3 {
+	text-align: center;
+}
+
+
+/* --- Site page top bar --- */
+.topBar {
+	position: relative;
+	top: -8px;
+	left: -8px;
+	width: 100%;
+	background-color: #404070;
+	padding: 6px 10px 4px 10px;
+	border-bottom: 2px solid #444;
+}
+
+.topBar span {
+	float: right;
+	margin-right: 5px;
+}
+
+
+/* --- Centered block object (usually a div) --- */
+.hcenter {
+	display: table;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 50px;
+	background-color: #555;
+	border-radius: 100px;
+	box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.5);
+}
+
+
 /* --- Error/success message text --- */
 .errorMessage {
 	color: red;
@@ -7,14 +56,6 @@
 .successMessage {
 	color: green;
 	font-weight: bold;
-}
-
-
-/* --- Centered div --- */
-div.centered {
-	display: table;
-	margin: 0 auto;
-	text-align: center
 }
 
 
@@ -45,7 +86,6 @@ table.dbRows td {
 
 /* --- Table for basic forms --- */
 table.form {
-	font-family: Arial;
 	text-align: right;
 }
 
@@ -54,12 +94,24 @@ table.form td {
 	vertical-align: top;
 }
 
-table.form input[type="text"], table.form input[type="number"] {
-	width: 150px;
+table.form tfoot {
+	text-align: center;
+}
+
+table.form input[type="text"],
+table.form input[type="number"],
+table.form input[type="password"],
+table.form textarea {
+	width: 200px;
 }
 
 table.form textarea {
 	resize: none;
-	width: 150px;
 	height: 100px;
+}
+
+/* --- Login --- */
+form.login {
+	text-align: center;
+	line-height: 3em;
 }

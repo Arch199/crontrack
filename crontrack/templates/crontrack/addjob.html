@@ -3,35 +3,39 @@
 {% block title %} Add a new job {% endblock %}
 
 {% block content %}
-	<div class="centered">
+	<div class="hcenter">
 		<h3>Add a new job</h3>
 		<form action="{% url 'crontrack:add_job' %}" method="post">
 			{% csrf_token %}
 			<table class="form">
 				<tr>
 					<td>Job name</td>
-					<td><input type="text" name="name"></td>
+					<td><input type="text" name="name" value="{{ prefill.name }}"></td>
 				</tr>
 				<tr>
 					<td>Cron schedule string</td>
-					<td><input type="text" name="schedule_str"></td>
+					<td><input type="text" name="schedule_str" value="{{ prefill.schedule_str }}"></td>
 				</tr>
 				<tr>
 					<td>Time window (minutes)</td>
-					<td><input type="number" name="time_window"></td>
+					<td><input type="number" name="time_window" value="{{ prefill.time_window }}"></td>
 				</tr>
 				<tr>
 					<td>Description (optional)</td>
-					<td><textarea name="description" maxlength="200"></textarea></td>  <!-- TODO: should really define this as a constant somewhere -->
-				<tr>
-					<td>Your timezone: [TODO]</td>
-					<td><input type="submit" value="Add job"></td>
+					<td><textarea name="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
+					<!-- TODO: should really define maxlength this as a constant somewhere -->
+				<tfoot>
+					<tr>
+						<td>Your timezone: [TODO]</td>
+						<td><input type="submit" value="Add job"></td>
+					</tr>
+				</tfoot>
 			</table>
 			{% if error_message %}
 				<br><p class="errorMessage">Error: {{ error_message }}.</p>
 			{% endif %}
 			{% if success_message %}
-				<br><p class="successMessage">{{ success_message }}</p>
+				<br><p class="successMessage">{{ success_message }}</p> <!--- TODO: remove? -->
 			{% endif %}
 		</form>
 	</div>

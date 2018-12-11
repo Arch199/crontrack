@@ -2,10 +2,22 @@
 <!doctype html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>{% block title %}(title missing){% endblock %} | CronTrack</title>
 		<link rel="stylesheet" type="text/css" href="{% static 'crontrack/base.css' %}">
 	</head>
 	<body>
+		<div class="topBar">
+			<b>CronTrack</b>
+			<span>
+				{% if user.is_authenticated %}
+					Logged in as <b>{{ user.username }}</b>.
+					<a href="{% url 'crontrack:logout' %}">Log out</a>
+				{% else %}
+					<a href="{% url 'crontrack:login' %}">Log in</a>
+				{% endif %}
+			</span>
+			</div>
 		{% block content %}{% endblock %}
 	</body>
 </html>

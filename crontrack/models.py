@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Job(models.Model):
 	schedule_str = models.CharField('cron schedule string', max_length=100)
@@ -7,11 +8,7 @@ class Job(models.Model):
 	next_run = models.DateTimeField('next time to run')
 	last_notified = models.DateTimeField('last time notification received')
 	description = models.CharField(max_length=200, blank=True, default='')
-	
-	""" TODO:
-	- Add user account id to this model
-	- Add a model for a user (logins and stuff? - auth can do that maybe)
-	"""
+	user = models.ForeignKey(User, models.CASCADE)
 	
 	def __str__(self):
-		return f'{self.name}: "{self.schedule_str}", {self.time_window}min window, next={self.next_run}, last={self.last_notified}'
+		return f'{self.user}\'s {self.name}: "{self.schedule_str}", {self.description}'
