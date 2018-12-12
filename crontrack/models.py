@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from timezone_field import TimeZoneField
 
 class Job(models.Model):
 	schedule_str = models.CharField('cron schedule string', max_length=100)
@@ -12,3 +13,7 @@ class Job(models.Model):
 	
 	def __str__(self):
 		return f'{self.user}\'s {self.name}: "{self.schedule_str}", {self.description}'
+		
+class Profile(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+	timezone = TimeZoneField(default='UTC')

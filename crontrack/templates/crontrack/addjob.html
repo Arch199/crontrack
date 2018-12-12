@@ -4,30 +4,30 @@
 
 {% block content %}
 	<div class="hcenter">
-		<h3>Add a new job</h3>
+		<h2>Add a new job</h2>
 		{% if user.is_authenticated %}
 			<form action="{% url 'crontrack:add_job' %}" method="post">
 				{% csrf_token %}
 				<table class="form">
 					<tr>
-						<td>Job name</td>
-						<td><input type="text" name="name" value="{{ prefill.name }}"></td>
+						<td><label for="name">Job name</label></td>
+						<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
 					</tr>
 					<tr>
-						<td>Cron schedule string</td>
-						<td><input type="text" name="schedule_str" value="{{ prefill.schedule_str }}"></td>
+						<td><label for="schedule_str">Cron schedule string</label></td>
+						<td><input type="text" name="schedule_str" id="schedule_str" value="{{ prefill.schedule_str }}"></td>
 					</tr>
 					<tr>
-						<td>Time window (minutes)</td>
-						<td><input type="number" name="time_window" value="{{ prefill.time_window }}"></td>
+						<td><label for="time_window">Time window (minutes)</label></td>
+						<td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
 					</tr>
 					<tr>
-						<td>Description (optional)</td>
-						<td><textarea name="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
+						<td><label for="description">Description (optional)</label></td>
+						<td><textarea name="description" id="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
 						<!-- TODO: should really define maxlength this as a constant somewhere -->
 					<tfoot>
 						<tr>
-							<td>Your timezone: [TODO]</td>
+							<td><label>Your timezone: [TODO]</label></td>
 							<td><input type="submit" value="Add job"></td>
 						</tr>
 					</tfoot>

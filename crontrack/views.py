@@ -1,16 +1,16 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-
 from django.contrib.auth.forms import UserCreationForm  # from https://wsvincent.com/django-user-authentication-tutorial-signup/
-#from django.urls import reverse_lazy
 from django.views import generic
+from django.core.exceptions import ValidationError
 
 from croniter import croniter, CroniterBadCronError  # see https://pypi.org/project/croniter/#usage
-from datetime import datetime
 
-from .models import Job
+from .models import Job, User, Profile
 
 def index(request):
 	return render(request, 'crontrack/index.html')
@@ -51,11 +51,26 @@ def add_job(request):
 		return render(request, 'crontrack/addjob.html')
 
 def profile(request):
-	if request.method == 'POST':
-		# Update profile settings
+	context = {}
+	if request.method == 'POST' and request.user.is_authenticated:
+		context['prefill'] = request.POST
 		
-	elif request.user.is_authenticated:
-		context = {}#{'prefill': ''}
+		# Update profile settings
+		try:
+			profile = User.objects.get(pk=request.user.id).profile
+			#print("profile type",type(profile))
+			#print('profile:',profile)
+		except Profile.DoesNotExist:
+			profile = Profile(user=request.user)
+		
+		try:
+			profile.timezone = request.POST['timezone']
+			profile.full_clean()
+			profile.save()
+			context['success_message'] = "Account settings updated."
+		except ValidationError:
+			context['error_message'] = "invalid timezone; please select from the list"
+
 	return render(request, 'registration/profile.html', context)
 
 class Register(generic.CreateView):  # TODO: consider making a separate accounts app for this stuff

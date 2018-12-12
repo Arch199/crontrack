@@ -4,33 +4,44 @@ body {
 	background-color: #505058;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
 	text-align: center;
 }
 
-input {
-	font-size: 14px;
-	padding: 5px;
+a {
+	color: black;
 }
 
-select, input {
+input, textarea, a.button {
+	font-size: 14px;
+	padding: 5px;
+	border-width: 2px;
+	border-style: inset;
+	border-color: #ccc;
+}
+
+input, textarea, a.button, select, datalist, option {
 	background-color: #393946; /* #444; for non-blue gray */
 	color: white;
 }
 
-input[type="submit"] {
+input[type="submit"], a.button {
 	font-weight: bold;
 	padding: 8px;
 	border-radius: 16px;
 	cursor: pointer;
-	transition-duration: 0.5s;
+	transition-duration: 0.4s;
+	
+	display: inline-block;
+	border: 1px solid black;
+	width: auto;
+	text-decoration: none;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover, a.button:hover {
 	background-color: white;
 	color: #393946;
 }
-
 
 /* --- Site page top bar --- */
 .topBar {
@@ -67,11 +78,12 @@ input[type="submit"]:hover {
 	left: 50%;
 	transform: translate(-50%, -50%);
 	padding: 50px;
+	padding-top: 25px;
 	background-color: #c3c3c3;
-	border-radius: 100px;
-	box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.5);
-	-webkit-box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.5);
-	-moz-box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.5);
+	border-radius: 50px;
+	box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
 }
 
 
@@ -101,14 +113,17 @@ table.dbRows td, table.dbRows th {
 }
 
 table.dbRows th {
-	background-color: gray;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-	-webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-	-moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	position: relative;
+	background-color: #333;
+	color: white;
+	box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
+	-moz-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
 }
 
 table.dbRows td {
 	text-align: center;
+	background-color: #bbb;
 }
 
 
@@ -117,13 +132,17 @@ table.form {
 	text-align: right;
 }
 
-table.form td {
-	padding: 10px;
-	vertical-align: top;
-}
-
 table.form tfoot {
 	text-align: center;
+}
+
+table.form td {
+	padding: 10px;
+	vertical-align: middle;
+}
+
+table.form label {
+	color: white;
 }
 
 table.form input[type="text"],
@@ -138,6 +157,7 @@ table.form textarea {
 	height: 100px;
 }
 
+
 /* --- Login --- */
 form.login {
 	text-align: center;
@@ -145,3 +165,12 @@ form.login {
 	padding-left: 30px;
 	padding-right: 30px;
 }
+
+
+/* --- Class overrides --- */
+
+/* TODO: remove this (not currently in use) */
+.dark, .dark a {
+	background-color: #393946; /* #444; for non-blue gray */
+	color: white;
+}  /* same as one of the global styles (for buttons, input, textarea, etc.) */

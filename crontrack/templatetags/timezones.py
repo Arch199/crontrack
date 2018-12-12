@@ -7,9 +7,8 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 @register.simple_tag
-def timezone_select(prefill):
-	my_timezone = dict(prefill).get('timezone', 'UTC')
-	result = '<input name="timezone" list="timezoneList">'
+def timezone_selector(my_timezone):
+	result = f'<input name="timezone" list="timezoneList" placeholder="Country/City" value="{my_timezone}">'
 	result += '<datalist id="timezoneList">'
 	
 	for tz in all_timezones:

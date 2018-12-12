@@ -4,33 +4,35 @@
 
 {% block content %}
 	<div class="hcenter">
-		<h3>View running jobs</h3>
+		<h2>View running jobs</h2>
 		{% if user.is_authenticated %}
 			{% if jobs %}
 				<table class="dbRows">
-					<tr>
+					<thead><tr>
 						<th>ID</th>
 						<th>Name</th>
 						<th>Cron Schedule String</th>
 						<th>Time Window (min)</th>
 						<th>Next Run Time</th>
 						<th>Last Notified</th>
-					</tr>
-					{% for job in jobs %}
-						<tr>
-							<td>{{ job.id }}</td>
-							<td>{{ job.name }}</td>
-							<td>{{ job.schedule_str }}</td>
-							<td>{{ job.time_window }}</td>
-							<td>{{ job.next_run }}</td>
-							<td>{{ job.last_notified }}</td>
-						</tr>
-					{% endfor %}
+					</tr></thead>
+					<tbody>
+						{% for job in jobs %}
+							<tr>
+								<td>{{ job.id }}</td>
+								<td>{{ job.name }}</td>
+								<td>{{ job.schedule_str }}</td>
+								<td>{{ job.time_window }}</td>
+								<td>{{ job.next_run }}</td>
+								<td>{{ job.last_notified }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
 				</table>
 			{% else %}
 				<p>No jobs to view.</p>
 			{% endif %}
-			<br><a href="{% url 'crontrack:add_job' %}">Add a new job</a>
+			<br><a href="{% url 'crontrack:add_job' %}" class="button">Add a new job</a>
 		{% else %}
 			<p>You are not logged in.</p>
 			<a href="{% url 'crontrack:login' %}">Log in</a>

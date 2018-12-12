@@ -11,7 +11,7 @@
 			<a href="{% url 'crontrack:index' %}"><b>CronTrack</b></a>
 			<span>
 				{% if user.is_authenticated %}
-					Logged in as <b>{{ user.username }}</b>.
+					Logged in as <b>{{ user.username }}</b>. 
 					<a href="{% url 'crontrack:view_jobs' %}">View jobs</a> | 
 					<a href="{% url 'crontrack:add_job' %}">Add job</a> | 
 					<a href="{% url 'crontrack:profile' %}">Profile</a> | 
