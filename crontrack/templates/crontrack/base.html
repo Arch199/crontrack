@@ -8,13 +8,17 @@
 	</head>
 	<body>
 		<div class="topBar">
-			<b>CronTrack</b>
+			<a href="{% url 'crontrack:index' %}"><b>CronTrack</b></a>
 			<span>
 				{% if user.is_authenticated %}
 					Logged in as <b>{{ user.username }}</b>.
+					<a href="{% url 'crontrack:view_jobs' %}">View jobs</a> | 
+					<a href="{% url 'crontrack:add_job' %}">Add job</a> | 
+					<a href="{% url 'crontrack:profile' %}">Profile</a> | 
 					<a href="{% url 'crontrack:logout' %}">Log out</a>
 				{% else %}
-					<a href="{% url 'crontrack:login' %}">Log in</a>
+					<a href="{% url 'crontrack:login' %}">Log in</a> | 
+					<a href="{% url 'crontrack:register' %}">Register</a>
 				{% endif %}
 			</span>
 			</div>

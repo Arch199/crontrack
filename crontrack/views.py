@@ -24,6 +24,7 @@ def add_job(request):
 		# Logic to add the job
 		try:
 			job = Job(
+				user = request.user,
 				name=request.POST['name'],
 				schedule_str=request.POST['schedule_str'],
 				time_window=int(request.POST['time_window']),
@@ -50,7 +51,12 @@ def add_job(request):
 		return render(request, 'crontrack/addjob.html')
 
 def profile(request):
-	return render(request, 'registration/profile.html')
+	if request.method == 'POST':
+		# Update profile settings
+		
+	elif request.user.is_authenticated:
+		context = {}#{'prefill': ''}
+	return render(request, 'registration/profile.html', context)
 
 class Register(generic.CreateView):  # TODO: consider making a separate accounts app for this stuff
 	form_class = UserCreationForm
