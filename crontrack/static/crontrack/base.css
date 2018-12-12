@@ -6,6 +6,7 @@ body {
 
 h1, h2, h3, h4 {
 	text-align: center;
+	text-shadow: 1px 1px gray;
 }
 
 a {
@@ -108,8 +109,21 @@ table.dbRows {
 	border-collapse: collapse;
 }
 
+table.dbRows tr {
+	background-color: #ccc;
+	transition-duration: 0.3s;
+}
+
+table.dbRows tr:hover {
+	background-color: #999;
+}
+
 table.dbRows td, table.dbRows th {
 	padding: 10px;
+}
+
+table.dbRows td {
+	text-align: center;
 }
 
 table.dbRows th {
@@ -121,19 +135,10 @@ table.dbRows th {
 	-moz-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
 }
 
-table.dbRows td {
-	text-align: center;
-	background-color: #bbb;
-}
-
 
 /* --- Table for basic forms --- */
 table.form {
 	text-align: right;
-}
-
-table.form tfoot {
-	text-align: center;
 }
 
 table.form td {
@@ -164,6 +169,14 @@ form.login {
 	line-height: 3em;
 	padding-left: 30px;
 	padding-right: 30px;
+}
+
+
+/* --- Small note text --- */
+.note, .note a {
+	color: #999;
+	font-size: 14px;
+	text-decoration: italic;
 }
 
 

@@ -1,5 +1,7 @@
 {% extends 'crontrack/base.html' %}
 
+{% load timezones %}
+
 {% block title %} Add a new job {% endblock %}
 
 {% block content %}
@@ -24,19 +26,15 @@
 					<tr>
 						<td><label for="description">Description (optional)</label></td>
 						<td><textarea name="description" id="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
-						<!-- TODO: should really define maxlength this as a constant somewhere -->
-					<tfoot>
-						<tr>
-							<td><label>Your timezone: [TODO]</label></td>
-							<td><input type="submit" value="Add job"></td>
-						</tr>
-					</tfoot>
+						<!-- TODO: should really define maxlength as a constant somewhere -->
+					<tr>
+						<td><label>Timezone</label></td>
+						<td>{% timezone_selector user.profile.timezone %}</td>
+					</tr>
 				</table>
+				<br><input type="submit" value="Add job">
 				{% if error_message %}
 					<br><p class="errorMessage">Error: {{ error_message }}.</p>
-				{% endif %}
-				{% if success_message %}
-					<br><p class="successMessage">{{ success_message }}</p> <!--- TODO: remove? -->
 				{% endif %}
 			</form>
 		{% else %}

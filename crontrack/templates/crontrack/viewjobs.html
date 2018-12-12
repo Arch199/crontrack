@@ -7,9 +7,12 @@
 		<h2>View running jobs</h2>
 		{% if user.is_authenticated %}
 			{% if jobs %}
+				<p class="note">
+					Currently displaying in timezone "{{ user.profile.timezone }}."
+					(<a href="{% url 'crontrack:profile' %}">change</a>)
+				</p>
 				<table class="dbRows">
 					<thead><tr>
-						<th>ID</th>
 						<th>Name</th>
 						<th>Cron Schedule String</th>
 						<th>Time Window (min)</th>
@@ -19,7 +22,6 @@
 					<tbody>
 						{% for job in jobs %}
 							<tr>
-								<td>{{ job.id }}</td>
 								<td>{{ job.name }}</td>
 								<td>{{ job.schedule_str }}</td>
 								<td>{{ job.time_window }}</td>

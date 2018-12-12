@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
-
 class CrontrackConfig(AppConfig):
-    name = 'crontrack'
+	name = 'crontrack'
+	
+	def ready(self):
+		import crontrack.signals
