@@ -1,45 +1,84 @@
 {% extends 'crontrack/base.html' %}
 
+{% load static %}
 {% load timezones %}
 
 {% block title %} Add a new job {% endblock %}
 
 {% block content %}
 	<div class="hcenter">
-		<h2>Add a new job</h2>
+		<h2>Add jobs</h2>
 		{% if user.is_authenticated %}
-			<form action="{% url 'crontrack:add_job' %}" method="post">
-				{% csrf_token %}
-				<table class="form">
-					<tr>
-						<td><label for="name">Job name</label></td>
-						<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
-					</tr>
-					<tr>
-						<td><label for="schedule_str">Cron schedule string</label></td>
-						<td><input type="text" name="schedule_str" id="schedule_str" value="{{ prefill.schedule_str }}"></td>
-					</tr>
-					<tr>
-						<td><label for="time_window">Time window (minutes)</label></td>
-						<td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
-					</tr>
-					<tr>
-						<td><label for="description">Description (optional)</label></td>
-						<td><textarea name="description" id="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
-						<!-- TODO: should really define maxlength as a constant somewhere -->
-					<tr>
-						<td><label>Timezone</label></td>
-						<td>{% timezone_selector user.profile.timezone %}</td>
-					</tr>
-				</table>
-				<br><input type="submit" value="Add job">
-				{% if error_message %}
-					<br><p class="errorMessage">Error: {{ error_message }}.</p>
-				{% endif %}
-			</form>
+			<div class="tab">
+				<button onclick="changeTab(event, 'Add single')" class="active">Add single</button>
+				<button onclick="changeTab(event, 'Add group')">Add group</button>
+			</div>
+			<div class="tabContent active" id="Add single">
+				<form action="{% url 'crontrack:add_job' %}" method="post">
+					{% csrf_token %}
+					<table class="form">
+						<tr>
+							<td><label for="name">Job name</label></td>
+							<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
+						</tr>
+						<tr>
+							<td><label for="schedule_str">Cron schedule string</label></td>
+							<td><input type="text" name="schedule_str" id="schedule_str" value="{{ prefill.schedule_str }}"></td>
+						</tr>
+						<tr>
+							<td><label for="time_window">Time window (minutes)</label></td>
+							<td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
+						</tr>
+						<tr>
+							<td><label for="description">Description (optional)</label></td>
+							<td><textarea name="description" id="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
+							<!-- TODO: should really define maxlength as a constant somewhere -->
+						<tr>
+							<td><label>Timezone</label></td>
+							<td>{% timezone_selector user.profile.timezone %}</td>
+						</tr>
+					</table>
+					<br><input type="submit" value="Add job">
+					{% if error_message %}
+						<br><p class="errorMessage">Error: {{ error_message }}.</p>
+					{% endif %}
+				</form>
+			</div>
+			<div class="tabContent" id="Add group">
+				<form action="{% url 'crontrack:add_job' %}" method="post">
+					{% csrf_token %}
+					<table class="form">
+						<tr>
+							<td><label for="name">Group name</label></td>
+							<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
+						</tr>
+						<tr>
+							<td><label for="schedule_str">Cron schedule strings (paste in)</label></td>
+							<td><textarea name="schedule_str" id="schedule_str" maxlength="200" value="{{ prefill.schedule_str }}"></textarea></td>
+						</tr>
+						<tr>
+							<td><label for="time_window">Time window (minutes)</label></td>
+							<td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
+						</tr>
+						<tr>
+							<td><label for="description">Group description (optional)</label></td>
+							<td><textarea name="description" id="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
+							<!-- TODO: should really define maxlength as a constant somewhere -->
+						<tr>
+							<td><label>Timezone</label></td>
+							<td>{% timezone_selector user.profile.timezone %}</td>
+						</tr>
+					</table>
+					<br><input type="submit" value="Add job group">
+					{% if error_message %}
+						<br><p class="errorMessage">Error: {{ error_message }}.</p>
+					{% endif %}
+				</form>
+			</div>
 		{% else %}
 			<p>You are not logged in.</p>
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
+	<script src="{% static 'crontrack/tab.js' %}"></script>
 {% endblock %}
