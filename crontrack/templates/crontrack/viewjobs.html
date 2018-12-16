@@ -18,7 +18,6 @@
 						<th>Time Window (min)</th>
 						<th>Next Run Time</th>
 						<th>Last Notified</th>
-						<th>UUID</th>
 					</tr></thead>
 					<tbody>
 						{% for job in jobs %}
@@ -28,7 +27,8 @@
 								<td>{{ job.time_window }}</td>
 								<td>{{ job.next_run }}</td>
 								<td>{{ job.last_notified }}</td>
-								<td>{{ job.id }}</td>
+								
+								<!-- TODO: add dropdown for description/UUID -->
 							</tr>
 						{% endfor %}
 					</tbody>

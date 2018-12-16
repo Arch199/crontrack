@@ -113,6 +113,7 @@ table.dbRows {
 table.dbRows tr {
 	background-color: #ccc;
 	transition-duration: 0.3s;
+	cursor: pointer;
 }
 
 table.dbRows tr:hover {
@@ -198,11 +199,12 @@ div.tab button.active {
 
 div.tabContent {
 	width: 540px;
-	height: 410px;
+	height: 435px;
 	display: none;
 	background-color: #ccc;
 	border: 1px solid #222;
 	padding: 20px;
+	padding-top: 10px;
 }
 
 div.tabContent.active {

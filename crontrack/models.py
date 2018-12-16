@@ -7,6 +7,10 @@ from timezone_field import TimeZoneField
 class JobGroup(models.Model):
 	name = models.CharField(max_length=50)
 	description = models.CharField(max_length=200, blank=True, default='')
+	user = models.ForeignKey(User, models.CASCADE)
+	
+	def __str__(self):
+		return f'{self.user}\'s {self.name}: {self.description}'
 
 class Job(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
