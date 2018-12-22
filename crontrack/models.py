@@ -24,7 +24,7 @@ class Job(models.Model):
 	group = models.ForeignKey(JobGroup, models.CASCADE, null=True)
 	
 	def __str__(self):
-		return f'{self.user}\'s {self.name}: "{self.schedule_str}", {self.description}'
+		return f'{self.user}\'s {self.name}: "{self.schedule_str}"'
 		
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)

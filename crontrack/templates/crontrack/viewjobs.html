@@ -1,12 +1,14 @@
 {% extends 'crontrack/base.html' %}
 
+{% load static %}
+
 {% block title %} View running jobs {% endblock %}
 
 {% block content %}
 	<div class="hcenter">
 		<h2>View running jobs</h2>
 		{% if user.is_authenticated %}
-			{% if jobs %}
+			{% if groups %}
 				<p class="note">
 					Currently displaying in timezone "{{ user.profile.timezone }}."
 					(<a href="{% url 'crontrack:profile' %}">change</a>)
@@ -19,19 +21,25 @@
 						<th>Next Run Time</th>
 						<th>Last Notified</th>
 					</tr></thead>
-					<tbody>
-						{% for job in jobs %}
-							<tr>
-								<td>{{ job.name }}</td>
-								<td>{{ job.schedule_str }}</td>
-								<td>{{ job.time_window }}</td>
-								<td>{{ job.next_run }}</td>
-								<td>{{ job.last_notified }}</td>
-								
-								<!-- TODO: add dropdown for description/UUID -->
-							</tr>
-						{% endfor %}
-					</tbody>
+					{% for group in groups %}
+						<tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">{{ group.name }}</td></tr>
+						<tbody class="rowGroupContent open">
+							{% if group.description %}
+								<tr><td colspan="5" class="rowGroupInfo">{{ group.description }}</td></tr>
+							{% endif %}
+							{% for job in group.jobs %}
+								<tr>
+									<td>{{ job.name }}</td>
+									<td>{{ job.schedule_str }}</td>
+									<td>{{ job.time_window }}</td>
+									<td>{{ job.next_run }}</td>
+									<td>{{ job.last_notified }}</td>
+									
+									<!-- TODO: add dropdown for description/UUID to each job -->
+								</tr>
+							{% endfor %}
+						</tbody>
+					{% endfor %}
 				</table>
 			{% else %}
 				<p>No jobs to view.</p>
@@ -42,4 +50,5 @@
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
+	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
 {% endblock %}

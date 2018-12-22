@@ -21,7 +21,11 @@ def index(request):
 
 def view_jobs(request):
 	timezone.activate(request.user.profile.timezone)
-	context = {'jobs': Job.objects.filter(user=request.user)}
+	my_jobs = Job.objects.filter(user=request.user)
+	my_groups = JobGroup.objects.filter(user=request.user)
+	context = {'groups': [{'name': g.name, 'description': g.description, 'jobs': my_jobs.filter(group=g)} for g in my_groups]}
+	context['groups'].append({'name': 'Ungrouped', 'jobs': my_jobs.filter(group__isnull=True)})
+	
 	return render(request, 'crontrack/viewjobs.html', context)
 
 def add_job(request):
