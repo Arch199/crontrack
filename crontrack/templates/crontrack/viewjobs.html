@@ -22,7 +22,14 @@
 						<th>Last Notified</th>
 					</tr></thead>
 					{% for group in groups %}
-						<tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">{{ group.name }}</td></tr>
+						<tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
+							<span>{{ group.name }}</span>
+							<form action="{% url 'crontrack:edit_group' %}" method="post">
+								{% csrf_token %}
+								<input type="hidden" name="group" value="{{ group.id|default:'None' }}">
+								<input type="submit" value="Edit group">
+							</form>
+						</td></tr>
 						<tbody class="rowGroupContent open">
 							{% if group.description %}
 								<tr><td colspan="5" class="rowGroupInfo">{{ group.description }}</td></tr>

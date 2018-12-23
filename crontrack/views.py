@@ -1,4 +1,6 @@
 from datetime import datetime
+from itertools import chain
+import re
 
 import pytz
 
@@ -21,17 +23,17 @@ def index(request):
 
 def view_jobs(request):
 	timezone.activate(request.user.profile.timezone)
-	my_jobs = Job.objects.filter(user=request.user)
-	my_groups = JobGroup.objects.filter(user=request.user)
-	context = {'groups': [{'name': g.name, 'description': g.description, 'jobs': my_jobs.filter(group=g)} for g in my_groups]}
-	context['groups'].append({'name': 'Ungrouped', 'jobs': my_jobs.filter(group__isnull=True)})
+	
+	ungrouped = ([get_group(request.user, None)])
+	grouped = (get_group(request.user, g) for g in JobGroup.objects.filter(user=request.user))
+	context = {'groups': chain(ungrouped, grouped)}
 	
 	return render(request, 'crontrack/viewjobs.html', context)
 
 def add_job(request):
 	if request.method == 'POST':
 		context = {'prefill': request.POST}
-		# Logic to add the job
+		#Logic to add the job
 		try:
 			now = datetime.now(tz=pytz.timezone(request.POST['timezone']))
 			
@@ -65,17 +67,23 @@ def add_job(request):
 							schedule_str=schedule_str,
 							time_window=int(request.POST['time_window']),
 							description=request.POST['description'],
-							next_run=croniter(schedule_str, now).get_next(datetime),  #problem: this returns a naive datetime (?)
+							next_run=croniter(schedule_str, now).get_next(datetime),
 							last_notified=now,  # TODO: change default last_notified to null, etc. ?
 							group=group,
 						)
 						if settings.DEBUG:
 							print("Adding new job:", job)
+						have_added_job = True
 						job.save()
 					if not have_added_job:
 						#We didn't get any jobs
 						context['error_message'] = "no valid jobs entered"
-						return HttpResponseRedirect('/crontrack/viewjobs')
+						#return HttpResponseRedirect('/crontrack/viewjobs')
+						return render(request, 'crontrack/addjob.html', context)
+					
+					#Group added successfully, open it up for editing
+					context = {'group': get_group(request.user, group)}
+					return render(request, 'crontrack/editgroup.html', context)
 			
 			#Otherwise, just add the single job
 			else:
@@ -90,22 +98,79 @@ def add_job(request):
 				)
 				if settings.DEBUG:
 					print("Adding new job:", job)
-				job.save()			
+				job.save()
+
+				return HttpResponseRedirect('/crontrack/viewjobs')
 		except KeyError:
 			context['error_message'] = "missing required field(s)"
-		#except ValueError:
+		except ValueError:
 			# hopefully this can only happen for the int() call on time window
-		#	context['error_message'] = "invalid time window"
-		#except (CroniterBadCronError, IndexError):
-		#	context['error_message'] = "invalid cron schedule string"
-		else:
-			#return HttpResponseRedirect(request.path_info, context) #<--doesn't keep request.POST in scope ?
-			return HttpResponseRedirect('/crontrack/viewjobs')
+			context['error_message'] = "invalid time window"
+		except (CroniterBadCronError, IndexError):
+			context['error_message'] = "invalid cron schedule string"
 		
 		return render(request, 'crontrack/addjob.html', context)
 	else:
 		return render(request, 'crontrack/addjob.html')
+		
+# ---- TODO: convert the context/error_message system to use django messages (?)
+# Also make sure to redirect after successfully dealing with post data to prevent duplicates
 
+def edit_group(request):
+	if request.method == 'POST' and request.user.is_authenticated:
+		timezone.activate(request.user.profile.timezone)
+		context = {'group': get_group(request.user, request.POST['group'])}
+		if 'edited' in request.POST:
+			#Submission after editing the group
+			#Process the edit then return to view all jobs
+			
+			#context = {key: request.POST[key] for key in request.POST if key != 'edited'}
+			# TODO: add some kind of prefill (with a form?)
+			
+			pattern = re.compile(r'^([0-9a-z\-]+)__')
+			already_edited = []
+			try:
+				for key in request.POST:
+					match = pattern.match(key)
+					if match:
+						job_id = match.group(1)
+						if job_id in already_edited:
+							continue
+						job = Job.objects.get(id=job_id)
+						assert job.user == request.user  # TODO: handle this better?
+						
+						with transaction.atomic():
+							job.name = request.POST[f'{job_id}__name']
+							job.schedule_str = request.POST[f'{job_id}__schedule_str']  # TODO: need to add Croniter validation
+							job.time_window = request.POST[f'{job_id}__time_window']
+							# --- TODO: add description and test this works --------------------------------
+							
+							# Note: removed this for being unecessary
+							"""tz = request.user.profile.timezone
+							format = '%Y-%m-%dT%H:%M'
+							job.last_notified = tz.localize(datetime.strptime(request.POST[f'{job_id}__last_notified'], format))
+							job.next_run = tz.localize(datetime.strptime(request.POST[f'{job_id}__next_run'], format))"""
+						
+							
+							# TODO: Add a form class for validation (this is seriously ugly as is)
+							# see https://docs.djangoproject.com/en/2.1/topics/forms/
+							
+							job.full_clean()
+							job.save()
+						
+						already_edited.append(job_id)
+				
+			except ValidationError:
+				context['error_message'] = "invalid data entered in one or more fields"
+			else:
+				return HttpResponseRedirect('/crontrack/viewjobs')
+			
+			return render(request, 'crontrack/editgroup.html', context)
+		else:
+			#First view of page with group to edit
+			return render(request, 'crontrack/editgroup.html', context)
+	return render(request, 'crontrack/editgroup.html')	
+		
 def profile(request):
 	context = {}
 	if request.method == 'POST' and request.user.is_authenticated:
@@ -135,3 +200,16 @@ class Register(generic.CreateView):  # TODO: consider making a separate accounts
 		new_user = authenticate(username=username, password=password)
 		login(self.request, new_user)
 		return valid
+		
+#Helper function for getting a user's job group information with their corresponding jobs
+def get_group(user_id, group):
+	if group is None or group == 'None':
+		jobs = Job.objects.filter(user=user_id, group__isnull=True)
+		return {'id': None, 'name': 'Ungrouped', 'description': '', 'jobs': jobs}
+	else:
+		if type(group) == str and group.isdigit():
+			#Group is an ID rather than an object
+			group = JobGroup.objects.get(user=user_id, id=group)
+		
+		jobs = Job.objects.filter(user=user_id, group=group.id)
+		return {'id': group.id, 'name': group.name, 'description': group.description, 'jobs': jobs}

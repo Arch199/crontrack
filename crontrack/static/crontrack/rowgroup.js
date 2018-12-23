@@ -1,5 +1,8 @@
 // Toggle opening or closing a rowGroup
 function toggleRowGroup(ev) {
+	// Ignore clicks on input elements
+	if (ev.target.tagName.toLowerCase() == 'input') return;
+	
 	// Find the next rowGroupContent object
 	var content = ev.currentTarget.parentNode.parentNode.nextElementSibling;
 	// ^ current node is <td>, parent 1 is <tr>, parent 2 is <tbody> 

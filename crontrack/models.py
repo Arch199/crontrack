@@ -21,7 +21,7 @@ class Job(models.Model):
 	last_notified = models.DateTimeField('last time notification received')
 	description = models.CharField(max_length=200, blank=True, default='')
 	user = models.ForeignKey(User, models.CASCADE)
-	group = models.ForeignKey(JobGroup, models.CASCADE, null=True)
+	group = models.ForeignKey(JobGroup, models.CASCADE, null=True, blank=True)
 	
 	def __str__(self):
 		return f'{self.user}\'s {self.name}: "{self.schedule_str}"'

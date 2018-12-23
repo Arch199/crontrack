@@ -93,11 +93,13 @@ input[type="submit"]:hover, a.button:hover {
 .errorMessage {
 	color: red;
 	font-weight: bold;
+	text-shadow: 1px 1px #222;
 }
 
 .successMessage {
 	color: green;
 	font-weight: bold;
+	text-shadow: 1px 1px #222;
 }
 
 
@@ -154,6 +156,32 @@ table.dbRows .rowGroupHeader {
 	transition-duration: inherit;
 }
 
+table.dbRows .rowGroupHeader span {
+	line-height: 120%;
+}
+
+table.dbRows .rowGroupHeader form {
+	float: right;
+	display: inline-block;
+}
+
+table.dbRows .rowGroupHeader input[type="submit"] {
+	font-size: 12px;
+	margin: 0;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	
+	/*color: #bbb;
+	font-style: normal;
+	font-weight: normal;
+	background: none !important;
+    border: none; 
+    padding: 0 !important;
+	text-decoration: underline;
+    cursor: pointer;*/
+	/* from https://stackoverflow.com/questions/1367409/how-to-make-button-look-like-a-link */
+}
+
 table.dbRows .rowGroupHeader.open {
 	background-color: #666;
 }
@@ -171,7 +199,7 @@ table.dbRows .rowGroupContent.open {
 }
 
 table.dbRows .rowGroupInfo {
-	background-color: #999;
+	background-color: #aaa;
 	color: #111;
 	font-size: 14px;
 	cursor: auto;
@@ -179,7 +207,7 @@ table.dbRows .rowGroupInfo {
 	padding-left: 25px;
 	padding-top: 5px;
 	padding-bottom: 5px;
-}	
+}
 
 
 /* --- Table for basic forms --- */

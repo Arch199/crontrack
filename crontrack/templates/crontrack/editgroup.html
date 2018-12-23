@@ -1,0 +1,63 @@
+{% extends 'crontrack/base.html' %}
+
+{% load static %}
+
+{% block title %} Edit a group of jobs {% endblock %}
+
+{% block content %}
+	<div class="hcenter">
+		<h2>Edit job group</h2>
+		{% if user.is_authenticated %}
+			{% if group %}
+				<p class="note">
+					Currently displaying in timezone "{{ user.profile.timezone }}."
+					(<a href="{% url 'crontrack:profile' %}">change</a>)
+				</p>
+				<form action="{% url 'crontrack:edit_group' %}" method="post">
+					{% csrf_token %}
+					<input type="hidden" name="edited">
+					<input type="hidden" name="group" value="{{ group.id }}">
+					<table class="dbRows">
+						<thead><tr>
+							<th>Name</th>
+							<th>Cron Schedule String</th>
+							<th>Time Window (min)</th>
+							<!--<th>Next Run Time</th>
+							<th>Last Notified</th>-->
+						</tr></thead>
+						<tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">{{ group.name }}</td></tr>
+						<tbody class="rowGroupContent open">
+							{% if group.description %}
+								<tr><td colspan="3" class="rowGroupInfo">{{ group.description }}</td></tr>
+							{% endif %}
+							{% for job in group.jobs %}
+								<tr>
+									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>
+									<td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
+									<td><input type="text" name="{{ job.id }}__time_window" value="{{ job.time_window }}"></td>
+									
+									<!-- Didn't need to add this: these fields shouldn't be user-editable
+									<td><input type="datetime-local" name="{{ job.id }}__next_run" value="{{ job.next_run|date:'Y-m-d\TH:i' }}"></td>
+									<td><input type="datetime-local" name="{{ job.id }}__last_notified" value="{{ job.last_notified|date:'Y-m-d\TH:i' }}"></td>
+									<!-- TODO: check if these datetime inputs actually take in input at the right time -->
+									
+									<!-- TODO: add dropdown for description/UUID to each job -->
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					<br><input type="submit" value="Confirm">
+				</form>
+				{% if error_message %}
+					<br><p class="errorMessage">Error: {{ error_message }}.</p>
+				{% endif %}
+			{% else %}
+				<p class="errorMessage">Error: the selected group does not exist.</p>
+			{% endif %}
+		{% else %}
+			<p>You are not logged in.</p>
+			<a href="{% url 'crontrack:login' %}">Log in</a>
+		{% endif %}
+	</div>
+	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
+{% endblock %}
