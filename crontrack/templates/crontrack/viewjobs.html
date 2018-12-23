@@ -40,7 +40,7 @@
 									<td>{{ job.schedule_str }}</td>
 									<td>{{ job.time_window }}</td>
 									<td>{{ job.next_run }}</td>
-									<td>{{ job.last_notified }}</td>
+									<td>{{ job.last_notified|default:'-' }}</td>
 									
 									<!-- TODO: add dropdown for description/UUID to each job -->
 								</tr>

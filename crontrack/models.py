@@ -18,7 +18,7 @@ class Job(models.Model):
 	name = models.CharField(max_length=50)
 	time_window = models.IntegerField('time window (minutes)', default=0)
 	next_run = models.DateTimeField('next time to run')
-	last_notified = models.DateTimeField('last time notification received')
+	last_notified = models.DateTimeField('last time notification received', null=True)
 	description = models.CharField(max_length=200, blank=True, default='')
 	user = models.ForeignKey(User, models.CASCADE)
 	group = models.ForeignKey(JobGroup, models.CASCADE, null=True, blank=True)

@@ -32,7 +32,7 @@
 						</tr>
 						<tr>
 							<td><label for="description">Description (optional)</label></td>
-							<td><textarea name="description" id="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
+							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
 							<!-- TODO: should really define maxlength as a constant somewhere -->
 						<tr>
 							<td><label>Timezone</label></td>
@@ -56,7 +56,7 @@
 						</tr>
 						<tr>
 							<td><label for="group_schedule">Cron schedule string(s)</label></td>
-							<td><textarea name="group_schedule" id="group_schedule" value="{{ prefill.group_schedule }}"></textarea></td>
+							<td><textarea name="group_schedule" id="group_schedule">{{ prefill.group_schedule }}</textarea></td>
 						</tr>
 						<tr>
 							<td><label for="time_window">Time window (minutes)</label></td>
@@ -64,7 +64,7 @@
 						</tr>
 						<tr>
 							<td><label for="description">Group description (optional)</label></td>
-							<td><textarea name="description" id="description" maxlength="200" value="{{ prefill.description }}"></textarea></td>
+							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
 							<!-- TODO: should really define maxlength as a constant somewhere -->
 						<tr>
 							<td><label>Timezone</label></td>

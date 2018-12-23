@@ -68,7 +68,6 @@ def add_job(request):
 							time_window=int(request.POST['time_window']),
 							description=request.POST['description'],
 							next_run=croniter(schedule_str, now).get_next(datetime),
-							last_notified=now,  # TODO: change default last_notified to null, etc. ?
 							group=group,
 						)
 						if settings.DEBUG:
@@ -93,8 +92,7 @@ def add_job(request):
 					schedule_str=request.POST['schedule_str'],
 					time_window=int(request.POST['time_window']),
 					description=request.POST['description'],
-					next_run=croniter(request.POST['schedule_str'], now).get_next(datetime),  #problem: this returns a naive datetime (?)
-					last_notified=now,  # TODO: change default last_notified to null, etc. ?
+					next_run=croniter(request.POST['schedule_str'], now).get_next(datetime),
 				)
 				if settings.DEBUG:
 					print("Adding new job:", job)
@@ -103,11 +101,11 @@ def add_job(request):
 				return HttpResponseRedirect('/crontrack/viewjobs')
 		except KeyError:
 			context['error_message'] = "missing required field(s)"
+		except (CroniterBadCronError, IndexError):
+			context['error_message'] = "invalid cron schedule string"
 		except ValueError:
 			# hopefully this can only happen for the int() call on time window
 			context['error_message'] = "invalid time window"
-		except (CroniterBadCronError, IndexError):
-			context['error_message'] = "invalid cron schedule string"
 		
 		return render(request, 'crontrack/addjob.html', context)
 	else:
