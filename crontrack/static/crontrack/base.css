@@ -29,6 +29,7 @@ input, textarea, a.button, select, datalist, option {
 
 input[type="submit"], input[type="button"], a.button {
 	font-weight: bold;
+	font-style: normal;
 	padding: 8px;
 	border-radius: 16px;
 	cursor: pointer;

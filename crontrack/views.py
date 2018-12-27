@@ -137,15 +137,12 @@ def edit_group(request):
 					return render(request, 'crontrack/editgroup.html', context)
 			
 			#Modify the jobs in the group
-			pattern = re.compile(r'^([0-9a-z\-]+)__')
-			already_edited = []
+			pattern = re.compile(r'^([0-9a-z\-]+)__name')
 			try:			
 				for key in request.POST:
 					match = pattern.match(key)
 					if match:
 						job_id = match.group(1)
-						if job_id in already_edited:
-							continue
 						job = Job.objects.get(id=job_id)
 						assert job.user == request.user  # TODO: handle this better?
 						
@@ -155,25 +152,27 @@ def edit_group(request):
 							job.time_window = int(request.POST[f'{job_id}__time_window'])
 							job.description = request.POST[f'{job_id}__description']
 							
+							#Cron validation for schedule string
+							if not croniter.is_valid(job.schedule_str):
+								raise CroniterBadCronError
+							
 							# Note: removed this for being unecessary
 							"""tz = request.user.profile.timezone
 							format = '%Y-%m-%dT%H:%M'
 							job.last_notified = tz.localize(datetime.strptime(request.POST[f'{job_id}__last_notified'], format))
 							job.next_run = tz.localize(datetime.strptime(request.POST[f'{job_id}__next_run'], format))"""
 						
-							
-							# TODO: Add a form class for validation (this is seriously ugly as is)
+							# TODO: Add a form class for validation (this is kinda ugly as is)
 							# see https://docs.djangoproject.com/en/2.1/topics/forms/
 							
 							job.full_clean()
 							job.save()
-						
-						already_edited.append(job_id)
-				
-			except ValueError:
-				context['error_message'] = "please enter a valid whole number for the time window"
+			except CroniterBadCronError:
+				context['error_message'] = "invalid cron schedule string"
 			except ValidationError:
 				context['error_message'] = "invalid data entered in one or more fields"
+			except ValueError:
+				context['error_message'] = "please enter a valid whole number for the time window"
 			else:
 				return HttpResponseRedirect('/crontrack/viewjobs')
 			

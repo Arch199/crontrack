@@ -36,6 +36,7 @@
 							
 							{% if group.id %}
 								<span class="right">
+									<a class="button" href="{% url 'crontrack:view_jobs' %}">Cancel</a>&nbsp;
 									<input type="button" value="Delete" onclick="deleteRowGroup(event, '{{ group.name }}')" class="danger">
 								</span>
 							{% endif %}
@@ -47,7 +48,7 @@
 								</td></tr>
 							{% endif %}
 							{% for job in group.jobs %}
-								<tr class="rowGroupItem" onclick="toggleRowGroupItem(event)">
+								<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)">
 									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>
 									<td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
 									<td><input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}"></td>
