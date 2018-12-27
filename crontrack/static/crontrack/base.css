@@ -27,7 +27,7 @@ input, textarea, a.button, select, datalist, option {
 	color: white;
 }
 
-input[type="submit"], a.button {
+input[type="submit"], input[type="button"], a.button, button {
 	font-weight: bold;
 	padding: 8px;
 	border-radius: 16px;
@@ -40,9 +40,20 @@ input[type="submit"], a.button {
 	text-decoration: none;
 }
 
-input[type="submit"]:hover, a.button:hover {
+input[type="submit"]:hover, input[type="button"]:hover, a.button:hover, button:hover {
 	background-color: white;
 	color: #393946;
+}
+
+/* Danger button (for deleting things, etc.) */
+input[type="submit"].danger, input[type="button"].danger, a.button.danger, button.danger {
+	background-color: #393946;
+	color: #FF1010;
+}
+
+input[type="submit"].danger:hover, input[type="button"].danger:hover, a.button.danger:hover, button.danger:hover {
+	background-color: #FF1010;
+	color: #222;
 }
 
 /* --- Site page top bar --- */
@@ -160,12 +171,15 @@ table.dbRows .rowGroupHeader span {
 	line-height: 120%;
 }
 
-table.dbRows .rowGroupHeader form {
+table.dbRows .rowGroupHeader .right {
 	float: right;
 	display: inline-block;
+	height: 100%;
+	line-height: 100%;
 }
 
-table.dbRows .rowGroupHeader input[type="submit"] {
+table.dbRows .rowGroupHeader input[type="submit"],
+table.dbRows .rowGroupHeader input[type="button"]:not(.danger) {
 	font-size: 12px;
 	margin: 0;
 	padding-top: 3px;
@@ -180,6 +194,13 @@ table.dbRows .rowGroupHeader input[type="submit"] {
 	text-decoration: underline;
     cursor: pointer;*/
 	/* from https://stackoverflow.com/questions/1367409/how-to-make-button-look-like-a-link */
+}
+
+table.dbRows .rowGroupHeader input[type="text"] {
+	font-size: 16px;
+	font-weight: bold;
+	font-style: italic;
+	color: black;
 }
 
 table.dbRows .rowGroupHeader.open {
@@ -204,9 +225,17 @@ table.dbRows .rowGroupInfo {
 	font-size: 14px;
 	cursor: auto;
 	text-align: left;
-	padding-left: 25px;
-	padding-top: 5px;
-	padding-bottom: 5px;
+}
+
+table.dbRows .rowGroupInfo p {
+	margin-left: 25px;
+	margin-top: 1px;
+	margin-bottom: 1px;
+}
+
+table.dbRows .rowGroupInfo textarea {
+	width: 100%;
+	box-sizing: border-box;
 }
 
 

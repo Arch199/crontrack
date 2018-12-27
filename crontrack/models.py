@@ -18,10 +18,12 @@ class Job(models.Model):
 	name = models.CharField(max_length=50)
 	time_window = models.IntegerField('time window (minutes)', default=0)
 	next_run = models.DateTimeField('next time to run')
-	last_notified = models.DateTimeField('last time notification received', null=True)
+	last_notified = models.DateTimeField('last time notification received', null=True, blank=True)
 	description = models.CharField(max_length=200, blank=True, default='')
 	user = models.ForeignKey(User, models.CASCADE)
 	group = models.ForeignKey(JobGroup, models.CASCADE, null=True, blank=True)
+	
+	# TODO: add last alert sent field
 	
 	def __str__(self):
 		return f'{self.user}\'s {self.name}: "{self.schedule_str}"'
@@ -29,3 +31,5 @@ class Job(models.Model):
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 	timezone = TimeZoneField(default='UTC')
+	
+	# TODO: add alert gap field (or should this be for each job?)

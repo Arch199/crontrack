@@ -24,7 +24,7 @@
 					{% for group in groups %}
 						<tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
 							<span>{{ group.name }}</span>
-							<form action="{% url 'crontrack:edit_group' %}" method="post">
+							<form action="{% url 'crontrack:edit_group' %}" method="post" class="right">
 								{% csrf_token %}
 								<input type="hidden" name="group" value="{{ group.id|default:'None' }}">
 								<input type="submit" value="Edit group">
@@ -32,7 +32,7 @@
 						</td></tr>
 						<tbody class="rowGroupContent open">
 							{% if group.description %}
-								<tr><td colspan="5" class="rowGroupInfo">{{ group.description }}</td></tr>
+								<tr><td colspan="5" class="rowGroupInfo"><p>{{ group.description }}</p></td></tr>
 							{% endif %}
 							{% for job in group.jobs %}
 								<tr>

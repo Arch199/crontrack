@@ -13,6 +13,10 @@
 					Currently displaying in timezone "{{ user.profile.timezone }}."
 					(<a href="{% url 'crontrack:profile' %}">change</a>)
 				</p>
+				<form action="{% url 'crontrack:delete_group' %}" method="post" id="deleteForm">
+					{% csrf_token %}
+					<input type="hidden" name="group" value="{{ group.id }}">
+				</form>
 				<form action="{% url 'crontrack:edit_group' %}" method="post">
 					{% csrf_token %}
 					<input type="hidden" name="edited">
@@ -25,16 +29,28 @@
 							<!--<th>Next Run Time</th>
 							<th>Last Notified</th>-->
 						</tr></thead>
-						<tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">{{ group.name }}</td></tr>
+						<tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
+							<span><input type="text" name="group_name" value="{{ group.name }}" size="50" maxlength="50"></span>
+							
+							<!-- ^THIS 50 is a magic number and should be burnt with fire -- I need to make a constants field and pass it into the template -->
+							
+							{% if group.id %}
+								<span class="right">
+									<input type="button" value="Delete" onclick="deleteRowGroup(event, '{{ group.name }}')" class="danger">
+								</span>
+							{% endif %}
+						</td></tr>
 						<tbody class="rowGroupContent open">
 							{% if group.description %}
-								<tr><td colspan="3" class="rowGroupInfo">{{ group.description }}</td></tr>
+								<tr><td colspan="3" class="rowGroupInfo">
+									<textarea name="description" maxlength="200">{{ group.description }}</textarea>
+								</td></tr>
 							{% endif %}
 							{% for job in group.jobs %}
 								<tr>
 									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>
 									<td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
-									<td><input type="text" name="{{ job.id }}__time_window" value="{{ job.time_window }}"></td>
+									<td><input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}"></td>
 									
 									<!-- Didn't need to add this: these fields shouldn't be user-editable
 									<td><input type="datetime-local" name="{{ job.id }}__next_run" value="{{ job.next_run|date:'Y-m-d\TH:i' }}"></td>
@@ -46,7 +62,8 @@
 							{% endfor %}
 						</tbody>
 					</table>
-					<br><input type="submit" value="Confirm">
+					<br>
+					<input type="submit" value="Confirm">
 				</form>
 				{% if error_message %}
 					<br><p class="errorMessage">Error: {{ error_message }}.</p>

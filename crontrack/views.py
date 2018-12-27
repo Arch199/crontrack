@@ -125,9 +125,21 @@ def edit_group(request):
 			#context = {key: request.POST[key] for key in request.POST if key != 'edited'}
 			# TODO: add some kind of prefill (with a form?)
 			
+			#Rename the group
+			try:
+				group = JobGroup.objects.get(pk=request.POST['group'], user=request.user)
+				with transaction.atomic():
+					group.name = request.POST['group_name']
+					group.full_clean()
+					group.save()
+			except ValidationError:
+				context['error_message'] = f"invalid group name '{request.POST['group_name']}'"
+				return render(request, 'crontrack/editgroup.html', context)
+			
+			#Modify the jobs in the group
 			pattern = re.compile(r'^([0-9a-z\-]+)__')
 			already_edited = []
-			try:
+			try:			
 				for key in request.POST:
 					match = pattern.match(key)
 					if match:
@@ -140,7 +152,7 @@ def edit_group(request):
 						with transaction.atomic():
 							job.name = request.POST[f'{job_id}__name']
 							job.schedule_str = request.POST[f'{job_id}__schedule_str']  # TODO: need to add Croniter validation
-							job.time_window = request.POST[f'{job_id}__time_window']
+							job.time_window = int(request.POST[f'{job_id}__time_window'])
 							# --- TODO: add description and test this works --------------------------------
 							
 							# Note: removed this for being unecessary
@@ -158,6 +170,8 @@ def edit_group(request):
 						
 						already_edited.append(job_id)
 				
+			except ValueError:
+				context['error_message'] = "please enter a valid whole number for the time window"
 			except ValidationError:
 				context['error_message'] = "invalid data entered in one or more fields"
 			else:
@@ -168,7 +182,17 @@ def edit_group(request):
 			#First view of page with group to edit
 			return render(request, 'crontrack/editgroup.html', context)
 	return render(request, 'crontrack/editgroup.html')	
-		
+
+def delete_group(request):
+	if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
+		try:
+			group = JobGroup.objects.get(pk=request.POST['group'], user=request.user)
+			group.delete()
+		except JobGroup.DoesNotExist:
+			print(f"ERROR: Tried to delete job group with id '{request.POST['group']}' and it didn't exist (or didn't belong to the user '{request.user.username}')")
+	
+	return HttpResponseRedirect('/crontrack/viewjobs')
+
 def profile(request):
 	context = {}
 	if request.method == 'POST' and request.user.is_authenticated:
