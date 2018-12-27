@@ -47,7 +47,7 @@
 								</td></tr>
 							{% endif %}
 							{% for job in group.jobs %}
-								<tr>
+								<tr class="rowGroupItem" onclick="toggleRowGroupItem(event)">
 									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>
 									<td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
 									<td><input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}"></td>
@@ -58,6 +58,11 @@
 									<!-- TODO: check if these datetime inputs actually take in input at the right time -->
 									
 									<!-- TODO: add dropdown for description/UUID to each job -->
+								</tr>
+								<tr class="rowGroupItemInfo">
+									<td colspan="5">
+										<textarea name="{{ job.id }}__description" maxlength="200">{{ job.description }}</textarea>
+									</td>
 								</tr>
 							{% endfor %}
 						</tbody>

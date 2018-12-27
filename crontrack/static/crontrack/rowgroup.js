@@ -13,12 +13,34 @@ function toggleRowGroup(ev) {
 	}
 	
 	// Toggle being open or closed
-	if (ev.currentTarget.className.includes(' open')) {
-		ev.currentTarget.className = ev.currentTarget.className.replace(' open', '');
-		content.className = content.className.replace(' open', '');
+	toggleOpen(ev.currentTarget, [content]);
+}
+
+// Toggle opening or closing a rowGroupItem
+function toggleRowGroupItem(ev) {
+	// Ignore clicks on input elements
+	if (ev.target.tagName.toLowerCase() == 'input') return;
+	
+	// Find the next rowGroupItemInfo object
+	var info = ev.currentTarget.nextElementSibling;
+	if (!info.className.includes('rowGroupItemInfo')) return;
+	
+	// Toggle being open or closed
+	toggleOpen(ev.currentTarget, [info]);
+}
+
+// Generic helper function for toggling open/closed
+function toggleOpen(leader, others=[]) {	
+	if (leader.className.includes(' open')) {
+		leader.className = leader.className.replace(' open', '');
+		others.forEach(function(item) {
+			item.className = item.className.replace(' open', '')
+		});
 	} else {
-		ev.currentTarget.className += ' open';
-		content.className += ' open';
+		leader.className += ' open';
+		others.forEach(function(item) {
+			item.className += ' open';
+		});
 	}
 }
 

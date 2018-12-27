@@ -27,7 +27,7 @@ input, textarea, a.button, select, datalist, option {
 	color: white;
 }
 
-input[type="submit"], input[type="button"], a.button, button {
+input[type="submit"], input[type="button"], a.button {
 	font-weight: bold;
 	padding: 8px;
 	border-radius: 16px;
@@ -40,18 +40,18 @@ input[type="submit"], input[type="button"], a.button, button {
 	text-decoration: none;
 }
 
-input[type="submit"]:hover, input[type="button"]:hover, a.button:hover, button:hover {
+input[type="submit"]:hover, input[type="button"]:hover, a.button:hover {
 	background-color: white;
 	color: #393946;
 }
 
 /* Danger button (for deleting things, etc.) */
-input[type="submit"].danger, input[type="button"].danger, a.button.danger, button.danger {
+input[type="submit"].danger, input[type="button"].danger, a.button.danger {
 	background-color: #393946;
 	color: #FF1010;
 }
 
-input[type="submit"].danger:hover, input[type="button"].danger:hover, a.button.danger:hover, button.danger:hover {
+input[type="submit"].danger:hover, input[type="button"].danger:hover, a.button.danger:hover {
 	background-color: #FF1010;
 	color: #222;
 }
@@ -172,14 +172,14 @@ table.dbRows .rowGroupHeader span {
 }
 
 table.dbRows .rowGroupHeader .right {
+	position: relative;
 	float: right;
 	display: inline-block;
 	height: 100%;
 	line-height: 100%;
 }
 
-table.dbRows .rowGroupHeader input[type="submit"],
-table.dbRows .rowGroupHeader input[type="button"]:not(.danger) {
+table.dbRows .rowGroupHeader input[type="submit"] {
 	font-size: 12px;
 	margin: 0;
 	padding-top: 3px;
@@ -219,7 +219,7 @@ table.dbRows .rowGroupContent.open {
 	display: table-row-group;
 }
 
-table.dbRows .rowGroupInfo {
+table.dbRows .rowGroupInfo, table.dbRows .rowGroupItemInfo {
 	background-color: #aaa;
 	color: #111;
 	font-size: 14px;
@@ -227,15 +227,34 @@ table.dbRows .rowGroupInfo {
 	text-align: left;
 }
 
-table.dbRows .rowGroupInfo p {
+table.dbRows .rowGroupInfo p,
+table.dbRows .rowGroupItemInfo p {
+	text-align: left;
 	margin-left: 25px;
 	margin-top: 1px;
 	margin-bottom: 1px;
 }
 
-table.dbRows .rowGroupInfo textarea {
+table.dbRows .rowGroupContent textarea {
 	width: 100%;
 	box-sizing: border-box;
+}
+
+table.dbRows .rowGroupItemInfo, table.dbRows .rowGroupItemInfo:hover {
+	display: none;
+	background-color: #bdbdbd;
+}
+
+table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
+	display: table-row;
+}
+
+table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box in job descriptions */
+	float: right;
+	padding: 1px;
+	border: 2px groove #ccc;
+	font-family: 'Courier New', monospace;
+	font-size: 13px;
 }
 
 

@@ -35,7 +35,7 @@
 								<tr><td colspan="5" class="rowGroupInfo"><p>{{ group.description }}</p></td></tr>
 							{% endif %}
 							{% for job in group.jobs %}
-								<tr>
+								<tr class="rowGroupItem" onclick="toggleRowGroupItem(event)">
 									<td>{{ job.name }}</td>
 									<td>{{ job.schedule_str }}</td>
 									<td>{{ job.time_window }}</td>
@@ -43,6 +43,12 @@
 									<td>{{ job.last_notified|default:'-' }}</td>
 									
 									<!-- TODO: add dropdown for description/UUID to each job -->
+								</tr>
+								<tr class="rowGroupItemInfo">
+									<td colspan="5"><p>
+										<span class="right">UUID: <b>{{ job.id|default:'No description...' }}</b></span>
+										{{ job.description }}
+									</p></td>
 								</tr>
 							{% endfor %}
 						</tbody>

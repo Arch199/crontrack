@@ -66,7 +66,6 @@ def add_job(request):
 							name=job_name,
 							schedule_str=schedule_str,
 							time_window=int(request.POST['time_window']),
-							description=request.POST['description'],
 							next_run=croniter(schedule_str, now).get_next(datetime),
 							group=group,
 						)
@@ -126,15 +125,16 @@ def edit_group(request):
 			# TODO: add some kind of prefill (with a form?)
 			
 			#Rename the group
-			try:
-				group = JobGroup.objects.get(pk=request.POST['group'], user=request.user)
-				with transaction.atomic():
-					group.name = request.POST['group_name']
-					group.full_clean()
-					group.save()
-			except ValidationError:
-				context['error_message'] = f"invalid group name '{request.POST['group_name']}'"
-				return render(request, 'crontrack/editgroup.html', context)
+			if request.POST['group'] != 'None':
+				try:
+					group = JobGroup.objects.get(pk=request.POST['group'], user=request.user)
+					with transaction.atomic():
+						group.name = request.POST['group_name']
+						group.full_clean()
+						group.save()
+				except ValidationError:
+					context['error_message'] = f"invalid group name '{request.POST['group_name']}'"
+					return render(request, 'crontrack/editgroup.html', context)
 			
 			#Modify the jobs in the group
 			pattern = re.compile(r'^([0-9a-z\-]+)__')
@@ -153,7 +153,7 @@ def edit_group(request):
 							job.name = request.POST[f'{job_id}__name']
 							job.schedule_str = request.POST[f'{job_id}__schedule_str']  # TODO: need to add Croniter validation
 							job.time_window = int(request.POST[f'{job_id}__time_window'])
-							# --- TODO: add description and test this works --------------------------------
+							job.description = request.POST[f'{job_id}__description']
 							
 							# Note: removed this for being unecessary
 							"""tz = request.user.profile.timezone
