@@ -140,6 +140,7 @@ table.dbRows tr:hover {
 }
 
 table.dbRows td, table.dbRows th {
+	position: relative;
 	padding: 10px;
 }
 
@@ -148,13 +149,17 @@ table.dbRows td {
 }
 
 table.dbRows th {
-	position: relative;
 	background-color: #333;
 	color: white;
 	font-size: 16px;
 	box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
 	-webkit-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
 	-moz-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
+}
+
+table.dbRows .float {
+	position: absolute;
+	left: 103%;
 }
 
 /* Row Groups */

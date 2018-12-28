@@ -13,10 +13,16 @@
 					Currently displaying in timezone "{{ user.profile.timezone }}."
 					(<a href="{% url 'crontrack:profile' %}">change</a>)
 				</p>
-				<form action="{% url 'crontrack:delete_group' %}" method="post" id="deleteForm">
+				<form action="{% url 'crontrack:delete_group' %}" method="post" id="deleteRowGroupForm">
 					{% csrf_token %}
 					<input type="hidden" name="group" value="{{ group.id }}">
 				</form>
+				<form action="{% url 'crontrack:delete_job' %}" method="post" id="deleteRowGroupItemForm">
+					{% csrf_token %}
+					<input type="hidden" name="job" id="deleteRowGroupItemInput">
+				</form>
+				<!-- TODO: remove this second form -->
+				
 				<form action="{% url 'crontrack:edit_group' %}" method="post">
 					{% csrf_token %}
 					<input type="hidden" name="edited">
@@ -37,7 +43,7 @@
 							{% if group.id %}
 								<span class="right">
 									<a class="button" href="{% url 'crontrack:view_jobs' %}">Cancel</a>&nbsp;
-									<input type="button" value="Delete" onclick="deleteRowGroup(event, '{{ group.name }}')" class="danger">
+									<input type="button" value="Delete" onclick="deleteRowGroup(event,'{{ group.name }}')" class="danger">
 								</span>
 							{% endif %}
 						</td></tr>
@@ -48,17 +54,18 @@
 								</td></tr>
 							{% endif %}
 							{% for job in group.jobs %}
-								<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)">
+								<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="{{ job.id }}">
 									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>
 									<td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
-									<td><input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}"></td>
+									<td>
+										<input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}">
+										<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')" my-url="{% url 'crontrack:delete_job' %}" class="danger float">
+									</td>
 									
 									<!-- Didn't need to add this: these fields shouldn't be user-editable
 									<td><input type="datetime-local" name="{{ job.id }}__next_run" value="{{ job.next_run|date:'Y-m-d\TH:i' }}"></td>
 									<td><input type="datetime-local" name="{{ job.id }}__last_notified" value="{{ job.last_notified|date:'Y-m-d\TH:i' }}"></td>
 									<!-- TODO: check if these datetime inputs actually take in input at the right time -->
-									
-									<!-- TODO: add dropdown for description/UUID to each job -->
 								</tr>
 								<tr class="rowGroupItemInfo">
 									<td colspan="5">
@@ -82,5 +89,8 @@
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
+	<script src="{% static 'lib/jquery.js' %}"></script>
+	<script src="{% static 'lib/js.cookie.js' %}"></script>
+	<script src="{% static 'crontrack/setup.js' %}"></script>
 	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
 {% endblock %}

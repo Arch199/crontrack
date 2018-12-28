@@ -2,6 +2,7 @@ crontrack/__pycache__/
 crontrack/admin.py
 crontrack/migrations/__pycache__/
 crontrack/templatetags/__pycache__/
+crontrack/static/lib/
 crontrack/tests.py
 crontrack_site/
 manage.py

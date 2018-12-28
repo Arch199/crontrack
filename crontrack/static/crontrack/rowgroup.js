@@ -48,6 +48,28 @@ function toggleOpen(leader, others=[]) {
 function deleteRowGroup(ev, groupName) {
 	response = confirm('Are you sure you want to delete the group "' + groupName + '"?\nThis cannot be undone.');
 	if (response) {
-		document.getElementById('deleteForm').submit();
+		document.getElementById('deleteRowGroupForm').submit();
+	}
+}
+
+// Ask for confirmation for deleting a row item
+function deleteRowGroupItem(ev, itemName) {
+	response = confirm('Are you sure you want to delete the item "' + itemName + '"?\nThis cannot be undone.');
+	if (response) {
+		//document.getElementById('deleteRowGroupItemInput').value = itemID;
+		//document.getElementById('deleteRowGroupItemForm').submit();
+		var itemID = $(ev.target).closest('tr').attr('id');
+		$.ajax({
+			beforeSend: setToken,
+			type: 'POST',
+			url: $(ev.target).attr('my-url'),
+			data: {
+				'itemID': itemID
+			},
+			dataType: 'json',
+			success: function (data) {
+				$('#' + data.itemID).remove();
+			}
+		});
 	}
 }

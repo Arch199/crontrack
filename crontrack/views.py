@@ -7,7 +7,7 @@ import pytz
 from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm  # from https://wsvincent.com/django-user-authentication-tutorial-signup/
 from django.views import generic
@@ -114,7 +114,7 @@ def add_job(request):
 # Also make sure to redirect after successfully dealing with post data to prevent duplicates
 
 def edit_group(request):
-	if request.method == 'POST' and request.user.is_authenticated:
+	if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
 		timezone.activate(request.user.profile.timezone)
 		context = {'group': get_group(request.user, request.POST['group'])}
 		if 'edited' in request.POST:
@@ -189,6 +189,21 @@ def delete_group(request):
 			group.delete()
 		except JobGroup.DoesNotExist:
 			print(f"ERROR: Tried to delete job group with id '{request.POST['group']}' and it didn't exist (or didn't belong to the user '{request.user.username}')")
+	
+	return HttpResponseRedirect('/crontrack/viewjobs')
+
+# Delete job with AJAX
+def delete_job(request):
+	# Delete job and return to editing group
+	if request.method == 'POST' and request.user.is_authenticated and 'itemID' in request.POST:
+		try:
+			job = Job.objects.get(pk=request.POST['itemID'], user=request.user)
+			job.delete()
+			data = {'itemID': request.POST['itemID']}
+		except Job.DoesNotExist:
+			print(f"ERROR: Tried to delete job with id '{request.POST['itemID']}' and it didn't exist (or didn't belong to the user '{request.user.username}')")
+		else:
+			return JsonResponse(data)
 	
 	return HttpResponseRedirect('/crontrack/viewjobs')
 
