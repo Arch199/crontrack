@@ -3,6 +3,7 @@ from itertools import chain
 import re
 
 import pytz
+from croniter import croniter, CroniterBadCronError  # see https://pypi.org/project/croniter/#usage
 
 from django.conf import settings
 from django.shortcuts import render
@@ -14,8 +15,6 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import transaction
-
-from croniter import croniter, CroniterBadCronError  # see https://pypi.org/project/croniter/#usage
 
 from .models import Job, JobGroup, User, Profile
 

@@ -5,3 +5,4 @@ class CrontrackConfig(AppConfig):
 	
 	def ready(self):
 		import crontrack.signals
+		import crontrack.background
