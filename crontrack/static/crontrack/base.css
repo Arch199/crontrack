@@ -73,6 +73,7 @@ input[type="submit"].danger:hover, input[type="button"].danger:hover, a.button.d
 	color: #222;
 }
 
+
 /* --- Site page top bar --- */
 .topBar {
 	position: relative;
@@ -141,6 +142,15 @@ table.dbRows {
 	width: 65em;
 }
 
+div.dbRows { /* for aligning below a dbRows table */
+	position: relative;
+	width: 65em;
+}
+
+div.dbRows .float.right {
+	left: 90%;
+}
+
 table.dbRows tbody {
 	font-size: 15px;
 }
@@ -171,11 +181,6 @@ table.dbRows th {
 	box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
 	-webkit-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
 	-moz-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
-}
-
-table.dbRows .float {
-	position: absolute;
-	left: 103%;
 }
 
 /* Row Groups */
@@ -233,6 +238,10 @@ table.dbRows .rowGroupHeader.open:hover {
 	background-color: #555;
 }
 
+table.dbRows .rowGroupHeader:hover {
+	background-color: #404040;
+}
+
 table.dbRows .rowGroupContent {
 	display: none;
 }
@@ -264,7 +273,7 @@ table.dbRows .rowGroupContent textarea {
 
 table.dbRows .rowGroupItemInfo, table.dbRows .rowGroupItemInfo:hover {
 	display: none;
-	background-color: #bdbdbd;
+	background-color: #dfdfdf;/*#bdbdbd;*/
 }
 
 table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
@@ -280,6 +289,16 @@ table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box 
 table.dbRows .rowGroupItemInfo .right input {
 	font-family: 'Courier New', monospace;
 	font-size: 13px;
+}
+
+
+/* --- Floating buttons (for use with table.dbRows etc.) --- */
+.float {
+	position: absolute;
+}
+
+.float.right {
+	left: 103%;
 }
 
 

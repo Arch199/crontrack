@@ -67,6 +67,7 @@
 	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
 	<script>
 		$(document).ready(function() {
+			// Add copy function to "COPY UUID" button
 			$('.js-copyUUID').on('click', function() {
 				$(this).prev('.js-UUID').select();
 				document.execCommand('copy');

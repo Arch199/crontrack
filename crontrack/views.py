@@ -52,7 +52,7 @@ def view_jobs(request):
 	context = {'groups': chain(ungrouped, grouped)}
 	
 	return render(request, 'crontrack/viewjobs.html', context)
-
+	
 def add_job(request):
 	if request.method == 'POST':
 		context = {'prefill': request.POST}
@@ -147,12 +147,13 @@ def edit_group(request):
 			#context = {key: request.POST[key] for key in request.POST if key != 'edited'}
 			# TODO: add some kind of prefill (with a form?)
 			
-			#Rename the group
+			#Rename the group / modify its description
 			if request.POST['group'] != 'None':
 				try:
 					group = JobGroup.objects.get(pk=request.POST['group'], user=request.user)
 					with transaction.atomic():
 						group.name = request.POST['group_name']
+						group.description = request.POST['description']
 						group.full_clean()
 						group.save()
 				except ValidationError:
@@ -165,19 +166,26 @@ def edit_group(request):
 				for key in request.POST:
 					match = pattern.match(key)
 					if match:
-						job_id = match.group(1)
-						job = Job.objects.get(id=job_id)
-						assert job.user == request.user  # TODO: handle this better?
-						
 						with transaction.atomic():
+							job_id = match.group(1)
+							#Check if we're adding a new job (with a single number for its temporary ID)
+							if job_id.isdigit():
+								job = Job(
+									user=request.user,
+									group=JobGroup.objects.get(pk=request.POST['group']),
+								)
+							#Otherwise, find the existing job to edit
+							else:
+								job = Job.objects.get(id=job_id)
+								assert job.user == request.user  # TODO: handle this better?
+				
 							job.name = request.POST[f'{job_id}__name']
-							job.schedule_str = request.POST[f'{job_id}__schedule_str']  # TODO: need to add Croniter validation
+							job.schedule_str = request.POST[f'{job_id}__schedule_str']
 							job.time_window = int(request.POST[f'{job_id}__time_window'])
 							job.description = request.POST[f'{job_id}__description']
 							
-							#Cron validation for schedule string
-							if not croniter.is_valid(job.schedule_str):
-								raise CroniterBadCronError
+							now = timezone.localtime(timezone.now())
+							job.next_run = croniter(job.schedule_str, now).get_next(datetime)
 							
 							# Note: removed this for being unecessary
 							"""tz = request.user.profile.timezone
@@ -192,10 +200,10 @@ def edit_group(request):
 							job.save()
 			except CroniterBadCronError:
 				context['error_message'] = "invalid cron schedule string"
+			except ValueError:
+				context['error_message'] = "please enter a valid whole number for the time window"  #TODO: check if this can be called by other fields
 			except ValidationError:
 				context['error_message'] = "invalid data entered in one or more fields"
-			except ValueError:
-				context['error_message'] = "please enter a valid whole number for the time window"
 			else:
 				return HttpResponseRedirect('/crontrack/viewjobs')
 			
@@ -211,7 +219,10 @@ def delete_group(request):
 			group = JobGroup.objects.get(pk=request.POST['group'], user=request.user)
 			group.delete()
 		except JobGroup.DoesNotExist:
-			print(f"ERROR: Tried to delete job group with id '{request.POST['group']}' and it didn't exist (or didn't belong to the user '{request.user.username}')")
+			print(
+				f"ERROR: Tried to delete job group with id '{request.POST['group']}' and it didn't exist "
+				"(or didn't belong to the user '{request.user.username}')"
+			)
 	
 	return HttpResponseRedirect('/crontrack/viewjobs')
 
@@ -229,7 +240,7 @@ def delete_job(request):
 			return JsonResponse(data)
 	
 	return HttpResponseRedirect('/crontrack/viewjobs')
-
+	
 def profile(request):
 	context = {}
 	if request.method == 'POST' and request.user.is_authenticated:
