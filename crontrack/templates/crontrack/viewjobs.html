@@ -41,12 +41,12 @@
 									<td>{{ job.time_window }}</td>
 									<td>{{ job.next_run }}</td>
 									<td>{{ job.last_notified|default:'-' }}</td>
-									
-									<!-- TODO: add dropdown for description/UUID to each job -->
 								</tr>
 								<tr class="rowGroupItemInfo">
 									<td colspan="5"><p>
-										<span class="right">UUID: <b>{{ job.id|default:'No description...' }}</b></span>
+										<span class="right">
+											UUID: <input type="text" class="js-UUID" readonly value="{{ job.id }}" size="35"><button class="js-copyUUID">COPY</button>
+										</span>
 										{{ job.description }}
 									</p></td>
 								</tr>
@@ -63,5 +63,14 @@
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
+	<script src="{% static 'lib/jquery.js' %}"></script>
 	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
+	<script>
+		$(document).ready(function() {
+			$('.js-copyUUID').on('click', function() {
+				$(this).prev('.js-UUID').select();
+				document.execCommand('copy');
+			});
+		});
+	</script>
 {% endblock %}

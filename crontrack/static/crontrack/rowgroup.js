@@ -42,6 +42,7 @@ function toggleOpen(leader, others=[]) {
 			item.className += ' open';
 		});
 	}
+	// note: could use some jQuery for this e.g. toggleClass
 }
 
 // Ask for confirmation for deleting a row group

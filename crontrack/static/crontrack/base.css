@@ -14,6 +14,22 @@ a {
 	color: black;
 }
 
+/* Button styling taken from div.tab button */
+button {
+	color: white;
+	background-color: #555;
+	padding: 4px;
+	margin: 1px;
+	border: 2px groove #444;
+	cursor: pointer;
+	transition-duration: 0.3s;
+	font-weight: bold;
+}
+
+button:hover {
+	background-color: #353535;
+}
+
 input, textarea, a.button {
 	font-size: 14px;
 	padding: 5px;
@@ -259,6 +275,9 @@ table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box 
 	float: right;
 	padding: 1px;
 	border: 2px groove #ccc;
+}
+
+table.dbRows .rowGroupItemInfo .right input {
 	font-family: 'Courier New', monospace;
 	font-size: 13px;
 }
@@ -309,6 +328,7 @@ div.tab button {
 	background-color: inherit;
 	border: none;
 	outline: none;
+	margin: 0;
 	cursor: pointer;
 	padding: 14px 16px;
 	transition-duration: 0.3s;

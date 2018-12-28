@@ -8,9 +8,10 @@ from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponseRedirect, JsonResponse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm  # from https://wsvincent.com/django-user-authentication-tutorial-signup/
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
@@ -20,6 +21,28 @@ from .models import Job, JobGroup, User, Profile
 
 def index(request):
 	return render(request, 'crontrack/index.html')
+	
+# is exempting this from CSRF protection ok? 
+@csrf_exempt
+def notify_job(request, id):
+	username = request.POST['username']
+	password = request.POST['password']
+	user = authenticate(request, username=username, password=password)
+	data = {}
+	if user is not None:
+		try:
+			job = Job.objects.get(pk=id, user=user)
+			job.last_notified = timezone.now()
+			job.save()
+			if settings.DEBUG:
+				print(f'Notified by user "{username}", job "{id}" at {job.last_notified}')
+		except Job.DoesNotExist:
+			data['error_message'] = f"Error: Job not found for UUID '{id}' and user '{username}'."
+		finally:
+			logout(request)
+	else:
+		data['error_message'] = "Error: invalid login credentials."
+	return JsonResponse(data)
 
 def view_jobs(request):
 	timezone.activate(request.user.profile.timezone)

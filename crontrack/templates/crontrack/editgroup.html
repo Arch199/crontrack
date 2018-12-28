@@ -48,11 +48,9 @@
 							{% endif %}
 						</td></tr>
 						<tbody class="rowGroupContent open">
-							{% if group.description %}
-								<tr><td colspan="3" class="rowGroupInfo">
-									<textarea name="description" maxlength="200">{{ group.description }}</textarea>
-								</td></tr>
-							{% endif %}
+							<tr><td colspan="3" class="rowGroupInfo">
+								<textarea name="description" maxlength="200">{{ group.description }}</textarea>
+							</td></tr>
 							{% for job in group.jobs %}
 								<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="{{ job.id }}">
 									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>

@@ -11,6 +11,8 @@ urlpatterns = [
 	path('deletegroup', views.delete_group, name='delete_group'),
 	path('deletejob', views.delete_job, name='delete_job'),
 	
+	path('api/notifyjob/<uuid:id>', views.notify_job, name='notify_job'),
+	
 	path('accounts/', include('django.contrib.auth.urls')),
 	path('accounts/profile', views.profile, name='profile'),
 	path('accounts/register', views.Register.as_view(), name='register'),
