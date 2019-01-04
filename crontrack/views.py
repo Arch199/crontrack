@@ -17,6 +17,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from .models import Job, JobGroup, User, Profile
+from .forms import ProfileForm
 
 def index(request):
 	return render(request, 'crontrack/index.html')
@@ -55,11 +56,11 @@ def view_jobs(request):
 def add_job(request):
 	if request.method == 'POST':
 		context = {'prefill': request.POST}
-		#Logic to add the job
+		# Logic to add the job
 		try:
 			now = datetime.now(tz=pytz.timezone(request.POST['timezone']))
 			
-			#Check if we're adding a group
+			# Check if we're adding a group
 			if 'group' in request.POST:
 				with transaction.atomic():
 					if not request.POST['name']:
@@ -96,16 +97,16 @@ def add_job(request):
 						have_added_job = True
 						job.save()
 					if not have_added_job:
-						#We didn't get any jobs
+						# We didn't get any jobs
 						context['error_message'] = "no valid jobs entered"
 						#return HttpResponseRedirect('/crontrack/viewjobs')
 						return render(request, 'crontrack/addjob.html', context)
 					
-					#Group added successfully, open it up for editing
+					# Group added successfully, open it up for editing
 					context = {'group': get_group(request.user, group)}
 					return render(request, 'crontrack/editgroup.html', context)
 			
-			#Otherwise, just add the single job
+			# Otherwise, just add the single job
 			else:
 				job = Job(
 					user=request.user,
@@ -140,13 +141,13 @@ def edit_group(request):
 		timezone.activate(request.user.profile.timezone)
 		context = {'group': get_group(request.user, request.POST['group'])}
 		if 'edited' in request.POST:
-			#Submission after editing the group
-			#Process the edit then return to view all jobs
+			# Submission after editing the group
+			# Process the edit then return to view all jobs
 			
 			#context = {key: request.POST[key] for key in request.POST if key != 'edited'}
 			# TODO: add some kind of prefill (with a form?)
 			
-			#Rename the group / modify its description
+			# Rename the group / modify its description
 			if request.POST['group'] != 'None':
 				try:
 					group = JobGroup.objects.get(pk=request.POST['group'], user=request.user)
@@ -159,7 +160,7 @@ def edit_group(request):
 					context['error_message'] = f"invalid group name '{request.POST['group_name']}'"
 					return render(request, 'crontrack/editgroup.html', context)
 			
-			#Modify the jobs in the group
+			# Modify the jobs in the group
 			pattern = re.compile(r'^([0-9a-z\-]+)__name')
 			try:			
 				for key in request.POST:
@@ -167,13 +168,13 @@ def edit_group(request):
 					if match:
 						with transaction.atomic():
 							job_id = match.group(1)
-							#Check if we're adding a new job (with a single number for its temporary ID)
+							# Check if we're adding a new job (with a single number for its temporary ID)
 							if job_id.isdigit():
 								job = Job(
 									user=request.user,
 									group=JobGroup.objects.get(pk=request.POST['group']),
 								)
-							#Otherwise, find the existing job to edit
+							# Otherwise, find the existing job to edit
 							else:
 								job = Job.objects.get(id=job_id)
 								assert job.user == request.user  # TODO: handle this better?
@@ -208,7 +209,7 @@ def edit_group(request):
 			
 			return render(request, 'crontrack/editgroup.html', context)
 		else:
-			#First view of page with group to edit
+			# First view of page with group to edit
 			return render(request, 'crontrack/editgroup.html', context)
 	return render(request, 'crontrack/editgroup.html')	
 
@@ -243,18 +244,31 @@ def delete_job(request):
 def profile(request):
 	context = {}
 	if request.method == 'POST' and request.user.is_authenticated:
-		context['prefill'] = request.POST
-		
+		form = ProfileForm(request.POST)
+		if form.is_valid():
 		# Update profile settings
-		profile = User.objects.get(pk=request.user.id).profile		
-		try:
-			profile.timezone = request.POST['timezone']
-			profile.full_clean()
+			profile = User.objects.get(pk=request.user.id).profile		
+			profile.timezone = form.cleaned_data['timezone']
+			profile.alert_method = form.cleaned_data['alert_method']
 			profile.save()
+			
+			request.user.email = form.cleaned_data['email']
+			request.user.save()
 			context['success_message'] = "Account settings updated."
-		except ValidationError:
-			context['error_message'] = "invalid timezone; please select from the list"
-
+			
+			"""
+			try:
+				profile.timezone = request.POST['timezone']
+				profile.full_clean()
+				profile.save()
+				context['success_message'] = "Account settings updated."
+			except ValidationError:
+				context['error_message'] = "invalid timezone; please select from the list"
+			"""
+	else:
+		form = ProfileForm(initial={'timezone': request.user.profile.timezone})
+		
+	context['form'] = form
 	return render(request, 'registration/profile.html', context)
 
 class Register(generic.CreateView):  # TODO: consider making a separate accounts app for this stuff
@@ -269,15 +283,18 @@ class Register(generic.CreateView):  # TODO: consider making a separate accounts
 		new_user = authenticate(username=username, password=password)
 		login(self.request, new_user)
 		return valid
-		
-#Helper function for getting a user's job group information with their corresponding jobs
+
+
+# --- HELPER FUNCTIONS ---
+
+# Gets a user's job group information with their corresponding jobs
 def get_group(user_id, group):
 	if group is None or group == 'None':
 		jobs = Job.objects.filter(user=user_id, group__isnull=True)
 		return {'id': None, 'name': 'Ungrouped', 'description': '', 'jobs': jobs}
 	else:
 		if type(group) == str and group.isdigit():
-			#Group is an ID rather than an object
+			# Group is an ID rather than an object
 			group = JobGroup.objects.get(user=user_id, id=group)
 		
 		jobs = Job.objects.filter(user=user_id, group=group.id)

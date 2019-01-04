@@ -29,7 +29,15 @@ class Job(models.Model):
 		return f'{self.user}\'s {self.name}: "{self.schedule_str}"'
 		
 class Profile(models.Model):
+	EMAIL = 'E'
+	TEXT = 'T'
+	ALERT_METHOD_CHOICES = (
+		(EMAIL, 'Email'),
+		(TEXT, 'Text'),
+	)
 	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 	timezone = TimeZoneField(default='UTC')
+	alert_method = models.CharField(max_length=1, choices=ALERT_METHOD_CHOICES, default=EMAIL)
+	# TODO: add phone field
 	
-	# TODO: add alert gap field (or should this be for each job?)
+	# TODO: add alert gap/buffer field (or should this be for each job?)
