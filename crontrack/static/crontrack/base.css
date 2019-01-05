@@ -322,6 +322,8 @@ table.form label {
 table.form input[type="text"],
 table.form input[type="number"],
 table.form input[type="password"],
+table.form input[type="email"],
+table.form input[type="tel"],
 table.form textarea {
 	width: 300px;
 }

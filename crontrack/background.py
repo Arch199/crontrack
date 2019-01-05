@@ -5,10 +5,11 @@ import threading
 
 from croniter import croniter
 
+from django.core import mail
 from django.conf import settings
 from django.utils import timezone
 
-from .models import Job
+from .models import Job, Profile
 
 class JobMonitor:
 	def __init__(self):
@@ -25,7 +26,7 @@ class JobMonitor:
 				# Calculate the next scheduled run time + time window
 				run_by = job.next_run + timedelta(minutes=job.time_window)
 				
-				# Keep going if this run time is in the future
+				# Skip if this run time is in the future
 				if run_by > timezone.now():
 					continue
 				
@@ -38,12 +39,37 @@ class JobMonitor:
 				timezone.activate(job.user.profile.timezone)
 				now = timezone.localtime(timezone.now())
 				job.next_run = croniter(job.schedule_str, now).get_next(datetime)
+				job.save()
 				
 			time.sleep(10)
 		
 	def alertUser(self, job):
-		# Either send an email or text based on user preferences
-		# TODO
-		print(f'Alert! Job: {job} failed to notify in the time window.')
+		#DEBUG
+		if job.user.username != 'eggman':
+			print('Was gonna alert but noped out for james')
+			return
 		
-#monitor = JobMonitor()
+		# Either send an email or text based on user preferences
+		if settings.DEBUG:
+			print(f'Alert! Job: {job} failed to notify in the time window.')
+		
+		# TODO: remove DEBUG option
+		if job.user.profile.alert_method == Profile.EMAIL:
+			print('Emailing user about it')
+			job.user.email_user(
+				f'ALERT: Job "{job.name}" failed to notify within time window',
+				# TODO: should probably make an email template
+				f'''
+					Dear {job.user.username},
+
+					Your job "{job.name}" with scheule string "{job.schedule_str}" has failed to notify CronTrack.
+					
+					Job Run Time: {job.next_run}
+					Time Window: {job.time_window} minutes
+					
+					Go to <a href="http://127.0.0.1:8000/crontrack/viewjobs">http://127.0.0.1:8000/crontrack/viewjobs</a> for more details.
+				''',
+			)
+
+if not settings.RUNNING_SHELL:
+	monitor = JobMonitor()

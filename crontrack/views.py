@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm  # from https://wsvincent.com/django-user-authentication-tutorial-signup/
+from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
@@ -44,6 +45,7 @@ def notify_job(request, id):
 		data['error_message'] = "Error: invalid login credentials."
 	return JsonResponse(data)
 
+@login_required
 def view_jobs(request):
 	timezone.activate(request.user.profile.timezone)
 	
@@ -52,7 +54,8 @@ def view_jobs(request):
 	context = {'groups': chain(ungrouped, grouped)}
 	
 	return render(request, 'crontrack/viewjobs.html', context)
-	
+
+@login_required
 def add_job(request):
 	if request.method == 'POST':
 		context = {'prefill': request.POST}
@@ -136,6 +139,7 @@ def add_job(request):
 # ---- TODO: convert the context/error_message system to use django messages (?)
 # Also make sure to redirect after successfully dealing with post data to prevent duplicates
 
+@login_required
 def edit_group(request):
 	if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
 		timezone.activate(request.user.profile.timezone)
@@ -213,6 +217,7 @@ def edit_group(request):
 			return render(request, 'crontrack/editgroup.html', context)
 	return render(request, 'crontrack/editgroup.html')	
 
+@login_required
 def delete_group(request):
 	if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
 		try:
@@ -227,6 +232,7 @@ def delete_group(request):
 	return HttpResponseRedirect('/crontrack/viewjobs')
 
 # Delete job with AJAX
+@login_required
 def delete_job(request):
 	# Delete job and return to editing group
 	if request.method == 'POST' and request.user.is_authenticated and 'itemID' in request.POST:
@@ -240,7 +246,8 @@ def delete_job(request):
 			return JsonResponse(data)
 	
 	return HttpResponseRedirect('/crontrack/viewjobs')
-	
+
+@login_required
 def profile(request):
 	context = {}
 	if request.method == 'POST' and request.user.is_authenticated:

@@ -22,18 +22,18 @@
 							<td><label for="alert_method">Alert method</label></td>
 							<td>
 								<label for="alertMethodEmail">Email</label>
-								<input type="radio" name="alert_method" id="alertMethodEmail" value="E" selected>
+								<input type="radio" name="alert_method" id="alertMethodEmail" value="E" checked>
 								<label for="alertMethodText">Text</label>
 								<input type="radio" name="alert_method" id="alertMethodText" value="T" maxlength="15">
 							</td>
 						</tr>
 						<tr id="emailRow">
 							<td><label for="email">Email address</label></td>
-							<td><input type="email" name="email" id="email"></td>
+							<td><input type="email" name="email" id="email" value="{{ user.email }}"></td>
 						</tr>
 						<tr id="phoneRow" style="display: none">
 							<td><label for="phone">Phone number</label></td>
-							<td><input type="tel" name="phone" id="phone"></td>
+							<td><input type="tel" name="phone" id="phone" value="{{ user.profile.phone }}"></td>
 						</tr>
 					</table>
 					<br><center><input type="submit" value="Confirm"></center>
@@ -55,6 +55,7 @@
 		{% endif %}
 	</div>
 	<script src="{% static 'lib/jquery.js' %}"></script>
+	<p>{{ user.profile.TEXT }}</p>
 	<script>	
 		$(document).ready(function() {
 			$('#alertMethodEmail').on('click', function() {
@@ -65,6 +66,10 @@
 				$('#phoneRow').show();
 				$('#emailRow').hide();
 			});
+			
+			{% if user.profile.alert_method == user.profile.TEXT %}
+				$('#alertMethodText').trigger('click');
+			{% endif %}
 		});
 	</script>
 {% endblock %}
