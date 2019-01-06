@@ -8,6 +8,7 @@ from croniter import croniter
 from django.core import mail
 from django.conf import settings
 from django.utils import timezone
+from django.template.loader import render_to_string
 
 from .models import Job, Profile
 
@@ -41,12 +42,12 @@ class JobMonitor:
 				job.next_run = croniter(job.schedule_str, now).get_next(datetime)
 				job.save()
 				
-			time.sleep(10)
+			time.sleep(10)  # TODO: Put this back to 2*60 (2 min) or 1 min (?)
 		
 	def alertUser(self, job):
 		#DEBUG
 		if job.user.username != 'eggman':
-			print('Was gonna alert but noped out for james')
+			#print('Was gonna alert but noped out for james')
 			return
 		
 		# Either send an email or text based on user preferences
@@ -58,17 +59,7 @@ class JobMonitor:
 			print('Emailing user about it')
 			job.user.email_user(
 				f'ALERT: Job "{job.name}" failed to notify within time window',
-				# TODO: should probably make an email template
-				f'''
-					Dear {job.user.username},
-
-					Your job "{job.name}" with scheule string "{job.schedule_str}" has failed to notify CronTrack.
-					
-					Job Run Time: {job.next_run}
-					Time Window: {job.time_window} minutes
-					
-					Go to <a href="http://127.0.0.1:8000/crontrack/viewjobs">http://127.0.0.1:8000/crontrack/viewjobs</a> for more details.
-				''',
+				render_to_string('crontrack/email/alertuser.html', {'job': job})
 			)
 
 if not settings.RUNNING_SHELL:
