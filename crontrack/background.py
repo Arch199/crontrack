@@ -15,11 +15,6 @@ from .models import Job, Profile
 
 class JobMonitor:
 	def __init__(self):
-		# Cancel if a JobMonitor is already running
-		for thread in threading.enumerate():
-			if thread.name == 'JobMonitorThread':
-				return
-		
 		if settings.DEBUG:
 			print('Starting JobMonitor thread')
 		
@@ -53,19 +48,18 @@ class JobMonitor:
 			time.sleep(60)  # TODO: Put this back to 2*60 (2 min) or 1 min (?)
 		
 	def alertUser(self, job):
-		#DEBUG
+		#DEBUG <- TODO: remove
 		if job.user.username != 'eggman':
 			#print('Was gonna alert but noped out for james')
 			return
 		
-		# Either send an email or text based on user preferences
 		if settings.DEBUG:
 			print(f'Alert! Job: {job} failed to notify in the time window.')
 		
-		# TODO: remove DEBUG option
+		# Either send an email or text based on user preferences
 		if job.user.profile.alert_method == Profile.EMAIL:
 			print('Emailing user about it')
-			subject = f'ALERT: Job "{job.name}" failed to notify within time window',
+			subject = f'[CronTrack] ALERT: Job "{job.name}" failed to notify within time window',
 			context = {'job': job, 'domain': settings.DEFAULT_SITE_URL }
 			message = render_to_string('crontrack/email/alertuser.html', context)
 			job.user.email_user(subject, strip_tags(message), html_message=message)

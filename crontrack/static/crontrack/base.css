@@ -2,6 +2,7 @@
 body {
 	font-family: Arial, sans-serif;
 	background-color: #505058;
+	margin: 0;
 }
 
 h1, h2, h3, h4 {
@@ -14,8 +15,7 @@ a {
 	color: black;
 }
 
-/* Button styling taken from div.tab button */
-button {
+button { /* Button styling taken from div.tab button */
 	color: white;
 	background-color: #555;
 	padding: 4px;
@@ -57,18 +57,21 @@ input[type="submit"], input[type="button"], a.button {
 	text-decoration: none;
 }
 
-input[type="submit"]:hover, input[type="button"]:hover, a.button:hover {
+input[type="submit"]:hover,
+input[type="button"]:hover, a.button:hover {
 	background-color: white;
 	color: #393946;
 }
 
 /* Danger button (for deleting things, etc.) */
-input[type="submit"].danger, input[type="button"].danger, a.button.danger {
+input[type="submit"].danger,
+input[type="button"].danger, a.button.danger {
 	background-color: #393946;
 	color: #FF1010;
 }
 
-input[type="submit"].danger:hover, input[type="button"].danger:hover, a.button.danger:hover {
+input[type="submit"].danger:hover,
+input[type="button"].danger:hover, a.button.danger:hover {
 	background-color: #FF1010;
 	color: #222;
 }
@@ -76,14 +79,23 @@ input[type="submit"].danger:hover, input[type="button"].danger:hover, a.button.d
 
 /* --- Site page top bar --- */
 .topBar {
-	position: relative;
+	z-index: 1000;
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0;
+	margin: 0 auto;
+	margin-bottom: 5px;
+	/*position: relative; /* old settings, TODO: remove
 	top: -8px;
 	left: -8px;
-	width: 99.7%;
+	width: 99.7%;*/
 	background-color: #393946; /*#404070;*/
 	color: white;
 	padding: 6px 10px 4px 10px;
-	border-bottom: 2px solid #444;
+	/*border-bottom: 2px solid #444;*/
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .topBar a {
@@ -187,6 +199,7 @@ table.dbRows th {
 
 /* Row Groups */
 table.dbRows .rowGroupHeader {
+	position: relative;
 	background-color: #444;
 	text-align: left;
 	padding-left: 20px;
@@ -278,6 +291,10 @@ table.dbRows .rowGroupItemInfo, table.dbRows .rowGroupItemInfo:hover {
 	background-color: #dfdfdf;/*#bdbdbd;*/
 }
 
+table.dbRows .rowGroupItem {
+	position: relative;
+}
+
 table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
 	display: table-row;
 }
@@ -291,6 +308,51 @@ table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box 
 table.dbRows .rowGroupItemInfo .right input {
 	font-family: 'Courier New', monospace;
 	font-size: 13px;
+}
+
+/* dropdown triangle (closed) */
+table.dbRows .rowGroupHeader::before,
+table.dbRows .rowGroupItem td:first-child::before {
+	/* copied from https://css-tricks.com/the-shapes-of-css/ */
+	/* make a > shape */
+	content: "";
+	position: absolute;
+	left: 6px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 0;
+	height: 0;
+	border-top: 5px solid transparent;
+	border-left: 10px solid #000;
+	border-bottom: 5px solid transparent;	
+}
+
+table.dbRows .rowGroupItem td:first-child::before {
+	border-top: 4px solid transparent;
+	border-left: 8px solid #111;
+	border-bottom: 4px solid transparent;	
+}
+
+/* dropdown triangle (open) */
+table.dbRows .rowGroupHeader.open::before,
+table.dbRows .rowGroupItem.open td:first-child::before {
+	/* make a V shape */
+	content: "";
+	position: absolute;
+	left: 6px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 0;
+	height: 0;
+	border-top: 10px solid #000;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;	
+}
+
+table.dbRows .rowGroupItem.open td:first-child::before {
+	border-top: 8px solid #111;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;		
 }
 
 
@@ -325,8 +387,7 @@ table.form input[type="text"],
 table.form input[type="number"],
 table.form input[type="password"],
 table.form input[type="email"],
-table.form input[type="tel"],
-table.form textarea {
+table.form input[type="tel"], table.form textarea {
 	width: 300px;
 }
 
