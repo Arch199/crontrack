@@ -110,8 +110,10 @@ input[type="submit"].danger:hover, input[type="button"].danger:hover, a.button.d
 	transform: translate(-50%, -50%);
 	padding: 50px;
 	padding-top: 25px;
+	padding-bottom: 35px;
 	background-color: #c3c3c3;
 	border-radius: 50px;
+	text-align: center;
 	box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
 	-webkit-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
 	-moz-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);

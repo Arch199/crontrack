@@ -8,20 +8,28 @@ from croniter import croniter
 from django.core import mail
 from django.conf import settings
 from django.utils import timezone
+from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 
 from .models import Job, Profile
 
 class JobMonitor:
 	def __init__(self):
-		self.t = threading.Thread(target=self.monitor)
-		self.t.setDaemon(True)
+		# Cancel if a JobMonitor is already running
+		for thread in threading.enumerate():
+			if thread.name == 'JobMonitorThread':
+				return
+		
+		if settings.DEBUG:
+			print('Starting JobMonitor thread')
+		
+		self.t = threading.Thread(target=self.monitor, name='JobMonitorThread', daemon=True)
 		self.t.start()
 	
 	def monitor(self):		
 		while True:
 			if settings.DEBUG:
-				print('Starting monitor loop')
+				print(f'Starting monitor loop at {timezone.now()}')
 			
 			for job in Job.objects.all():
 				# Calculate the next scheduled run time + time window
@@ -42,7 +50,7 @@ class JobMonitor:
 				job.next_run = croniter(job.schedule_str, now).get_next(datetime)
 				job.save()
 				
-			time.sleep(10)  # TODO: Put this back to 2*60 (2 min) or 1 min (?)
+			time.sleep(60)  # TODO: Put this back to 2*60 (2 min) or 1 min (?)
 		
 	def alertUser(self, job):
 		#DEBUG
@@ -57,10 +65,7 @@ class JobMonitor:
 		# TODO: remove DEBUG option
 		if job.user.profile.alert_method == Profile.EMAIL:
 			print('Emailing user about it')
-			job.user.email_user(
-				f'ALERT: Job "{job.name}" failed to notify within time window',
-				render_to_string('crontrack/email/alertuser.html', {'job': job})
-			)
-
-if not settings.RUNNING_SHELL:
-	monitor = JobMonitor()
+			subject = f'ALERT: Job "{job.name}" failed to notify within time window',
+			context = {'job': job, 'domain': settings.DEFAULT_SITE_URL }
+			message = render_to_string('crontrack/email/alertuser.html', context)
+			job.user.email_user(subject, strip_tags(message), html_message=message)

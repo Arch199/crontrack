@@ -4,11 +4,12 @@
 
 <table class="form">
 	<tr><th>Cron schedule string</th><td>{{ job.schedule_str }}</td></tr>
-	<tr><th>Scheduled run time<th><td>{{ job.next_run }}</td></tr>
+	<tr><th>Scheduled run time</th><td>{{ job.next_run }}</td></tr>
 	<tr><th>Time window</th><td>{{ job.time_window }} minutes</td></tr>
 </table>
-				
-<p>Go to <a href="{% url 'crontrack:view_jobs' %}">{% url 'crontrack:view_jobs' %}"></a> for more details.</p>
+
+{% url 'crontrack:view_jobs' as jobs_url %}
+<p>Go to <a href="{{ domain }}{{ jobs_url }}">{{ domain }}{{ jobs_url }}"</a> for more details.</p>
 
 <p>Sincerely,<br>CronTrack</p>
 

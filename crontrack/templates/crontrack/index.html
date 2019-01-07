@@ -7,10 +7,14 @@
 		<h1>CronTrack</h1>
 		<p>An open-source web service for tracking Cron jobs.</p>
 		<p>
-			<a href="{% url 'crontrack:login' %}">Log in</a> | 
-			<a href="{% url 'crontrack:register' %}">Register</a> | 
-			<a href="{% url 'crontrack:view_jobs' %}">View jobs</a> | 
-			<a href="{% url 'crontrack:add_job' %}">Add job</a> | 
+			{% if not user.is_authenticated %}
+				<a href="{% url 'crontrack:login' %}">Log in</a> | 
+				<a href="{% url 'crontrack:register' %}">Register</a> | 
+			{% else %}
+				<a href="{% url 'crontrack:view_jobs' %}">View jobs</a> |
+				<a href="{% url 'crontrack:add_job' %}">Add job</a> |
+				<a href="{% url 'crontrack:profile' %}">Profile</a> |
+			{% endif %}
 			<a href="https://github.com/Arch199/crontrack">Github repo</a>
 		</p>
 	</div>
