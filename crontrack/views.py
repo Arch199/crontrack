@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm  # from https://wsvincent.com/django-user-authentication-tutorial-signup/
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -194,8 +194,10 @@ def edit_group(request):
 							# Note: removed this for being unecessary
 							"""tz = request.user.profile.timezone
 							format = '%Y-%m-%dT%H:%M'
-							job.last_notified = tz.localize(datetime.strptime(request.POST[f'{job_id}__last_notified'], format))
-							job.next_run = tz.localize(datetime.strptime(request.POST[f'{job_id}__next_run'], format))"""
+							job.last_notified = tz.localize(datetime.strptime(request.POST[f'{job_id}__last_notified'],
+								format))
+							job.next_run = tz.localize(datetime.strptime(request.POST[f'{job_id}__next_run'], format))
+							"""
 						
 							# TODO: Add a form class for validation (this is kinda ugly as is)
 							# see https://docs.djangoproject.com/en/2.1/topics/forms/
@@ -205,7 +207,7 @@ def edit_group(request):
 			except CroniterBadCronError:
 				context['error_message'] = "invalid cron schedule string"
 			except ValueError:
-				context['error_message'] = "please enter a valid whole number for the time window"  #TODO: check if this can be called by other fields
+				context['error_message'] = "please enter a valid whole number for the time window"
 			except ValidationError:
 				context['error_message'] = "invalid data entered in one or more fields"
 			else:
@@ -241,7 +243,9 @@ def delete_job(request):
 			job.delete()
 			data = {'itemID': request.POST['itemID']}
 		except Job.DoesNotExist:
-			print(f"ERROR: Tried to delete job with id '{request.POST['itemID']}' and it didn't exist (or didn't belong to the user '{request.user.username}')")
+			print(f"ERROR: Tried to delete job with id '{request.POST['itemID']}' and it didn't exist " +
+				f"(or didn't belong to the user '{request.user.username}')"
+			)
 		else:
 			return JsonResponse(data)
 	
@@ -283,7 +287,6 @@ class Register(generic.CreateView):  # TODO: consider making a separate accounts
 	success_url = '/crontrack/accounts/profile'
 	template_name = 'registration/register.html'
 	
-	# from https://stackoverflow.com/questions/26510242/django-how-to-login-user-directly-after-registration-using-generic-createview
 	def form_valid(self, form):
 		valid = super(Register, self).form_valid(form)
 		username, password = form.cleaned_data.get('username'), form.cleaned_data.get('password1')

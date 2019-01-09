@@ -32,18 +32,21 @@
 						<tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
 							<span><input type="text" name="group_name" value="{{ group.name }}" size="50" maxlength="50"></span>
 							
-							<!-- ^THIS 50 is a magic number and should be burnt with fire -- I need to make a constants field and pass it into the template -->
+							<!-- ^THIS 50 is a magic number and should be burnt with fire
+								-- TODO: I need to make a constants field and pass it into the template -->
 							
 							<span class="right">
 								<a class="button" href="{% url 'crontrack:view_jobs' %}">Cancel</a>
 								{% if group.id %}
-									&nbsp;<input type="button" value="Delete" onclick="deleteRowGroup(event,'{{ group.name }}')" class="danger">
+									&nbsp;
+									<input type="button" value="Delete" onclick="deleteRowGroup(event,'{{ group.name }}')" class="danger">
 								{% endif %}
 							</span>
 						</td></tr>
 						<tbody class="rowGroupContent open">
 							<tr><td colspan="3" class="rowGroupInfo">
-								<textarea name="description" maxlength="200" placeholder="Group description">{{ group.description }}</textarea>
+								<textarea name="description" maxlength="200"
+										placeholder="Group description">{{ group.description }}</textarea>
 							</td></tr>
 							{% for job in group.jobs %}
 								<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="{{ job.id }}">
@@ -51,17 +54,20 @@
 									<td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
 									<td>
 										<input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}">
-										<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')" my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
+										<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
+												my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
 									</td>
 									
 									<!-- Didn't need to add this: these fields shouldn't be user-editable
-									<td><input type="datetime-local" name="{{ job.id }}__next_run" value="{{ job.next_run|date:'Y-m-d\TH:i' }}"></td>
-									<td><input type="datetime-local" name="{{ job.id }}__last_notified" value="{{ job.last_notified|date:'Y-m-d\TH:i' }}"></td>
-									<!-- TODO: check if these datetime inputs actually take in input at the right time -->
+									<td><input type="datetime-local" name="{{ job.id }}__next_run"
+											value="{{ job.next_run|date:'Y-m-d\TH:i' }}"></td>
+									<td><input type="datetime-local" name="{{ job.id }}__last_notified"
+											value="{{ job.last_notified|date:'Y-m-d\TH:i' }}"></td>-->
 								</tr>
 								<tr class="rowGroupItemInfo">
 									<td colspan="5">
-										<textarea name="{{ job.id }}__description" maxlength="200" placeholder="Job description">{{ job.description }}</textarea>
+										<textarea name="{{ job.id }}__description" maxlength="200"
+												placeholder="Job description">{{ job.description }}</textarea>
 									</td>
 								</tr>
 							{% endfor %}
@@ -98,7 +104,8 @@
 						<td><input type="text" name="${jobNum}__schedule_str"></td>
 						<td>
 							<input type="number" name="${jobNum}__time_window">
-							<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')" my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
+							<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
+									my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
 						</td>
 					</tr>
 					<tr class="rowGroupItemInfo">

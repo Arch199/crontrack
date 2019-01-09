@@ -3,6 +3,7 @@ body {
 	font-family: Arial, sans-serif;
 	background-color: #505058;
 	margin: 0;
+	margin-bottom: 5px;
 }
 
 h1, h2, h3, h4 {
@@ -323,13 +324,13 @@ table.dbRows .rowGroupItem td:first-child::before {
 	width: 0;
 	height: 0;
 	border-top: 5px solid transparent;
-	border-left: 10px solid #000;
+	border-left: 10px solid #111;
 	border-bottom: 5px solid transparent;	
 }
 
 table.dbRows .rowGroupItem td:first-child::before {
 	border-top: 4px solid transparent;
-	border-left: 8px solid #111;
+	border-left: 8px solid #222;
 	border-bottom: 4px solid transparent;	
 }
 
@@ -344,13 +345,13 @@ table.dbRows .rowGroupItem.open td:first-child::before {
 	transform: translateY(-50%);
 	width: 0;
 	height: 0;
-	border-top: 10px solid #000;
+	border-top: 10px solid #111;
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;	
 }
 
 table.dbRows .rowGroupItem.open td:first-child::before {
-	border-top: 8px solid #111;
+	border-top: 8px solid #222;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;		
 }
