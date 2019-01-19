@@ -15,16 +15,14 @@ from .models import Job, Profile
 
 class JobMonitor:
 	def __init__(self):
-		if settings.DEBUG:
-			print('Starting JobMonitor thread')
+		logger.debug('Starting JobMonitor thread')
 		
 		self.t = threading.Thread(target=self.monitor, name='JobMonitorThread', daemon=True)
 		self.t.start()
 	
 	def monitor(self):		
 		while True:
-			if settings.DEBUG:
-				print(f'Starting monitor loop at {timezone.now()}')
+			logger.debug(f'Starting monitor loop at {timezone.now()}')
 			
 			for job in Job.objects.all():
 				# Calculate the next scheduled run time + time window
@@ -53,8 +51,7 @@ class JobMonitor:
 			#print('Was gonna alert but noped out for james')
 			return
 		
-		if settings.DEBUG:
-			print(f'Alert! Job: {job} failed to notify in the time window.')
+		logger.debug(f'Alert! Job: {job} failed to notify in the time window.')
 		
 		# Either send an email or text based on user preferences
 		if job.user.profile.alert_method == Profile.EMAIL:

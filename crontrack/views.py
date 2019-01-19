@@ -35,8 +35,7 @@ def notify_job(request, id):
 			job = Job.objects.get(pk=id, user=user)
 			job.last_notified = timezone.now()
 			job.save()
-			if settings.DEBUG:
-				print(f'Notified by user "{username}", job "{id}" at {job.last_notified}')
+			logger.debug(f'Notified by user "{username}", job "{id}" at {job.last_notified}')
 		except Job.DoesNotExist:
 			data['error_message'] = f"Error: Job not found for UUID '{id}' and user '{username}'."
 		finally:
@@ -73,8 +72,7 @@ def add_job(request):
 						name=request.POST['name'],
 						description=request.POST['description'],
 					)
-					if settings.DEBUG:
-						print("Adding new group:", group)
+					logger.debug("Adding new group:", group)
 					group.save()
 				
 					job_name = '[unnamed job]'
@@ -95,8 +93,7 @@ def add_job(request):
 							next_run=croniter(schedule_str, now).get_next(datetime),
 							group=group,
 						)
-						if settings.DEBUG:
-							print("Adding new job:", job)
+						logger.debug("Adding new job:", job)
 						have_added_job = True
 						job.save()
 					if not have_added_job:
@@ -119,8 +116,7 @@ def add_job(request):
 					description=request.POST['description'],
 					next_run=croniter(request.POST['schedule_str'], now).get_next(datetime),
 				)
-				if settings.DEBUG:
-					print("Adding new job:", job)
+				logger.debug("Adding new job:", job)
 				job.save()
 
 				return HttpResponseRedirect('/crontrack/viewjobs')
