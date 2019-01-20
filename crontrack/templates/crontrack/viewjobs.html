@@ -64,7 +64,7 @@
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
-	<script src="{% static 'lib/jquery.js' %}"></script>
+	{% include 'crontrack/js/jquery.html' %}
 	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
 	<script>
 		$(document).ready(function() {

@@ -1,0 +1,25 @@
+{% load static %}
+{% if type == 'css' %}
+	<link rel="stylesheet" href="{% static 'lib/intl-tel-input/intlTelInput.min.css' %}">
+	<style>
+		/* Override the path to images */
+		.iti-flag {
+			background-image: url("{% static 'lib/intl-tel-input/flags.png' %}");
+		}
+
+		@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+			.iti-flag {
+				background-image: url("{% static 'lib/intl-tel-input/flags@2x.png' %}");
+			}
+		}
+	</style>
+{% else %}
+	<script src="{% static 'lib/intl-tel-input/intlTelInput.min.js' %}"></script>
+	<script>
+		window.intlTelInput(document.querySelector('#phone'), {
+			hiddenInput: 'full_phone',
+			preferredCountries: ['us', 'gb', 'au'],
+			utilsScript: '{% static "lib/intl-tel-input/utils.js" %}'
+		});
+	</script>
+{% endif %}

@@ -4,6 +4,7 @@
 {% load timezones %}
 
 {% block title %} {{ user.username }}'s profile {% endblock %}
+{% block head_extra %} {% include 'crontrack/js/intl-tel-input.html' with type='css' %} {% endblock %}
 
 {% block content %}
 	<div class="hcenter">
@@ -39,7 +40,11 @@
 					<br><center><input type="submit" value="Confirm"></center>
 				</form>
 				{% for error in form.errors.values %}
-					<br><span class="errorMessage">{{ error }}</span>
+					<br><span class="errorMessage">
+						{% for message in error %}
+							<br>{{ message }}
+						{% endfor %}
+					</span>
 				{% endfor %}
 				<br>
 				{% if error_message %} <!-- TODO: make a templatetag for success/error messages -->
@@ -54,8 +59,8 @@
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
-	<script src="{% static 'lib/jquery.js' %}"></script>
-	<p>{{ user.profile.TEXT }}</p>
+	{% include 'crontrack/js/jquery.html' %}
+	{% include 'crontrack/js/intl-tel-input.html' %}
 	<script>	
 		$(document).ready(function() {
 			$('#alertMethodEmail').on('click', function() {
@@ -67,7 +72,7 @@
 				$('#emailRow').hide();
 			});
 			
-			{% if user.profile.alert_method == user.profile.TEXT %}
+			{% if user.profile.alert_method == user.profile.SMS or prefill.alert_method == user.profile.SMS %}
 				$('#alertMethodText').trigger('click');
 			{% endif %}
 		});

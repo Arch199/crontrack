@@ -2,6 +2,7 @@
 
 from django import forms
 from timezone_field import TimeZoneFormField
+from phonenumber_field.formfields import PhoneNumberField
 
 from .models import Profile
 
@@ -13,4 +14,4 @@ class ProfileForm(forms.Form):
 		choices=Profile.ALERT_METHOD_CHOICES,
 	)
 	email = forms.EmailField(label='Email address', required=False)
-	#TODO: add phone number field
+	full_phone = PhoneNumberField(label='Phone number', required=False)

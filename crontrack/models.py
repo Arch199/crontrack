@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from timezone_field import TimeZoneField
+from phonenumber_field.modelfields import PhoneNumberField
 
 class JobGroup(models.Model):
 	name = models.CharField(max_length=50)
@@ -30,14 +31,14 @@ class Job(models.Model):
 		
 class Profile(models.Model):
 	EMAIL = 'E'
-	TEXT = 'T'
+	SMS = 'T'
 	ALERT_METHOD_CHOICES = (
 		(EMAIL, 'Email'),
-		(TEXT, 'Text'),
+		(SMS, 'SMS'),
 	)
 	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 	timezone = TimeZoneField(default='UTC')
 	alert_method = models.CharField(max_length=1, choices=ALERT_METHOD_CHOICES, default=EMAIL)
-	# TODO: add phone field
+	phone = PhoneNumberField(blank=True)
 	
 	# TODO: add alert gap/buffer field (or should this be for each job?)

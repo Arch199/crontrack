@@ -186,14 +186,6 @@ def edit_group(request):
 							
 							now = timezone.localtime(timezone.now())
 							job.next_run = croniter(job.schedule_str, now).get_next(datetime)
-							
-							# Note: removed this for being unecessary
-							"""tz = request.user.profile.timezone
-							format = '%Y-%m-%dT%H:%M'
-							job.last_notified = tz.localize(datetime.strptime(request.POST[f'{job_id}__last_notified'],
-								format))
-							job.next_run = tz.localize(datetime.strptime(request.POST[f'{job_id}__next_run'], format))
-							"""
 						
 							# TODO: Add a form class for validation (this is kinda ugly as is)
 							# see https://docs.djangoproject.com/en/2.1/topics/forms/
@@ -252,33 +244,27 @@ def profile(request):
 	context = {}
 	if request.method == 'POST' and request.user.is_authenticated:
 		form = ProfileForm(request.POST)
+		
 		if form.is_valid():
-		# Update profile settings
+			# Update profile settings
 			profile = User.objects.get(pk=request.user.id).profile		
 			profile.timezone = form.cleaned_data['timezone']
 			profile.alert_method = form.cleaned_data['alert_method']
+			profile.phone = form.cleaned_data['full_phone']
 			profile.save()
 			
 			request.user.email = form.cleaned_data['email']
 			request.user.save()
 			context['success_message'] = "Account settings updated."
-			
-			"""
-			try:
-				profile.timezone = request.POST['timezone']
-				profile.full_clean()
-				profile.save()
-				context['success_message'] = "Account settings updated."
-			except ValidationError:
-				context['error_message'] = "invalid timezone; please select from the list"
-			"""
+		else:
+			context['prefill'] = {'alert_method': form.data['alert_method']}
 	else:
-		form = ProfileForm(initial={'timezone': request.user.profile.timezone})
+		form = ProfileForm()
 		
 	context['form'] = form
 	return render(request, 'registration/profile.html', context)
 
-class Register(generic.CreateView):  # TODO: consider making a separate accounts app for this stuff
+class Register(generic.CreateView):
 	form_class = UserCreationForm
 	success_url = '/crontrack/accounts/profile'
 	template_name = 'registration/register.html'

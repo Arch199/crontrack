@@ -57,12 +57,6 @@
 										<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
 												my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
 									</td>
-									
-									<!-- Didn't need to add this: these fields shouldn't be user-editable
-									<td><input type="datetime-local" name="{{ job.id }}__next_run"
-											value="{{ job.next_run|date:'Y-m-d\TH:i' }}"></td>
-									<td><input type="datetime-local" name="{{ job.id }}__last_notified"
-											value="{{ job.last_notified|date:'Y-m-d\TH:i' }}"></td>-->
 								</tr>
 								<tr class="rowGroupItemInfo">
 									<td colspan="5">
@@ -90,8 +84,8 @@
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
-	<script src="{% static 'lib/jquery.js' %}"></script>
-	<script src="{% static 'lib/js.cookie.js' %}"></script>
+	{% include 'crontrack/js/jquery.html' %}
+	{% include 'crontrack/js/js-cookie.html' %}
 	<script src="{% static 'crontrack/setup.js' %}"></script>
 	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
 	<script>
