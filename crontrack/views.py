@@ -1,6 +1,7 @@
+import re
+import logging
 from datetime import datetime
 from itertools import chain
-import re
 
 import pytz
 from croniter import croniter, CroniterBadCronError  # see https://pypi.org/project/croniter/#usage
@@ -19,6 +20,8 @@ from django.db import transaction
 
 from .models import Job, JobGroup, User, Profile
 from .forms import ProfileForm
+
+logger = logging.getLogger(__name__)
 
 def index(request):
 	return render(request, 'crontrack/index.html')
@@ -72,7 +75,7 @@ def add_job(request):
 						name=request.POST['name'],
 						description=request.POST['description'],
 					)
-					logger.debug("Adding new group:", group)
+					logger.debug(f'Adding new group: {group}')
 					group.save()
 				
 					job_name = '[unnamed job]'
@@ -93,7 +96,7 @@ def add_job(request):
 							next_run=croniter(schedule_str, now).get_next(datetime),
 							group=group,
 						)
-						logger.debug("Adding new job:", job)
+						logger.debug(f'Adding new job: {job}')
 						have_added_job = True
 						job.save()
 					if not have_added_job:
@@ -116,7 +119,7 @@ def add_job(request):
 					description=request.POST['description'],
 					next_run=croniter(request.POST['schedule_str'], now).get_next(datetime),
 				)
-				logger.debug("Adding new job:", job)
+				logger.debug(f'Adding new job: {job}')
 				job.save()
 
 				return HttpResponseRedirect('/crontrack/viewjobs')

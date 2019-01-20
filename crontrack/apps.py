@@ -6,7 +6,7 @@ from django.conf import settings
 class CronTrackConfig(AppConfig):
 	name = 'crontrack'
 	
-	def ready(self):
+	def ready(self):	
 		import crontrack.signals
 		import crontrack.background
 		
