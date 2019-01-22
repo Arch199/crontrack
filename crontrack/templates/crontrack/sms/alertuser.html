@@ -1,1 +1,1 @@
-CronTrack: Your job "{{ job.name }}" failed to notify in time. Go to {{ domain }}{% url 'crontrack:view_jobs' %} for more details.
+CronTrack: Your job "{{ job.name|truncatechars:20 }}" failed to notify in time. Details here: {{ domain }}{% url 'crontrack:view_jobs' %}

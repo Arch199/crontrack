@@ -68,6 +68,7 @@ class JobMonitor:
 			message = render_to_string('crontrack/sms/alertuser.html', context)
 			client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 			try:
-				client.messages.create(body=message, to=job.user.profile.phone, from_=settings.TWILIO_FROM_NUMBER)
+				print(f'{len(message)} :: {message}')
+				client.messages.create(body=message, to=str(job.user.profile.phone), from_=settings.TWILIO_FROM_NUMBER)
 			except TwilioRestException:
 				logger.exception('Failed to send user "{job.user.username}" an SMS at {job.user.profile.phone}')
