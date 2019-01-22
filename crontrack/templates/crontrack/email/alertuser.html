@@ -1,4 +1,4 @@
-<p>Dear {{ job.user.username }},</p>
+<p>Hi {{ job.user.username }},</p>
 <p>Your job "{{ job.name }}" has failed to notify CronTrack in time.
 <br>Details below.</p>
 
@@ -9,7 +9,7 @@
 </table>
 
 {% url 'crontrack:view_jobs' as jobs_url %}
-<p>Go to <a href="{{ domain }}{{ jobs_url }}">{{ domain }}{{ jobs_url }}"</a> for more details.</p>
+<p>Go to <a href="{{ domain }}{{ jobs_url }}">{{ domain }}{{ jobs_url }}</a> for more details.</p>
 
 <p>Sincerely,<br>CronTrack</p>
 

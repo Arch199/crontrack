@@ -36,6 +36,10 @@
 							<td><label for="phone">Phone number</label></td>
 							<td><input type="tel" name="phone" id="phone" value="{{ user.profile.phone }}"></td>
 						</tr>
+						<tr>
+							<td><label for="alert_buffer">Time between alerts (min)</label></td>
+							<td><input type="number" name="alert_buffer" value="{{ user.profile.alert_buffer }}"></td>
+						</tr>
 					</table>
 					<br><center><input type="submit" value="Confirm"></center>
 				</form>

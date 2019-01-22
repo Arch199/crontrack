@@ -253,6 +253,7 @@ def profile(request):
 			profile = User.objects.get(pk=request.user.id).profile		
 			profile.timezone = form.cleaned_data['timezone']
 			profile.alert_method = form.cleaned_data['alert_method']
+			profile.alert_buffer = form.cleaned_data['alert_buffer']
 			profile.phone = form.cleaned_data['full_phone']
 			profile.save()
 			

@@ -12,6 +12,11 @@
 				background-image: url("{% static 'lib/intl-tel-input/flags@2x.png' %}");
 			}
 		}
+		
+		/* Hard-code fix to small width on tel input :( */
+		table.form .intl-tel-input.allow-dropdown input[type="tel"] {
+			width: 314px;
+		}
 	</style>
 {% else %}
 	<script src="{% static 'lib/intl-tel-input/intlTelInput.min.js' %}"></script>

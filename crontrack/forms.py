@@ -15,3 +15,4 @@ class ProfileForm(forms.Form):
 	)
 	email = forms.EmailField(label='Email address', required=False)
 	full_phone = PhoneNumberField(label='Phone number', required=False)
+	alert_buffer = forms.IntegerField()

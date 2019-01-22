@@ -28,17 +28,24 @@ class JobMonitor:
 		while True:
 			logger.debug(f'Starting monitor loop at {timezone.now()}')
 			for job in Job.objects.all():
+				now = timezone.now()
+			
 				# Calculate the next scheduled run time + time window
 				run_by = job.next_run + timedelta(minutes=job.time_window)
 				
 				# Skip if this run time is in the future
-				if run_by > timezone.now():
+				if run_by > now:
 					continue
 				
 				# Check if a notification was not received in the time window
 				if job.last_notified is None or not (job.next_run <= job.last_notified <= run_by):
 					# Error condition: the job did not send a notification
-					self.alertUser(job)
+					# But only alert them if we haven't previously alerted within the alert buffer time
+					buffer_time = timedelta(minutes=job.user.profile.alert_buffer)
+					if job.last_alert is None or now > job.last_alert + buffer_time:
+						self.alert_user(job)
+					else:
+						logger.debug(f'Skipped alert of failed job {job}')
 				
 				# Calculate the new next run time
 				timezone.activate(job.user.profile.timezone)
@@ -48,7 +55,7 @@ class JobMonitor:
 				
 			time.sleep(60)  # TODO: Put this back to 2*60 (2 min) or 1 min (?)
 		
-	def alertUser(self, job):
+	def alert_user(self, job):
 		#DEBUG <- TODO: remove
 		if job.user.username != 'eggman':
 			#print('Was gonna alert but noped out for james')
@@ -68,7 +75,9 @@ class JobMonitor:
 			message = render_to_string('crontrack/sms/alertuser.html', context)
 			client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 			try:
-				print(f'{len(message)} :: {message}')
 				client.messages.create(body=message, to=str(job.user.profile.phone), from_=settings.TWILIO_FROM_NUMBER)
 			except TwilioRestException:
 				logger.exception('Failed to send user "{job.user.username}" an SMS at {job.user.profile.phone}')
+		
+		job.last_alert = timezone.now()
+		job.save()
