@@ -5,6 +5,12 @@ from django.contrib.auth.models import User
 from timezone_field import TimeZoneField
 from phonenumber_field.modelfields import PhoneNumberField
 
+class UserGroup(models.Model):
+	name = models.CharField(max_length=50)
+	
+	def __str__(self):
+		return self.name
+
 class JobGroup(models.Model):
 	name = models.CharField(max_length=50)
 	description = models.CharField(max_length=200, blank=True, default='')
@@ -24,6 +30,7 @@ class Job(models.Model):
 	description = models.CharField(max_length=200, blank=True, default='')
 	user = models.ForeignKey(User, models.CASCADE)
 	group = models.ForeignKey(JobGroup, models.CASCADE, null=True, blank=True)
+	user_group = models.ForeignKey(UserGroup, models.SET_NULL, null=True)
 	
 	def __str__(self):
 		return f'{self.user}\'s {self.name}: "{self.schedule_str}"'
@@ -40,5 +47,4 @@ class Profile(models.Model):
 	alert_method = models.CharField(max_length=1, choices=ALERT_METHOD_CHOICES, default=EMAIL)
 	alert_buffer = models.IntegerField('time to wait between alerts (min)', default=1440)
 	phone = PhoneNumberField(blank=True)
-	
-	# TODO: add alert gap/buffer field (or should this be for each job?)
+	groups = models.ManyToManyField(UserGroup)

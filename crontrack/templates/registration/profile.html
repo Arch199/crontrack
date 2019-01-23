@@ -51,11 +51,8 @@
 					</span>
 				{% endfor %}
 				<br>
-				{% if error_message %} <!-- TODO: make a templatetag for success/error messages -->
-					<span class="errorMessage">Error: {{ error_message }}.</span>
-				{% endif %}
 				{% if success_message %}
-					<span class="successMessage">{{ success_message }}</span>
+					<br><span class="successMessage">{{ success_message }}</span>
 				{% endif %}
 			</div>
 		{% else %}

@@ -1,0 +1,78 @@
+{% extends 'crontrack/base.html' %}
+
+{% block title %} Manage user groups {% endblock %}
+
+{% block content %}
+	<div class="hcenter">
+		<h2>Manage user groups</h2>
+		{% if user.is_authenticated %}
+			<table class="dbRows">
+				<thead>
+					<tr>
+						<th>Group Name</th>
+						<th>Current Users</th>
+						<th>New User</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for group in user.profile.groups.all %}
+						<tr>
+							<td><b>{{ group.name }}</b></td>
+							<td>
+								<form method="post">
+									{% csrf_token %}
+									<input type="hidden" name="type" value="remove_user">
+									<input type="hidden" name="group_id" value="{{ group.id }}">
+									<select name="username">
+										{% for p in group.profile_set.all %}
+											<option value="{{ p.user }}">{{ p.user }}</option>
+										{% endfor %}
+									</select>
+									<input type="submit" value="Remove user" class="danger">
+								</form>
+							</td>
+							<td>
+								<form method="post">
+									{% csrf_token %}
+									<input type="hidden" name="type" value="add_user">
+									<input type="hidden" name="group_id" value="{{ group.id }}">
+									<input type="text" name="username" placeholder="Username">
+									<input type="submit" value="Add user">
+								</form>
+								<input type="button" value=" X " onclick="deleteGroup('{{ group.id }}')" class="danger float right">
+								<form id="deleteGroup{{ group.id }}" method="post">
+									{% csrf_token %}
+									<input type="hidden" name="type" value="delete_group">
+									<input type="hidden" name="group_id" value="{{ group.id }}">
+									<input type="hidden" name="group_name" value="{{ group.name }}">
+								</form>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<br><form method="post">
+				{% csrf_token %}
+				<input type="hidden" name="type" value="create_group">
+				<input type="text" name="group_name" placeholder="Group name">
+				&nbsp;<input type="submit" name="create_group" value="Create group">
+			</form>
+			{% if error_message %}
+				<br><p class="errorMessage">Error: {{ error_message }}.</p>
+			{% endif %}
+		{% else %}
+			<p>You are not logged in.</p>
+			<a href="{% url 'crontrack:login' %}">Log in</a>
+		{% endif %}
+	</div>
+	<script>
+		function deleteGroup(groupID) {
+			form = document.getElementById('deleteGroup' + groupID);
+			groupName = form.lastElementChild.value;
+			response = confirm('Are you sure you want to delete the group "' + groupName + '"?\nThis cannot be undone.');
+			if (response) {
+				form.submit();
+			}
+		}
+	</script>
+{% endblock %}

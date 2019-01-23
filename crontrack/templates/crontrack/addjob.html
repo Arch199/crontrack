@@ -35,6 +35,15 @@
 							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
 							<!-- TODO: should really define maxlength as a constant somewhere -->
 						<tr>
+							<td><label for="user_group">User group</label></td>
+							<td><select name="user_group" id="user_group">
+								<option value="">None</option>
+								{% for group in user.groups.all %}
+									<option value="{{ group.id }}">{{ group.name }}</option>
+								{% endfor %}
+							</select></td>
+						</tr>
+						<tr>
 							<td><label>Timezone</label></td>
 							<td>{% timezone_selector user.profile.timezone %}</td>
 						</tr>
@@ -67,9 +76,19 @@
 							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
 							<!-- TODO: should really define maxlength as a constant somewhere -->
 						<tr>
+							<td><label for="user_group">User group</label></td>
+							<td><select name="user_group" id="user_group">
+								<option value="">None</option>
+								{% for group in user.groups.all %}
+									<option value="{{ group.id }}">{{ group.name }}</option>
+								{% endfor %}
+							</select></td>
+						</tr>
+						<tr>
 							<td><label>Timezone</label></td>
 							<td>{% timezone_selector user.profile.timezone %}</td>
 						</tr>
+						<!-- TODO: make this a Django form -->
 					</table>
 					<br><input type="submit" value="Add job group">
 					{% if error_message and prefill.group %}

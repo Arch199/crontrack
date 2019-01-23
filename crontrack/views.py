@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from .models import Job, JobGroup, User, Profile
+from .models import Job, JobGroup, User, Profile, UserGroup
 from .forms import ProfileForm
 
 logger = logging.getLogger(__name__)
@@ -267,6 +267,41 @@ def profile(request):
 		
 	context['form'] = form
 	return render(request, 'registration/profile.html', context)
+	
+@login_required
+def user_groups(request):
+	context = {}
+	if request.method == 'POST' and 'type' in request.POST:
+		if request.POST['type'] == 'create_group':
+			group = None
+			with transaction.atomic():
+				group = UserGroup(name=request.POST.get('group_name'))
+				group.save()
+				request.user.profile.groups.add(group)
+			if group is None:
+				context['error_message'] = 'invalid group name'
+		elif request.POST['type'] == 'delete_group':
+			try:
+				UserGroup.objects.get(pk=request.POST['group_id']).delete()
+			except UserGroup.DoesNotExist:
+				pass
+		else:
+			try:
+				user = User.objects.get(username=request.POST['username'])
+				group = UserGroup.objects.get(pk=request.POST['group_id'])
+			except User.DoesNotExist:
+				context['error_message'] = f'no user found with username "{request.POST["username"]}"'
+			except UserGroup.DoesNotExist:
+				pass
+			else:
+				if request.POST['type'] == 'add_user':
+					# Is it okay to add users to groups without them having a say?
+					# TODO: consider sending a popup etc. to the other user to confirm before adding them
+					user.profile.groups.add(group)
+				elif request.POST['type'] == 'remove_user':
+					user.profile.groups.remove(group)
+	
+	return render(request, 'crontrack/usergroups.html', context)
 
 class Register(generic.CreateView):
 	form_class = UserCreationForm
