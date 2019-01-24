@@ -19,3 +19,7 @@ curl https://DOMAIN_NAME*/crontrack/api/notifyjob/UUID_FOR_THE_JOB \
 ```
 
 \*CronTrack currently isn't hosted anywhere (still in development). TODO: add the domain name.
+
+## Support for Teams
+
+You can create custom user groups which allow you to share jobs between multiple users. When you create a job or group of jobs, you can select a user group to associate it with, and all members of that group will be able to view and edit it. By default, all members of the group will also be alerted by CronTrack when jobs fail to run on time, but members can disable alerts for individual user groups.
