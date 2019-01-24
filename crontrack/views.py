@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from .models import Job, JobGroup, User, Profile, UserGroup
+from .models import *
 from .forms import ProfileForm
 
 logger = logging.getLogger(__name__)
@@ -311,7 +311,11 @@ def profile(request):
 	
 @login_required
 def user_groups(request):
-	context = {}
+	context = {
+		'membership_alerts': {
+			m.group.id for m in UserGroupMembership.objects.filter(profile=request.user.profile) if m.alerts_on
+		},
+	}
 	if request.method == 'POST' and 'type' in request.POST:
 		if request.POST['type'] == 'create_group':
 			group = None
@@ -324,10 +328,15 @@ def user_groups(request):
 			except ValidationError:
 				context['error_message'] = 'invalid group name'
 		elif request.POST['type'] == 'delete_group':
-			try:
-				UserGroup.objects.get(pk=request.POST['group_id']).delete()
-			except UserGroup.DoesNotExist:
-				pass
+			UserGroup.objects.get(pk=request.POST['group_id']).delete()
+		elif request.POST['type'] == 'toggle_alerts':		
+			group = UserGroup.objects.get(pk=request.POST['group_id'])
+			membership = UserGroupMembership.objects.get(group=group, profile=request.user.profile)
+			membership.alerts_on = 'alerts_on' in request.POST
+			membership.save()
+			
+			# Currently using AJAX
+			return JsonResponse({})
 		else:
 			try:
 				user = User.objects.get(username=request.POST['username'])

@@ -1,5 +1,7 @@
 {% extends 'crontrack/base.html' %}
 
+{% load static %}
+
 {% block title %} Manage user groups {% endblock %}
 
 {% block content %}
@@ -11,6 +13,7 @@
 					<th>Group Name</th>
 					<th>Current Users</th>
 					<th>New User</th>
+					<th>Alerts</th>
 				</tr></thead>
 				<tbody>
 					{% for group in user.profile.groups.all %}
@@ -26,7 +29,7 @@
 											<option value="{{ p.user }}">{{ p.user }}</option>
 										{% endfor %}
 									</select>
-									<input type="submit" value="Remove user" class="danger">
+									<input type="submit" value="Remove" class="danger">
 								</form>
 							</td>
 							<td>
@@ -35,8 +38,13 @@
 									<input type="hidden" name="type" value="add_user">
 									<input type="hidden" name="group_id" value="{{ group.id }}">
 									<input type="text" name="username" placeholder="Username">
-									<input type="submit" value="Add user">
+									<input type="submit" value="Add">
 								</form>
+							</td>
+							<td>
+								<input type="checkbox" name="alerts_on" {% if group.id in membership_alerts %} checked {% endif %}
+										group-id="{{ group.id }}">
+								
 								<input type="button" value=" X " onclick="deleteGroup('{{ group.id }}')" class="danger float right">
 								<form id="deleteGroup{{ group.id }}" method="post">
 									{% csrf_token %}
@@ -63,7 +71,27 @@
 			<a href="{% url 'crontrack:login' %}">Log in</a>
 		{% endif %}
 	</div>
+	{% include 'crontrack/js/jquery.html' %}
+	{% include 'crontrack/js/js-cookie.html' %}
+	<script src="{% static 'crontrack/setup.js' %}"></script>
 	<script>
+		$(document).on('load', function() {
+			$('input[name="alerts_on"]').on('change', function() {
+				console.log('YEAH');
+				$.ajax({
+					beforeSend: setToken,
+					type: 'POST',
+					url: $(ev.target).closest('form').action,
+					data: {
+						'type': 'toggle_alerts',
+						'group_id': $(this).attr('group-id'),
+						'alerts_on': this.checked
+					},
+					dataType: 'json'
+				});
+			});
+		});
+		
 		function deleteGroup(groupID) {
 			form = document.getElementById('deleteGroup' + groupID);
 			groupName = form.lastElementChild.value;

@@ -22,10 +22,15 @@
 						<tr>
 							<td><label for="alert_method">Alert method</label></td>
 							<td>
+								<label for="alertMethodNoAlerts">No alerts</label>
+								<input type="radio" name="alert_method" id="alertMethodNoAlerts" value="{{ user.profile.NO_ALERTS }}"
+										{% if user.profile.alert_method == user.profile.NO_ALERTS %}checked{% endif %}>
 								<label for="alertMethodEmail">Email</label>
-								<input type="radio" name="alert_method" id="alertMethodEmail" value="E" checked>
+								<input type="radio" name="alert_method" id="alertMethodEmail" value="{{ user.profile.EMAIL }}"
+										{% if user.profile.alert_method == user.profile.EMAIL %}checked{% endif %}>
 								<label for="alertMethodText">Text</label>
-								<input type="radio" name="alert_method" id="alertMethodText" value="T" maxlength="15">
+								<input type="radio" name="alert_method" id="alertMethodText" value="{{ user.profile.SMS }}"
+										{% if user.profile.alert_method == user.profile.SMS %}checked{% endif %}>
 							</td>
 						</tr>
 						<tr id="emailRow">
@@ -64,6 +69,10 @@
 	{% include 'crontrack/js/intl-tel-input.html' %}
 	<script>	
 		$(document).ready(function() {
+			$('#alertMethodNoAlerts').on('click', function() {
+				$('#emailRow').hide();
+				$('#phoneRow').hide();
+			});
 			$('#alertMethodEmail').on('click', function() {
 				$('#emailRow').show();
 				$('#phoneRow').hide();
