@@ -7,13 +7,11 @@
 		<h2>Manage user groups</h2>
 		{% if user.is_authenticated %}
 			<table class="dbRows">
-				<thead>
-					<tr>
-						<th>Group Name</th>
-						<th>Current Users</th>
-						<th>New User</th>
-					</tr>
-				</thead>
+				<thead><tr>
+					<th>Group Name</th>
+					<th>Current Users</th>
+					<th>New User</th>
+				</tr></thead>
 				<tbody>
 					{% for group in user.profile.groups.all %}
 						<tr>

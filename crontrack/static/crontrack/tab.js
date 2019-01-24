@@ -1,5 +1,5 @@
 // Change which tab of content is currently being displayed
-function changeTab(ev, tabName) {
+function changeTab(ev, tabName) {	
 	// Hide all the tab contents
 	var contents = document.getElementsByClassName('tabContent');
 	for (var i = 0; i < contents.length; i++) {

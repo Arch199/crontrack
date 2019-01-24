@@ -20,20 +20,19 @@
 				<form action="{% url 'crontrack:edit_group' %}" method="post">
 					{% csrf_token %}
 					<input type="hidden" name="edited">
-					<input type="hidden" name="group" value="{{ group.id }}">
+					<input type="hidden" name="group" value="{{ group.id|default:'None' }}">
+					<input type="hidden" name="user_group" value="{{ user_group|default:'None' }}">
 					<table class="dbRows">
 						<thead><tr>
 							<th>Name</th>
 							<th>Cron Schedule String</th>
 							<th>Time Window (min)</th>
-							<!--<th>Next Run Time</th>
-							<th>Last Notified</th>-->
 						</tr></thead>
 						<tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
 							<span><input type="text" name="group_name" value="{{ group.name }}" size="50" maxlength="50"></span>
 							
 							<!-- ^THIS 50 is a magic number and should be burnt with fire
-								-- TODO: I need to make a constants field and pass it into the template -->
+								TODO: I need to make a constants field and pass it into the template -->
 							
 							<span class="right">
 								<a class="button" href="{% url 'crontrack:view_jobs' %}">Cancel</a>
@@ -44,10 +43,12 @@
 							</span>
 						</td></tr>
 						<tbody class="rowGroupContent open">
-							<tr><td colspan="3" class="rowGroupInfo">
-								<textarea name="description" maxlength="200"
-										placeholder="Group description">{{ group.description }}</textarea>
-							</td></tr>
+							{% if group.id %}
+								<tr><td colspan="3" class="rowGroupInfo">
+									<textarea name="description" maxlength="200"
+											placeholder="Group description">{{ group.description }}</textarea>
+								</td></tr>
+							{% endif %}
 							{% for job in group.jobs %}
 								<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="{{ job.id }}">
 									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>

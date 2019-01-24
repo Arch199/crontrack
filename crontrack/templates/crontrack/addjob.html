@@ -13,7 +13,7 @@
 				<button onclick="changeTab(event, 'Add single')" class="{% if not prefill.group %}active{% endif %}">Add single</button>
 				<button onclick="changeTab(event, 'Add group')" class="{{ prefill.group }}">Add group</button>
 			</div>
-			<div class="tabContent {% if not prefill.group %}active{% endif %}" id="Add single">
+			<div class="tabContent show {% if not prefill.group %}active{% endif %}" id="Add single">
 				<form action="{% url 'crontrack:add_job' %}" method="post">
 					{% csrf_token %}
 					<input type="hidden" name="single" value="active">
@@ -21,6 +21,15 @@
 						<tr>
 							<td><label for="name">Job name</label></td>
 							<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
+						</tr>
+						<tr>
+							<td><label for="user_group">User group</label></td>
+							<td><select name="user_group" id="user_group">
+								<option value="None">None</option>
+								{% for group in user.profile.groups.all %}
+									<option value="{{ group.id }}">{{ group.name }}</option>
+								{% endfor %}
+							</select></td>
 						</tr>
 						<tr>
 							<td><label for="schedule_str">Cron schedule string</label></td>
@@ -35,15 +44,6 @@
 							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
 							<!-- TODO: should really define maxlength as a constant somewhere -->
 						<tr>
-							<td><label for="user_group">User group</label></td>
-							<td><select name="user_group" id="user_group">
-								<option value="">None</option>
-								{% for group in user.groups.all %}
-									<option value="{{ group.id }}">{{ group.name }}</option>
-								{% endfor %}
-							</select></td>
-						</tr>
-						<tr>
 							<td><label>Timezone</label></td>
 							<td>{% timezone_selector user.profile.timezone %}</td>
 						</tr>
@@ -54,7 +54,7 @@
 					{% endif %}
 				</form>
 			</div>
-			<div class="tabContent {{ prefill.group }}" id="Add group">
+			<div class="tabContent show {{ prefill.group }}" id="Add group">
 				<form action="{% url 'crontrack:add_job' %}" method="post">
 					{% csrf_token %}
 					<input type="hidden" name="group" value="active">
@@ -62,6 +62,15 @@
 						<tr>
 							<td><label for="name">Group name</label></td>
 							<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
+						</tr>
+						<tr>
+							<td><label for="user_group">User group</label></td>
+							<td><select name="user_group" id="user_group">
+								<option value="None">None</option>
+								{% for group in user.profile.groups.all %}
+									<option value="{{ group.id }}">{{ group.name }}</option>
+								{% endfor %}
+							</select></td>
 						</tr>
 						<tr>
 							<td><label for="group_schedule">Cron schedule string(s)</label></td>
@@ -75,15 +84,6 @@
 							<td><label for="description">Group description (optional)</label></td>
 							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
 							<!-- TODO: should really define maxlength as a constant somewhere -->
-						<tr>
-							<td><label for="user_group">User group</label></td>
-							<td><select name="user_group" id="user_group">
-								<option value="">None</option>
-								{% for group in user.groups.all %}
-									<option value="{{ group.id }}">{{ group.name }}</option>
-								{% endfor %}
-							</select></td>
-						</tr>
 						<tr>
 							<td><label>Timezone</label></td>
 							<td>{% timezone_selector user.profile.timezone %}</td>
