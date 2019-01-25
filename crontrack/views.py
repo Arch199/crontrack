@@ -329,14 +329,15 @@ def user_groups(request):
 				context['error_message'] = 'invalid group name'
 		elif request.POST['type'] == 'delete_group':
 			UserGroup.objects.get(pk=request.POST['group_id']).delete()
-		elif request.POST['type'] == 'toggle_alerts':		
-			group = UserGroup.objects.get(pk=request.POST['group_id'])
-			membership = UserGroupMembership.objects.get(group=group, profile=request.user.profile)
-			membership.alerts_on = 'alerts_on' in request.POST
-			membership.save()
-			
-			# Currently using AJAX
-			return JsonResponse({})
+		elif request.POST['type'] == 'toggle_alerts':
+			if request.POST['group_id'] == 'None':
+				request.user.profile.personal_alerts_on = request.POST['alerts_on'] == 'true'
+				request.user.profile.save()
+			else:
+				group = UserGroup.objects.get(pk=request.POST['group_id'])
+				membership = UserGroupMembership.objects.get(group=group, profile=request.user.profile)
+				membership.alerts_on = request.POST['alerts_on'] == 'true'
+				membership.save()
 		else:
 			try:
 				user = User.objects.get(username=request.POST['username'])
@@ -356,7 +357,10 @@ def user_groups(request):
 					else:
 						user.profile.groups.remove(group)
 	
-	return render(request, 'crontrack/usergroups.html', context)
+	if request.is_ajax():
+		return JsonResponse({})
+	else:
+		return render(request, 'crontrack/usergroups.html', context)
 
 class Register(generic.CreateView):
 	form_class = UserCreationForm

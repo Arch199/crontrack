@@ -7,17 +7,26 @@
 {% block content %}
 	<div class="hcenter">
 		<h2>Manage user groups</h2>
+		<div class="infoBox">
+			<label for="personalAlerts">(No user group) alerts on</label>
+			<input type="checkbox" name="alerts_on" {% if user.profile.personal_alerts_on %} checked {% endif %}
+					group-id="None" id="personalAlerts">
+		</div>
 		{% if user.is_authenticated %}
 			<table class="dbRows">
 				<thead><tr>
+					<th>Alerts</th>
 					<th>Group Name</th>
 					<th>Current Users</th>
 					<th>New User</th>
-					<th>Alerts</th>
 				</tr></thead>
 				<tbody>
 					{% for group in user.profile.groups.all %}
 						<tr>
+							<td>
+								<input type="checkbox" name="alerts_on" {% if group.id in membership_alerts %} checked {% endif %}
+										group-id="{{ group.id }}">
+							</td>
 							<td><b>{{ group.name }}</b></td>
 							<td>
 								<form method="post">
@@ -40,10 +49,6 @@
 									<input type="text" name="username" placeholder="Username">
 									<input type="submit" value="Add">
 								</form>
-							</td>
-							<td>
-								<input type="checkbox" name="alerts_on" {% if group.id in membership_alerts %} checked {% endif %}
-										group-id="{{ group.id }}">
 								
 								<input type="button" value=" X " onclick="deleteGroup('{{ group.id }}')" class="danger float right">
 								<form id="deleteGroup{{ group.id }}" method="post">
@@ -75,13 +80,12 @@
 	{% include 'crontrack/js/js-cookie.html' %}
 	<script src="{% static 'crontrack/setup.js' %}"></script>
 	<script>
-		$(document).on('load', function() {
+		$(document).ready(function() {
 			$('input[name="alerts_on"]').on('change', function() {
-				console.log('YEAH');
 				$.ajax({
 					beforeSend: setToken,
 					type: 'POST',
-					url: $(ev.target).closest('form').action,
+					url: window.location.href,
 					data: {
 						'type': 'toggle_alerts',
 						'group_id': $(this).attr('group-id'),

@@ -10,5 +10,5 @@ from .models import Profile
 
 @receiver(post_save, sender=User)
 def ensure_profile_exists(sender, **kwargs):
-    if kwargs.get('created', False):
-        Profile.objects.get_or_create(user=kwargs.get('instance'), timezone=pytz.utc)
+	if kwargs.get('created', False):
+		Profile.objects.get_or_create(user=kwargs.get('instance'), timezone=pytz.utc)

@@ -36,7 +36,7 @@ class Job(models.Model):
 	alerted_users = models.ManyToManyField(User, through='JobAlert', related_name='job_alert_set')
 	
 	def __str__(self):
-		return f'{self.user}\'s {self.name}: "{self.schedule_str}"'
+		return f'({self.user_group}) {self.user}\'s {self.name}: "{self.schedule_str}"'
 
 class JobAlert(models.Model):
 	job = models.ForeignKey(Job, models.CASCADE)
@@ -61,5 +61,6 @@ class Profile(models.Model):
 	timezone = TimeZoneField(default='UTC')
 	alert_method = models.CharField(max_length=1, choices=ALERT_METHOD_CHOICES, default=NO_ALERTS)
 	alert_buffer = models.IntegerField('time to wait between alerts (min)', default=1440)
+	personal_alerts_on = models.BooleanField('alerts on for jobs without a user group', default=True)
 	phone = PhoneNumberField(blank=True)
 	groups = models.ManyToManyField(UserGroup, through=UserGroupMembership)

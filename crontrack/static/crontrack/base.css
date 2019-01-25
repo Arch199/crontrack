@@ -157,6 +157,19 @@ form {
 }
 
 
+/* --- Small box for information --- */
+.infoBox {
+	display: inline-block;
+	background-color: #ccc; /* matching table.dbRows tr */
+	margin: 10px;
+	margin-top: 0px;
+	margin-bottom: 20px;
+	padding: 10px;
+	border: 2px #bbb inset;
+	font-weight: bold;
+}
+
+
 /* --- Table for displaying rows from a database --- */
 table.dbRows, table.dbRows td, table.dbRows th {
 	border: 1px solid black;

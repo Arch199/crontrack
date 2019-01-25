@@ -33,7 +33,7 @@
 										{% if user.profile.alert_method == user.profile.SMS %}checked{% endif %}>
 							</td>
 						</tr>
-						<tr id="emailRow">
+						<tr id="emailRow" style="display: none">
 							<td><label for="email">Email address</label></td>
 							<td><input type="email" name="email" id="email" value="{{ user.email }}"></td>
 						</tr>
@@ -42,7 +42,11 @@
 							<td><input type="tel" name="phone" id="phone" value="{{ user.profile.phone }}"></td>
 						</tr>
 						<tr>
-							<td><label for="alert_buffer">Time between alerts (min)</label></td>
+							<td>
+								<label for="alert_buffer">Time between alerts (min)
+									<br><span class="note">(1440 min = 24 hr)</span>
+								</label>
+							</td>
 							<td><input type="number" name="alert_buffer" value="{{ user.profile.alert_buffer }}"></td>
 						</tr>
 					</table>
@@ -82,8 +86,10 @@
 				$('#emailRow').hide();
 			});
 			
-			{% if user.profile.alert_method == user.profile.SMS or prefill.alert_method == user.profile.SMS %}
-				$('#alertMethodText').trigger('click');
+			{% if user.profile.alert_method == user.profile.EMAIL or prefill.alert_method == user.profile.EMAIL %}
+				$('#emailRow').show();
+			{% elif user.profile.alert_method == user.profile.SMS or prefill.alert_method == user.profile.SMS %}
+				$('#phoneRow').show();
 			{% endif %}
 		});
 	</script>

@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 
-from .models import Job, Profile, JobAlert
+from .models import Job, Profile, JobAlert, UserGroupMembership
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +38,11 @@ class JobMonitor:
 				# Check if a notification was not received in the time window
 				if job.last_notified is None or not (job.next_run <= job.last_notified <= run_by):
 					# Error condition: the job did not send a notification
+					logger.debug(f"Alert! Job: {job} failed to notify in the time window")
+					
 					# Try alerting users in the relevant user group
 					if job.user_group is None:
-						profiles = [job.user.profile]
+						profiles = (job.user.profile,)
 					else:
 						profiles = job.user_group.profile_set.all()
 					for profile in profiles:
@@ -66,13 +68,18 @@ class JobMonitor:
 				
 			time.sleep(60)  # TODO: Put this back to 2*60 (2 min) or 1 min (?)
 		
-	def alert_user(self, user, job):
-		logger.debug(f"Alert! Job: {job} failed to notify in the time window.")
-		
-		# Skip alerting if the user has alerts disabled (either globally or just for this user group)
+	def alert_user(self, user, job):		
+		# Skip alerting if the user has alerts disabled (either globally or just for this user group
 		if user.profile.alert_method == Profile.NO_ALERTS:
-			logger.debug(f"Not alerting user '{user}' as they have alerts disabled")
+			logger.debug(f"Not alerting user '{user}' as they have all alerts disabled")
 			return
+		if job.user_group is None:
+			alerts_on = user.profile.personal_alerts_on
+		else:
+			alerts_on = UserGroupMembership.objects.get(profile=user.profile, group=job.user_group).alerts_on
+		if not alerts_on:
+			logger.debug(f"Not alerting user '{user}' as they have alerts for group '{job.user_group}' disabled")
+			return		
 		
 		# Either send an email or text based on user preferences
 		context = {'job': job, 'domain': settings.DEFAULT_SITE_URL}
