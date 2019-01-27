@@ -10,7 +10,7 @@
 		{% if user.is_authenticated %}
 			{% if group %}
 				<p class="note">
-					Currently displaying in timezone "{{ user.profile.timezone }}."
+					Currently displaying in timezone "{{ user.timezone }}."
 					(<a href="{% url 'crontrack:profile' %}">change</a>)
 				</p>
 				<form action="{% url 'crontrack:delete_group' %}" method="post" id="deleteRowGroupForm">

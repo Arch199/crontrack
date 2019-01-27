@@ -11,15 +11,14 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from .models import *
-from .forms import ProfileForm
+from .models import Job, JobGroup, JobAlert, User, UserGroup, UserGroupMembership
+from .forms import ProfileForm, RegisterForm
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +53,10 @@ def notify_job(request, id):
 
 @login_required
 def view_jobs(request):
-	timezone.activate(request.user.profile.timezone)
+	timezone.activate(request.user.timezone)
 	
 	context = {'user_groups': []}
-	for user_group in chain((None,), request.user.profile.groups.all()):
+	for user_group in chain((None,), request.user.user_groups.all()):
 		ungrouped = (get_job_group(request.user, None, user_group),)
 		grouped = (get_job_group(request.user, g, user_group) for g in JobGroup.objects.all())
 		
@@ -85,7 +84,7 @@ def add_job(request):
 				user_group = None
 			else:
 				user_group = UserGroup.objects.get(pk=request.POST['user_group'])
-				if user_group not in request.user.profile.groups.all():
+				if user_group not in request.user.user_groups.all():
 					user_group = None
 					logger.warning("User {request.user} tried to access a group they\'re not in: {user_group}")
 			
@@ -174,7 +173,7 @@ def add_job(request):
 @login_required
 def edit_group(request):
 	if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
-		timezone.activate(request.user.profile.timezone)
+		timezone.activate(request.user.timezone)
 		context = {
 			'group': get_job_group(request.user, request.POST['group'], request.POST['user_group']),
 			'user_group': request.POST['user_group'],
@@ -287,31 +286,25 @@ def delete_job(request):
 
 @login_required
 def user_groups(request):
-	context = {
-		'membership_alerts': {
-			m.group.id for m in UserGroupMembership.objects.filter(profile=request.user.profile) if m.alerts_on
-		},
-	}
 	if request.method == 'POST' and 'type' in request.POST:
 		if request.POST['type'] == 'create_group':
 			group = None
 			try:
 				with transaction.atomic():
 					group = UserGroup(name=request.POST.get('group_name'), creator=request.user)
-					group.full_clean()
 					group.save()
-					request.user.profile.groups.add(group)
+					UserGroupMembership.objects.create(user=request.user, group=group)
 			except ValidationError:
 				context['error_message'] = 'invalid group name'
 		elif request.POST['type'] == 'delete_group':
 			UserGroup.objects.get(pk=request.POST['group_id']).delete()
 		elif request.POST['type'] == 'toggle_alerts':
 			if request.POST['group_id'] == 'None':
-				request.user.profile.personal_alerts_on = request.POST['alerts_on'] == 'true'
-				request.user.profile.save()
+				request.user.personal_alerts_on = request.POST['alerts_on'] == 'true'
+				request.user.save()
 			else:
 				group = UserGroup.objects.get(pk=request.POST['group_id'])
-				membership = UserGroupMembership.objects.get(group=group, profile=request.user.profile)
+				membership = UserGroupMembership.objects.get(group=group, user=request.user)
 				membership.alerts_on = request.POST['alerts_on'] == 'true'
 				membership.save()
 		else:
@@ -326,16 +319,21 @@ def user_groups(request):
 				if request.POST['type'] == 'add_user':
 					# Is it okay to add users to groups without them having a say?
 					# TODO: consider sending a popup etc. to the other user to confirm before adding them
-					user.profile.groups.add(group)
+					user.user_groups.add(group)
 				elif request.POST['type'] == 'remove_user':
 					if user.id == group.creator.id:
 						context['error_message'] = "you cannot remove yourself from a group you created"
 					else:
-						user.profile.groups.remove(group)
+						user.user_groups.remove(group)
 	
 	if request.is_ajax():
 		return JsonResponse({})
 	else:
+		context = {
+			'membership_alerts': {
+				m.group.id for m in UserGroupMembership.objects.filter(user=request.user) if m.alerts_on
+			},
+		}
 		return render(request, 'crontrack/usergroups.html', context)
 
 @login_required
@@ -345,15 +343,12 @@ def profile(request):
 		form = ProfileForm(request.POST)
 		
 		if form.is_valid():
-			# Update profile settings
-			profile = User.objects.get(pk=request.user.id).profile		
-			profile.timezone = form.cleaned_data['timezone']
-			profile.alert_method = form.cleaned_data['alert_method']
-			profile.alert_buffer = form.cleaned_data['alert_buffer']
-			profile.phone = form.cleaned_data['full_phone']
-			profile.save()
-			
+			# Update profile settings	
+			request.user.timezone = form.cleaned_data['timezone']
+			request.user.alert_method = form.cleaned_data['alert_method']
+			request.user.alert_buffer = form.cleaned_data['alert_buffer']
 			request.user.email = form.cleaned_data['email']
+			request.user.phone = form.cleaned_data['full_phone']
 			request.user.save()
 			context['success_message'] = "Account settings updated."
 		else:
@@ -374,13 +369,13 @@ def delete_account(request):
 		
 	return render(request, 'registration/deleteaccount.html', context)
 		
-class Register(generic.CreateView):
-	form_class = UserCreationForm
-	success_url = '/crontrack/accounts/profile'
+class RegisterView(generic.CreateView):
+	form_class = RegisterForm
+	success_url = '/crontrack/accounts/profile/'
 	template_name = 'registration/register.html'
 	
 	def form_valid(self, form):
-		valid = super(Register, self).form_valid(form)
+		valid = super(RegisterView, self).form_valid(form)
 		username, password = form.cleaned_data.get('username'), form.cleaned_data.get('password1')
 		new_user = authenticate(username=username, password=password)
 		login(self.request, new_user)
@@ -430,6 +425,6 @@ def get_job_group(user_id, job_group, user_group):
 	
 	return {'id': id, 'name': name, 'description': description, 'jobs': jobs}
 
-# Checks if a user shouldn't be able to modify a record (i.e. if they don't own it and aren't part of the group it's in)
+# Checks if a user shouldn't be able to access a job (i.e. if they don't own it and aren't part of the group it's in)
 def permission_denied(request_user, user, user_group):
-	return request_user != user and user_group not in request_user.profile.groups.all()
+	return request_user != user and user_group not in request_user.user_groups.all()

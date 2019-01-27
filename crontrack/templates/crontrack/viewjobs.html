@@ -10,12 +10,12 @@
 		{% if user.is_authenticated %}
 			<div class="tab fixedWidth">
 				<button onclick="changeTab(event, 'ug__0')" class="active">(No user group)</button>
-				{% for user_group in user.profile.groups.all %}
+				{% for user_group in user.user_groups.all %}
 					<button onclick="changeTab(event, 'ug__{{ user_group.id }}')">{{ user_group }}</button>
 				{% endfor %}
 			</div>
 			<p class="note">
-				Currently displaying in timezone "{{ user.profile.timezone }}."
+				Currently displaying in timezone "{{ user.timezone }}."
 				(<a href="{% url 'crontrack:profile' %}">change</a>)
 			</p>
 			{% for user_group in user_groups %}

@@ -17,7 +17,7 @@ urlpatterns = [
 	path('api/notifyjob/<uuid:id>/', views.notify_job, name='notify_job'),
 	
 	path('accounts/profile/', views.profile, name='profile'),
-	path('accounts/register/', views.Register.as_view(), name='register'),
+	path('accounts/register/', views.RegisterView.as_view(), name='register'),
 	path('accounts/delete/', views.delete_account, name='delete_account'),
 	
 	path('accounts/login/', auth_views.LoginView.as_view(), name='login'),

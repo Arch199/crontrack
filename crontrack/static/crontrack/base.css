@@ -421,6 +421,10 @@ table.form textarea {
 	height: 40px;
 }
 
+table.form.thin input {
+	width: 200px;
+}
+
 
 /* --- Tabs --- */
 /* help here: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_tabs */

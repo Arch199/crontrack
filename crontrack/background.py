@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 
-from .models import Job, Profile, JobAlert, UserGroupMembership
+from .models import Job, JobAlert, User, UserGroupMembership
 
 logger = logging.getLogger(__name__)
 
@@ -42,26 +42,26 @@ class JobMonitor:
 					
 					# Try alerting users in the relevant user group
 					if job.user_group is None:
-						profiles = (job.user.profile,)
+						users = (job.user,)
 					else:
-						profiles = job.user_group.profile_set.all()
-					for profile in profiles:
-						if profile.user not in job.alerted_users.all():
+						users = job.user_group.user_set.all()
+					for user in users:
+						if user not in job.alerted_users.all():
 							# Send an alert if it's our first
-							JobAlert.objects.create(user=profile.user, job=job, last_alert=timezone.now())
-							self.alert_user(profile.user, job)
+							JobAlert.objects.create(user=user, job=job, last_alert=timezone.now())
+							self.alert_user(user, job)
 						else:
 							# Otherwise, decide whether to skip alerting 
 							# (based on that user's alert_buffer setting and the last alert sent to them for this job)
-							buffer_time = timedelta(minutes=profile.alert_buffer)
-							last_alert = JobAlert.objects.get(job=job, user=profile.user).last_alert
+							buffer_time = timedelta(minutes=user.alert_buffer)
+							last_alert = JobAlert.objects.get(job=job, user=user).last_alert
 							if timezone.now() > last_alert + buffer_time:
-								self.alert_user(profile.user, job)
+								self.alert_user(user, job)
 							else:
-								logger.debug(f"Skipped alerting user '{profile.user}' of failed job {job}")
+								logger.debug(f"Skipped alerting user '{user}' of failed job {job}")
 				
 				# Calculate the new next run time
-				timezone.activate(job.user.profile.timezone)
+				timezone.activate(job.user.timezone)
 				now = timezone.localtime(timezone.now())
 				job.next_run = croniter(job.schedule_str, now).get_next(datetime)
 				job.save()
@@ -70,32 +70,32 @@ class JobMonitor:
 		
 	def alert_user(self, user, job):		
 		# Skip alerting if the user has alerts disabled (either globally or just for this user group
-		if user.profile.alert_method == Profile.NO_ALERTS:
+		if user.alert_method == User.NO_ALERTS:
 			logger.debug(f"Not alerting user '{user}' as they have all alerts disabled")
 			return
 		if job.user_group is None:
-			alerts_on = user.profile.personal_alerts_on
+			alerts_on = user.personal_alerts_on
 		else:
-			alerts_on = UserGroupMembership.objects.get(profile=user.profile, group=job.user_group).alerts_on
+			alerts_on = UserGroupMembership.objects.get(user=user, group=job.user_group).alerts_on
 		if not alerts_on:
 			logger.debug(f"Not alerting user '{user}' as they have alerts for group '{job.user_group}' disabled")
 			return		
 		
 		# Either send an email or text based on user preferences
 		context = {'job': job, 'domain': settings.DEFAULT_SITE_URL, 'user': user}
-		if user.profile.alert_method == Profile.EMAIL:
+		if user.alert_method == User.EMAIL:
 			logger.debug(f"Sending user '{user}' an email at {user.email}")
 			subject = f"[CronTrack] ALERT: Job '{job.name}' failed to notify within time window"
 			message = render_to_string('crontrack/email/alertuser.html', context)
 			user.email_user(subject, strip_tags(message), html_message=message)
 		else:
-			logger.debug(f"Sending user '{user}' an SMS at {user.profile.phone}")
+			logger.debug(f"Sending user '{user}' an SMS at {user.phone}")
 			message = render_to_string('crontrack/sms/alertuser.html', context)
 			client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 			try:
-				client.messages.create(body=message, to=str(user.profile.phone), from_=settings.TWILIO_FROM_NUMBER)
+				client.messages.create(body=message, to=str(user.phone), from_=settings.TWILIO_FROM_NUMBER)
 			except TwilioRestException:
-				logger.exception("Failed to send user '{user.username}' an SMS at {user.profile.phone}")
+				logger.exception("Failed to send user '{user.username}' an SMS at {user.phone}")
 		
 		JobAlert.objects.get(job=job, user=user).last_alert = timezone.now()
 		job.save()

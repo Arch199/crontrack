@@ -6,8 +6,7 @@ from django.conf import settings
 class CronTrackConfig(AppConfig):
 	name = 'crontrack'
 	
-	def ready(self):	
-		import crontrack.signals
+	def ready(self):
 		import crontrack.background
 		
 		# Only run the monitor in the main thread

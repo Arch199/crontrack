@@ -21,20 +21,20 @@
 					<table class="form">
 						<tr>
 							<td><label for="timezoneSelector">Timezone</label></td>
-							<td>{% timezone_selector prefill.timezone|default:user.profile.timezone %}</td>
+							<td>{% timezone_selector prefill.timezone|default:user.timezone %}</td>
 						</tr>
 						<tr>
 							<td><label for="alert_method">Alert method</label></td>
 							<td>
 								<label for="alertMethodNoAlerts">No alerts</label>
-								<input type="radio" name="alert_method" id="alertMethodNoAlerts" value="{{ user.profile.NO_ALERTS }}"
-										{% if user.profile.alert_method == user.profile.NO_ALERTS %}checked{% endif %}>
+								<input type="radio" name="alert_method" id="alertMethodNoAlerts" value="{{ user.NO_ALERTS }}"
+										{% if user.alert_method == user.NO_ALERTS %}checked{% endif %}>
 								<label for="alertMethodEmail">Email</label>
-								<input type="radio" name="alert_method" id="alertMethodEmail" value="{{ user.profile.EMAIL }}"
-										{% if user.profile.alert_method == user.profile.EMAIL %}checked{% endif %}>
+								<input type="radio" name="alert_method" id="alertMethodEmail" value="{{ user.EMAIL }}"
+										{% if user.alert_method == user.EMAIL %}checked{% endif %}>
 								<label for="alertMethodText">Text</label>
-								<input type="radio" name="alert_method" id="alertMethodText" value="{{ user.profile.SMS }}"
-										{% if user.profile.alert_method == user.profile.SMS %}checked{% endif %}>
+								<input type="radio" name="alert_method" id="alertMethodText" value="{{ user.SMS }}"
+										{% if user.alert_method == user.SMS %}checked{% endif %}>
 							</td>
 						</tr>
 						<tr id="emailRow" style="display: none">
@@ -43,7 +43,7 @@
 						</tr>
 						<tr id="phoneRow" style="display: none">
 							<td><label for="phone">Phone number</label></td>
-							<td><input type="tel" name="phone" id="phone" value="{{ user.profile.phone }}"></td>
+							<td><input type="tel" name="phone" id="phone" value="{{ user.phone }}"></td>
 						</tr>
 						<tr>
 							<td>
@@ -51,7 +51,7 @@
 									<br><span class="note">(1440 min = 24 hr)</span>
 								</label>
 							</td>
-							<td><input type="number" name="alert_buffer" value="{{ user.profile.alert_buffer }}"></td>
+							<td><input type="number" name="alert_buffer" value="{{ user.alert_buffer }}"></td>
 						</tr>
 					</table>
 					<br><center><input type="submit" value="Confirm"></center>
@@ -90,9 +90,9 @@
 				$('#emailRow').hide();
 			});
 			
-			{% if user.profile.alert_method == user.profile.EMAIL or prefill.alert_method == user.profile.EMAIL %}
+			{% if user.alert_method == user.EMAIL or prefill.alert_method == user.EMAIL %}
 				$('#emailRow').show();
-			{% elif user.profile.alert_method == user.profile.SMS or prefill.alert_method == user.profile.SMS %}
+			{% elif user.alert_method == user.SMS or prefill.alert_method == user.SMS %}
 				$('#phoneRow').show();
 			{% endif %}
 		});

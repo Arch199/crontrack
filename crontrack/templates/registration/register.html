@@ -8,8 +8,25 @@
 		<h3>Register an account</h3>
 		<form method="post">
 			{% csrf_token %}
-			{{ form.as_p }}
-			<input type="submit" value="Register">
+			<table class="form thin">
+				<tr>
+					<td>{{ form.email.label_tag }}</td>
+					<td>{{ form.email }}</td>
+				</tr>
+				<tr>
+					<td>{{ form.username.label_tag }}</td>
+					<td>{{ form.username }}</td>
+				</tr>
+				<tr>
+					<td>{{ form.password1.label_tag }}</td>
+					<td>{{ form.password1 }}</td>
+				</tr>
+				<tr>
+					<td>{{ form.password2.label_tag }}</td>
+					<td>{{ form.password2 }}</td>
+				</tr>
+			</table>
+			<br><input type="submit" value="Register">
 		</form>
 		{% for error in form.errors.values %}
 			<br><span class="errorMessage">

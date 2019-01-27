@@ -9,7 +9,7 @@
 		<h2>Manage user groups</h2>
 		<div class="infoBox">
 			<label for="personalAlerts">(No user group) alerts on</label>
-			<input type="checkbox" name="alerts_on" {% if user.profile.personal_alerts_on %} checked {% endif %}
+			<input type="checkbox" name="alerts_on" {% if user.personal_alerts_on %} checked {% endif %}
 					group-id="None" id="personalAlerts">
 		</div>
 		{% if user.is_authenticated %}
@@ -21,7 +21,7 @@
 					<th>New User</th>
 				</tr></thead>
 				<tbody>
-					{% for group in user.profile.groups.all %}
+					{% for group in user.user_groups.all %}
 						<tr>
 							<td>
 								<input type="checkbox" name="alerts_on" {% if group.id in membership_alerts %} checked {% endif %}
@@ -34,8 +34,8 @@
 									<input type="hidden" name="type" value="remove_user">
 									<input type="hidden" name="group_id" value="{{ group.id }}">
 									<select name="username">
-										{% for p in group.profile_set.all %}
-											<option value="{{ p.user }}">{{ p.user }}</option>
+										{% for u in group.user_set.all %}
+											<option value="{{ u }}">{{ u }}</option>
 										{% endfor %}
 									</select>
 									<input type="submit" value="Remove" class="danger">
