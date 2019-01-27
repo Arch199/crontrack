@@ -8,10 +8,10 @@ register = template.Library()
 
 @register.simple_tag
 def timezone_selector(my_timezone):
-	result = f'<input type="text" name="timezone" list="timezoneList" id="timezoneSelector" placeholder="Country/City" value="{my_timezone}">'
-	result += '<datalist id="timezoneList">'
-	
-	for tz in all_timezones:
-		result += f'<option value="{tz}">'
-		
-	return mark_safe(result + '</datalist>')
+    result = f'<input type="text" name="timezone" list="timezoneList" id="timezoneSelector" placeholder="Country/City" value="{my_timezone}">'
+    result += '<datalist id="timezoneList">'
+    
+    for tz in all_timezones:
+        result += f'<option value="{tz}">'
+        
+    return mark_safe(result + '</datalist>')

@@ -5,104 +5,104 @@
 {% block title %} Manage user groups {% endblock %}
 
 {% block content %}
-	<div class="hcenter">
-		<h2>Manage user groups</h2>
-		<div class="infoBox">
-			<label for="personalAlerts">(No user group) alerts on</label>
-			<input type="checkbox" name="alerts_on" {% if user.personal_alerts_on %} checked {% endif %}
-					group-id="None" id="personalAlerts">
-		</div>
-		{% if user.is_authenticated %}
-			<table class="dbRows">
-				<thead><tr>
-					<th>Alerts</th>
-					<th>Group Name</th>
-					<th>Current Users</th>
-					<th>New User</th>
-				</tr></thead>
-				<tbody>
-					{% for group in user.user_groups.all %}
-						<tr>
-							<td>
-								<input type="checkbox" name="alerts_on" {% if group.id in membership_alerts %} checked {% endif %}
-										group-id="{{ group.id }}">
-							</td>
-							<td><b>{{ group.name }}</b></td>
-							<td>
-								<form method="post">
-									{% csrf_token %}
-									<input type="hidden" name="type" value="remove_user">
-									<input type="hidden" name="group_id" value="{{ group.id }}">
-									<select name="username">
-										{% for u in group.user_set.all %}
-											<option value="{{ u }}">{{ u }}</option>
-										{% endfor %}
-									</select>
-									<input type="submit" value="Remove" class="danger">
-								</form>
-							</td>
-							<td>
-								<form method="post">
-									{% csrf_token %}
-									<input type="hidden" name="type" value="add_user">
-									<input type="hidden" name="group_id" value="{{ group.id }}">
-									<input type="text" name="username" placeholder="Username">
-									<input type="submit" value="Add">
-								</form>
-								
-								<input type="button" value=" X " onclick="deleteGroup('{{ group.id }}')" class="danger float right">
-								<form id="deleteGroup{{ group.id }}" method="post">
-									{% csrf_token %}
-									<input type="hidden" name="type" value="delete_group">
-									<input type="hidden" name="group_id" value="{{ group.id }}">
-									<input type="hidden" name="group_name" value="{{ group.name }}">
-								</form>
-							</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-			<br><form method="post">
-				{% csrf_token %}
-				<input type="hidden" name="type" value="create_group">
-				<input type="text" name="group_name" placeholder="Group name">
-				&nbsp;<input type="submit" name="create_group" value="Create group">
-			</form>
-			{% if error_message %}
-				<br><p class="errorMessage">Error: {{ error_message }}.</p>
-			{% endif %}
-		{% else %}
-			<p>You are not logged in.</p>
-			<a href="{% url 'crontrack:login' %}">Log in</a>
-		{% endif %}
-	</div>
-	{% include 'crontrack/js/jquery.html' %}
-	{% include 'crontrack/js/js-cookie.html' %}
-	<script src="{% static 'crontrack/setup.js' %}"></script>
-	<script>
-		$(document).ready(function() {
-			$('input[name="alerts_on"]').on('change', function() {
-				$.ajax({
-					beforeSend: setToken,
-					type: 'POST',
-					url: window.location.href,
-					data: {
-						'type': 'toggle_alerts',
-						'group_id': $(this).attr('group-id'),
-						'alerts_on': this.checked
-					},
-					dataType: 'json'
-				});
-			});
-		});
-		
-		function deleteGroup(groupID) {
-			form = document.getElementById('deleteGroup' + groupID);
-			groupName = form.lastElementChild.value;
-			response = confirm('Are you sure you want to delete the group "' + groupName + '"?\nThis cannot be undone.');
-			if (response) {
-				form.submit();
-			}
-		}
-	</script>
+  <div class="hcenter">
+    <h2>Manage user groups</h2>
+    <div class="infoBox">
+      <label for="personalAlerts">(No user group) alerts on</label>
+      <input type="checkbox" name="alerts_on" {% if user.personal_alerts_on %} checked {% endif %}
+          group-id="None" id="personalAlerts">
+    </div>
+    {% if user.is_authenticated %}
+      <table class="dbRows">
+        <thead><tr>
+          <th>Alerts</th>
+          <th>Group Name</th>
+          <th>Current Users</th>
+          <th>New User</th>
+        </tr></thead>
+        <tbody>
+          {% for group in user.user_groups.all %}
+            <tr>
+              <td>
+                <input type="checkbox" name="alerts_on" {% if group.id in membership_alerts %} checked {% endif %}
+                    group-id="{{ group.id }}">
+              </td>
+              <td><b>{{ group.name }}</b></td>
+              <td>
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="type" value="remove_user">
+                  <input type="hidden" name="group_id" value="{{ group.id }}">
+                  <select name="username">
+                    {% for u in group.user_set.all %}
+                      <option value="{{ u }}">{{ u }}</option>
+                    {% endfor %}
+                  </select>
+                  <input type="submit" value="Remove" class="danger">
+                </form>
+              </td>
+              <td>
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="type" value="add_user">
+                  <input type="hidden" name="group_id" value="{{ group.id }}">
+                  <input type="text" name="username" placeholder="Username">
+                  <input type="submit" value="Add">
+                </form>
+                
+                <input type="button" value=" X " onclick="deleteGroup('{{ group.id }}')" class="danger float right">
+                <form id="deleteGroup{{ group.id }}" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="type" value="delete_group">
+                  <input type="hidden" name="group_id" value="{{ group.id }}">
+                  <input type="hidden" name="group_name" value="{{ group.name }}">
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <br><form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="create_group">
+        <input type="text" name="group_name" placeholder="Group name">
+        &nbsp;<input type="submit" name="create_group" value="Create group">
+      </form>
+      {% if error_message %}
+        <br><p class="errorMessage">Error: {{ error_message }}.</p>
+      {% endif %}
+    {% else %}
+      <p>You are not logged in.</p>
+      <a href="{% url 'crontrack:login' %}">Log in</a>
+    {% endif %}
+  </div>
+  {% include 'crontrack/js/jquery.html' %}
+  {% include 'crontrack/js/js-cookie.html' %}
+  <script src="{% static 'crontrack/setup.js' %}"></script>
+  <script>
+    $(document).ready(function() {
+      $('input[name="alerts_on"]').on('change', function() {
+        $.ajax({
+          beforeSend: setToken,
+          type: 'POST',
+          url: window.location.href,
+          data: {
+            'type': 'toggle_alerts',
+            'group_id': $(this).attr('group-id'),
+            'alerts_on': this.checked
+          },
+          dataType: 'json'
+        });
+      });
+    });
+    
+    function deleteGroup(groupID) {
+      form = document.getElementById('deleteGroup' + groupID);
+      groupName = form.lastElementChild.value;
+      response = confirm('Are you sure you want to delete the group "' + groupName + '"?\nThis cannot be undone.');
+      if (response) {
+        form.submit();
+      }
+    }
+  </script>
 {% endblock %}

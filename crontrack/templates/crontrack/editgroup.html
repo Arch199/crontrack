@@ -5,113 +5,113 @@
 {% block title %} Edit a group of jobs {% endblock %}
 
 {% block content %}
-	<div class="hcenter">
-		<h2>Edit job group</h2>
-		{% if user.is_authenticated %}
-			{% if group %}
-				<p class="note">
-					Currently displaying in timezone "{{ user.timezone }}."
-					(<a href="{% url 'crontrack:profile' %}">change</a>)
-				</p>
-				<form action="{% url 'crontrack:delete_group' %}" method="post" id="deleteRowGroupForm">
-					{% csrf_token %}
-					<input type="hidden" name="group" value="{{ group.id }}">
-				</form>				
-				<form action="{% url 'crontrack:edit_group' %}" method="post">
-					{% csrf_token %}
-					<input type="hidden" name="edited">
-					<input type="hidden" name="group" value="{{ group.id|default:'None' }}">
-					<input type="hidden" name="user_group" value="{{ user_group|default:'None' }}">
-					<table class="dbRows">
-						<thead><tr>
-							<th>Name</th>
-							<th>Cron Schedule String</th>
-							<th>Time Window (min)</th>
-						</tr></thead>
-						<tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
-							<span><input type="text" name="group_name" value="{{ group.name }}" size="50" maxlength="50"></span>
-							
-							<!-- ^THIS 50 is a magic number and should be burnt with fire
-								TODO: I need to make a constants field and pass it into the template -->
-							
-							<span class="right">
-								<a class="button" href="{% url 'crontrack:view_jobs' %}">Cancel</a>
-								{% if group.id %}
-									&nbsp;
-									<input type="button" value="Delete" onclick="deleteRowGroup(event,'{{ group.name }}')" class="danger">
-								{% endif %}
-							</span>
-						</td></tr>
-						<tbody class="rowGroupContent open">
-							{% if group.id %}
-								<tr><td colspan="3" class="rowGroupInfo">
-									<textarea name="description" maxlength="200"
-											placeholder="Group description">{{ group.description }}</textarea>
-								</td></tr>
-							{% endif %}
-							{% for job in group.jobs %}
-								<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="{{ job.id }}">
-									<td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>
-									<td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
-									<td>
-										<input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}">
-										<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
-												my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
-									</td>
-								</tr>
-								<tr class="rowGroupItemInfo">
-									<td colspan="5">
-										<textarea name="{{ job.id }}__description" maxlength="200"
-												placeholder="Job description">{{ job.description }}</textarea>
-									</td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-					<br>
-					<div class="dbRows">
-						<input type="button" value="Add new job" id="addJobButton" class="float right">
-						<input type="submit" value="Confirm">
-					</div>
-				</form>
-				{% if error_message %}
-					<br><p class="errorMessage">Error: {{ error_message }}.</p>
-				{% endif %}
-			{% else %}
-				<p class="errorMessage">Error: the selected group does not exist.</p>
-			{% endif %}
-		{% else %}
-			<p>You are not logged in.</p>
-			<a href="{% url 'crontrack:login' %}">Log in</a>
-		{% endif %}
-	</div>
-	{% include 'crontrack/js/jquery.html' %}
-	{% include 'crontrack/js/js-cookie.html' %}
-	<script src="{% static 'crontrack/setup.js' %}"></script>
-	<script src="{% static 'crontrack/rowgroup.js' %}"></script>
-	<script>
-		$(document).ready(function() {
-			var jobNum = 0;
-			$('#addJobButton').on('click', function() {
-				var row = (`
-					<tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="${jobNum}">
-						<td><input type="text" name="${jobNum}__name"></td>
-						<td><input type="text" name="${jobNum}__schedule_str"></td>
-						<td>
-							<input type="number" name="${jobNum}__time_window">
-							<input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
-									my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
-						</td>
-					</tr>
-					<tr class="rowGroupItemInfo">
-						<td colspan="5">
-							<textarea name="${jobNum}__description" maxlength="200" placeholder="Job description"></textarea>
-						</td>
-					</tr>
-				`);
-				$('.rowGroupContent').append(row);
-				jobNum++;
-			});
-		});
-	</script>
+  <div class="hcenter">
+    <h2>Edit job group</h2>
+    {% if user.is_authenticated %}
+      {% if group %}
+        <p class="note">
+          Currently displaying in timezone "{{ user.timezone }}."
+          (<a href="{% url 'crontrack:profile' %}">change</a>)
+        </p>
+        <form action="{% url 'crontrack:delete_group' %}" method="post" id="deleteRowGroupForm">
+          {% csrf_token %}
+          <input type="hidden" name="group" value="{{ group.id }}">
+        </form>       
+        <form action="{% url 'crontrack:edit_group' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="edited">
+          <input type="hidden" name="group" value="{{ group.id|default:'None' }}">
+          <input type="hidden" name="user_group" value="{{ user_group|default:'None' }}">
+          <table class="dbRows">
+            <thead><tr>
+              <th>Name</th>
+              <th>Cron Schedule String</th>
+              <th>Time Window (min)</th>
+            </tr></thead>
+            <tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
+              <span><input type="text" name="group_name" value="{{ group.name }}" size="50" maxlength="50"></span>
+              
+              <!-- ^THIS 50 is a magic number and should be burnt with fire
+                TODO: I need to make a constants field and pass it into the template -->
+              
+              <span class="right">
+                <a class="button" href="{% url 'crontrack:view_jobs' %}">Cancel</a>
+                {% if group.id %}
+                  &nbsp;
+                  <input type="button" value="Delete" onclick="deleteRowGroup(event,'{{ group.name }}')" class="danger">
+                {% endif %}
+              </span>
+            </td></tr>
+            <tbody class="rowGroupContent open">
+              {% if group.id %}
+                <tr><td colspan="3" class="rowGroupInfo">
+                  <textarea name="description" maxlength="200"
+                      placeholder="Group description">{{ group.description }}</textarea>
+                </td></tr>
+              {% endif %}
+              {% for job in group.jobs %}
+                <tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="{{ job.id }}">
+                  <td><input type="text" name="{{ job.id }}__name" value="{{ job.name }}"></td>
+                  <td><input type="text" name="{{ job.id }}__schedule_str" value="{{ job.schedule_str }}"></td>
+                  <td>
+                    <input type="number" name="{{ job.id }}__time_window" value="{{ job.time_window }}">
+                    <input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
+                        my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
+                  </td>
+                </tr>
+                <tr class="rowGroupItemInfo">
+                  <td colspan="5">
+                    <textarea name="{{ job.id }}__description" maxlength="200"
+                        placeholder="Job description">{{ job.description }}</textarea>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <br>
+          <div class="dbRows">
+            <input type="button" value="Add new job" id="addJobButton" class="float right">
+            <input type="submit" value="Confirm">
+          </div>
+        </form>
+        {% if error_message %}
+          <br><p class="errorMessage">Error: {{ error_message }}.</p>
+        {% endif %}
+      {% else %}
+        <p class="errorMessage">Error: the selected group does not exist.</p>
+      {% endif %}
+    {% else %}
+      <p>You are not logged in.</p>
+      <a href="{% url 'crontrack:login' %}">Log in</a>
+    {% endif %}
+  </div>
+  {% include 'crontrack/js/jquery.html' %}
+  {% include 'crontrack/js/js-cookie.html' %}
+  <script src="{% static 'crontrack/setup.js' %}"></script>
+  <script src="{% static 'crontrack/rowgroup.js' %}"></script>
+  <script>
+    $(document).ready(function() {
+      var jobNum = 0;
+      $('#addJobButton').on('click', function() {
+        var row = (`
+          <tr class="rowGroupItem open" onclick="toggleRowGroupItem(event)" id="${jobNum}">
+            <td><input type="text" name="${jobNum}__name"></td>
+            <td><input type="text" name="${jobNum}__schedule_str"></td>
+            <td>
+              <input type="number" name="${jobNum}__time_window">
+              <input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
+                  my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
+            </td>
+          </tr>
+          <tr class="rowGroupItemInfo">
+            <td colspan="5">
+              <textarea name="${jobNum}__description" maxlength="200" placeholder="Job description"></textarea>
+            </td>
+          </tr>
+        `);
+        $('.rowGroupContent').append(row);
+        jobNum++;
+      });
+    });
+  </script>
 {% endblock %}

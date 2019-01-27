@@ -1,407 +1,407 @@
 /* --- Global styles --- */
 body {
-	font-family: Arial, sans-serif;
-	background-color: #505058;
-	margin: 0;
-	margin-bottom: 5px;
+  font-family: Arial, sans-serif;
+  background-color: #505058;
+  margin: 0;
+  margin-bottom: 5px;
 }
 
 h1, h2, h3, h4 {
-	text-align: center;
-	text-shadow: 1px 1px gray;
-	margin-top: 10px;
+  text-align: center;
+  text-shadow: 1px 1px gray;
+  margin-top: 10px;
 }
 
 a {
-	color: black;
+  color: black;
 }
 
 button { /* Button styling taken from div.tab button */
-	color: white;
-	background-color: #555;
-	padding: 4px;
-	margin: 1px;
-	border: 2px groove #444;
-	cursor: pointer;
-	transition-duration: 0.3s;
-	font-weight: bold;
+  color: white;
+  background-color: #555;
+  padding: 4px;
+  margin: 1px;
+  border: 2px groove #444;
+  cursor: pointer;
+  transition-duration: 0.3s;
+  font-weight: bold;
 }
 
 button:hover {
-	background-color: #353535;
+  background-color: #353535;
 }
 
 input, textarea, a.button, select {
-	font-size: 14px;
-	padding: 5px;
-	border-width: 2px;
-	border-style: inset;
-	border-color: #ccc;
+  font-size: 14px;
+  padding: 5px;
+  border-width: 2px;
+  border-style: inset;
+  border-color: #ccc;
 }
 
 input, textarea, a.button, select, datalist, option {
-	background-color: #393946; /* #444; for non-blue gray */
-	color: white;
+  background-color: #393946; /* #444; for non-blue gray */
+  color: white;
 }
 
 input[type="submit"], input[type="button"], a.button {
-	font-weight: bold;
-	font-style: normal;
-	padding: 8px;
-	border-radius: 16px;
-	cursor: pointer;
-	transition-duration: 0.4s;
-	
-	display: inline-block;
-	border: 1px solid black;
-	width: auto;
-	text-decoration: none;
+  font-weight: bold;
+  font-style: normal;
+  padding: 8px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition-duration: 0.4s;
+  
+  display: inline-block;
+  border: 1px solid black;
+  width: auto;
+  text-decoration: none;
 }
 
 input[type="submit"]:hover,
 input[type="button"]:hover, a.button:hover {
-	background-color: white;
-	color: #393946;
+  background-color: white;
+  color: #393946;
 }
 
 /* Danger button (for deleting things, etc.) */
 input[type="submit"].danger,
 input[type="button"].danger, a.button.danger {
-	background-color: #393946;
-	color: #FF1010;
+  background-color: #393946;
+  color: #FF1010;
 }
 
 input[type="submit"].danger:hover,
 input[type="button"].danger:hover, a.button.danger:hover {
-	background-color: #FF1010;
-	color: #222;
+  background-color: #FF1010;
+  color: #222;
 }
 
 select {
-	font-size: 14px;
-	padding: 3px;
+  font-size: 14px;
+  padding: 3px;
 }
 
 form {
-	display: inline-block;
+  display: inline-block;
 }
 
 
 /* --- Site page top bar --- */
 .topBar {
-	z-index: 1000;
-	position: -webkit-sticky; /* Safari */
-	position: sticky;
-	top: 0;
-	margin: 0 auto;
-	margin-bottom: 5px;
-	background-color: #393946; /*#404070;*/
-	color: white;
-	padding: 6px 10px 4px 10px;
-	/*border-bottom: 2px solid #444;*/
-	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
-	-webkit-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
-	-moz-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
+  margin: 0 auto;
+  margin-bottom: 5px;
+  background-color: #393946; /*#404070;*/
+  color: white;
+  padding: 6px 10px 4px 10px;
+  /*border-bottom: 2px solid #444;*/
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .topBar a {
-	color: white;
+  color: white;
 }
 
 .topBar span {
-	float: right;
-	margin-right: 5px;
+  float: right;
+  margin-right: 5px;
 }
 
 
 /* --- Centered block object (usually a div) --- */
 .hcenter {
-	display: table;
-	margin: 0 auto;
-	text-align: center;
+  display: table;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .center {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	border: 2px solid #333;
-	transform: translate(-50%, -50%);
-	background-color: #c3c3c3;
-	padding: 15px;
-	text-align: center;
-	box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
-	-webkit-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
-	-moz-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 2px solid #333;
+  transform: translate(-50%, -50%);
+  background-color: #c3c3c3;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.5);
 }
 
 .center.round {
-	padding: 50px;
-	padding-top: 25px;
-	padding-bottom: 35px;
-	border-radius: 50px;
+  padding: 50px;
+  padding-top: 25px;
+  padding-bottom: 35px;
+  border-radius: 50px;
 }
 
 
 /* --- Error/success message text --- */
 .errorMessage {
-	color: red;
-	font-weight: bold;
-	text-shadow: 1px 1px #222;
+  color: red;
+  font-weight: bold;
+  text-shadow: 1px 1px #222;
 }
 
 .successMessage {
-	color: green;
-	font-weight: bold;
-	text-shadow: 1px 1px #222;
+  color: green;
+  font-weight: bold;
+  text-shadow: 1px 1px #222;
 }
 
 
 /* --- Small box for information --- */
 .infoBox {
-	display: inline-block;
-	background-color: #ccc; /* matching table.dbRows tr */
-	margin: 10px;
-	margin-top: 0px;
-	margin-bottom: 20px;
-	padding: 10px;
-	border: 2px #bbb inset;
-	font-weight: bold;
+  display: inline-block;
+  background-color: #ccc; /* matching table.dbRows tr */
+  margin: 10px;
+  margin-top: 0px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 2px #bbb inset;
+  font-weight: bold;
 }
 
 
 /* --- Table for displaying rows from a database --- */
 table.dbRows, table.dbRows td, table.dbRows th {
-	border: 1px solid black;
+  border: 1px solid black;
 }
 
 table.dbRows {
-	border-collapse: collapse;
-	width: 65em;
+  border-collapse: collapse;
+  width: 65em;
 }
 
 div.dbRows { /* for aligning below a dbRows table */
-	position: relative;
-	width: 65em;
+  position: relative;
+  width: 65em;
 }
 
 div.dbRows .float.right {
-	left: 90%;
+  left: 90%;
 }
 
 table.dbRows tbody {
-	font-size: 15px;
+  font-size: 15px;
 }
 
 table.dbRows tr {
-	background-color: #ccc;
-	transition-duration: 0.3s;
+  background-color: #ccc;
+  transition-duration: 0.3s;
 }
 
 table.dbRows tr:hover {
-	background-color: #999;
+  background-color: #999;
 }
 
 table.dbRows td, table.dbRows th {
-	position: relative;
-	padding: 10px;
+  position: relative;
+  padding: 10px;
 }
 
 table.dbRows td {
-	text-align: center;
+  text-align: center;
 }
 
 table.dbRows th {
-	background-color: #333;
-	color: white;
-	font-size: 16px;
-	box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
-	-webkit-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
-	-moz-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
+  background-color: #333;
+  color: white;
+  font-size: 16px;
+  box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0px 3px 2px rgba(0,0,0,0.5);
 }
 
 table.dbRows input[type="submit"] {
-	font-size: 12px;
-	margin: 0;
-	padding-top: 3px;
-	padding-bottom: 3px;
+  font-size: 12px;
+  margin: 0;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 table.dbRows select {
-	width: 10em;
+  width: 10em;
 }
 
 /* Row Groups */
 table.dbRows .rowGroupHeader {
-	position: relative;
-	background-color: #444;
-	text-align: left;
-	padding-left: 25px;
-	font-size: 16px;
-	font-weight: bold;
-	font-style: italic;
-	transition-duration: inherit;
+  position: relative;
+  background-color: #444;
+  text-align: left;
+  padding-left: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  font-style: italic;
+  transition-duration: inherit;
 }
 
 table.dbRows .rowGroupHeader span {
-	line-height: 120%;
+  line-height: 120%;
 }
 
 table.dbRows .rowGroupHeader .right {
-	position: relative;
-	float: right;
-	display: inline-block;
-	height: 100%;
-	line-height: 100%;
+  position: relative;
+  float: right;
+  display: inline-block;
+  height: 100%;
+  line-height: 100%;
 }
 
 table.dbRows .rowGroupHeader input[type="text"] {
-	font-size: 16px;
-	font-weight: bold;
-	font-style: italic;
-	color: black;
+  font-size: 16px;
+  font-weight: bold;
+  font-style: italic;
+  color: black;
 }
 
 table.dbRows .rowGroupHeader.open {
-	background-color: #666;
+  background-color: #666;
 }
 
 table.dbRows .rowGroupHeader.open:hover {
-	background-color: #555;
+  background-color: #555;
 }
 
 table.dbRows .rowGroupHeader:hover {
-	background-color: #404040;
+  background-color: #404040;
 }
 
 table.dbRows .rowGroupHeader:hover, table.dbRows .rowGroupItem:hover {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 table.dbRows .rowGroupContent {
-	display: none;
+  display: none;
 }
 
 table.dbRows .rowGroupContent.open {
-	display: table-row-group;
+  display: table-row-group;
 }
 
 table.dbRows .rowGroupInfo, table.dbRows .rowGroupItemInfo {
-	background-color: #aaa;
-	color: #111;
-	font-size: 14px;
-	cursor: auto;
-	text-align: left;
+  background-color: #aaa;
+  color: #111;
+  font-size: 14px;
+  cursor: auto;
+  text-align: left;
 }
 
 table.dbRows .rowGroupInfo p,
 table.dbRows .rowGroupItemInfo p {
-	text-align: left;
-	margin-left: 25px;
-	margin-top: 1px;
-	margin-bottom: 1px;
+  text-align: left;
+  margin-left: 25px;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
 
 table.dbRows .rowGroupContent textarea {
-	width: 100%;
-	box-sizing: border-box;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 table.dbRows .rowGroupItemInfo, table.dbRows .rowGroupItemInfo:hover {
-	display: none;
-	background-color: #dfdfdf;/*#bdbdbd;*/
+  display: none;
+  background-color: #dfdfdf;/*#bdbdbd;*/
 }
 
 table.dbRows .rowGroupItem {
-	position: relative;
+  position: relative;
 }
 
 table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
-	display: table-row;
+  display: table-row;
 }
 
 table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box in job descriptions */
-	float: right;
-	padding: 1px;
-	border: 2px groove #ccc;
+  float: right;
+  padding: 1px;
+  border: 2px groove #ccc;
 }
 
 table.dbRows .rowGroupItemInfo .right input {
-	font-family: 'Courier New', monospace;
-	font-size: 13px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
 }
 
 /* dropdown triangle (closed) */
 table.dbRows .rowGroupHeader::before,
 table.dbRows .rowGroupItem td:first-child::before {
-	/* copied from https://css-tricks.com/the-shapes-of-css/ */
-	/* make a > shape */
-	content: "";
-	position: absolute;
-	left: 7px;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 0;
-	height: 0;
-	border-top: 4px solid transparent;
-	border-left: 8px solid #111;
-	border-bottom: 4px solid transparent;
+  /* copied from https://css-tricks.com/the-shapes-of-css/ */
+  /* make a > shape */
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-left: 8px solid #111;
+  border-bottom: 4px solid transparent;
 }
 
 table.dbRows .rowGroupHeader::before {
-	border-top: 6px solid transparent;
-	border-left: 12px solid #111;
-	border-bottom: 6px solid transparent;
+  border-top: 6px solid transparent;
+  border-left: 12px solid #111;
+  border-bottom: 6px solid transparent;
 }
 
 /* dropdown triangle (open) */
 table.dbRows .rowGroupHeader.open::before,
 table.dbRows .rowGroupItem.open td:first-child::before {
-	/* make a V shape */
-	content: "";
-	position: absolute;
-	left: 7x;
-	top: 55%;
-	transform: translateY(-50%);
-	width: 0;
-	height: 0;
-	border-top: 8px solid #111;
-	border-left: 4px solid transparent;
-	border-right: 4px solid transparent;	
+  /* make a V shape */
+  content: "";
+  position: absolute;
+  left: 7x;
+  top: 55%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid #111;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;  
 }
 
 table.dbRows .rowGroupHeader.open::before {
-	border-top: 12px solid #111;
-	border-left: 6px solid transparent;
-	border-right: 6px solid transparent;	
+  border-top: 12px solid #111;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;  
 }
 
 
 /* --- Floating buttons (for use with table.dbRows etc.) --- */
 .float {
-	position: absolute;
+  position: absolute;
 }
 
 .float.right {
-	left: 103%;
+  left: 103%;
 }
 
 
 /* --- Table for basic forms --- */
 table.form {
-	text-align: right;
-	width: 100%;
-	height: 100%;
-	margin: 0 auto;
+  text-align: right;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
 }
 
 table.form td {
-	padding: 10px;
-	vertical-align: middle;
+  padding: 10px;
+  vertical-align: middle;
 }
 
 table.form label {
-	color: black;
+  color: black;
 }
 
 table.form input[type="text"],
@@ -409,20 +409,20 @@ table.form input[type="number"],
 table.form input[type="password"],
 table.form input[type="email"],
 table.form input[type="tel"], table.form textarea {
-	width: 300px;
+  width: 300px;
 }
 
 table.form select {
-	max-width: 315px;
+  max-width: 315px;
 }
 
 table.form textarea {
-	resize: none;
-	height: 40px;
+  resize: none;
+  height: 40px;
 }
 
 table.form.thin input {
-	width: 200px;
+  width: 200px;
 }
 
 
@@ -430,78 +430,78 @@ table.form.thin input {
 /* help here: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_tabs */
 
 div.tab {
-	overflow: hidden;
-	background-color: #404040;
-	border: 1px solid #222;
+  overflow: hidden;
+  background-color: #404040;
+  border: 1px solid #222;
 }
 
 div.tab button {
-	float: left;
-	color: white;
-	background-color: inherit;
-	border: none;
-	outline: none;
-	margin: 0;
-	cursor: pointer;
-	padding: 14px 16px;
-	transition-duration: 0.3s;
-	font-weight: bold;
+  float: left;
+  color: white;
+  background-color: inherit;
+  border: none;
+  outline: none;
+  margin: 0;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition-duration: 0.3s;
+  font-weight: bold;
 }
 
 div.tab button:hover {
-	background-color: #353535;
+  background-color: #353535;
 }
 
 div.tab button.active {
-	background-color: #252525;
+  background-color: #252525;
 }
 
 div.tabContent.show {
-	width: 540px;
-	height: 435px;
-	background-color: #ccc;
-	border: 1px solid #222;
-	padding: 20px;
-	padding-top: 10px;
+  width: 540px;
+  height: 435px;
+  background-color: #ccc;
+  border: 1px solid #222;
+  padding: 20px;
+  padding-top: 10px;
 }
 
 div.tabContent.show.active {
-	display: block;
+  display: block;
 }
 
 .tabContent {
-	display: none;
+  display: none;
 }
 
 .tabContent.active {
-	display: initial;
+  display: initial;
 }
 
 
 /* --- Login --- */
 form.login {
-	text-align: center;
-	line-height: 3em;
-	padding-left: 30px;
-	padding-right: 30px;
+  text-align: center;
+  line-height: 3em;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 
 /* --- Small note text --- */
 .note, .note a {
-	color: #999;
-	font-size: 14px;
+  color: #999;
+  font-size: 14px;
 }
 
 
 /* --- Class overrides --- */
 
 .fixedWidth {
-	width: 65em; /* intended to match table.dbRows */
+  width: 65em; /* intended to match table.dbRows */
 }
 
 /* TODO: remove this (not currently in use) */
 .dark, .dark a {
-	background-color: #393946; /* #444; for non-blue gray */
-	color: white;
+  background-color: #393946; /* #444; for non-blue gray */
+  color: white;
 }  /* same as one of the global styles (for buttons, input, textarea, etc.) */

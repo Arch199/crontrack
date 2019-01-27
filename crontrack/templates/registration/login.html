@@ -3,23 +3,23 @@
 {% block title %} Log in {% endblock %}
 
 {% block content %}
-	<div class="center">
-		<h1>CronTrack</h1>
-		<h3>Login</h3>
-		<form method="post" class="login">
-			{% csrf_token %}
-			<input type="text" name="username" placeholder="Username" autofocus>
-			<br><input type="password" name="password" placeholder="Password">
-			<br><input type="submit" value="Log in">
-			</table>
-			<br><a href="{% url 'crontrack:password_reset' %}" class="note">forgot password</a>
-		</form>
-		{% for error in form.errors.values %}
-			<br><span class="errorMessage">
-				{% for message in error %}
-					<br>{{ message }}
-				{% endfor %}
-			</span>
-		{% endfor %}
-	</div>
+  <div class="center">
+    <h1>CronTrack</h1>
+    <h3>Login</h3>
+    <form method="post" class="login">
+      {% csrf_token %}
+      <input type="text" name="username" placeholder="Username" autofocus>
+      <br><input type="password" name="password" placeholder="Password">
+      <br><input type="submit" value="Log in">
+      </table>
+      <br><a href="{% url 'crontrack:password_reset' %}" class="note">forgot password</a>
+    </form>
+    {% for error in form.errors.values %}
+      <br><span class="errorMessage">
+        {% for message in error %}
+          <br>{{ message }}
+        {% endfor %}
+      </span>
+    {% endfor %}
+  </div>
 {% endblock %}

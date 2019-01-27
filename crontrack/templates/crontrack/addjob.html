@@ -6,100 +6,100 @@
 {% block title %} Add a new job {% endblock %}
 
 {% block content %}
-	<div class="hcenter">
-		<h2>Add jobs</h2>
-		{% if user.is_authenticated %}
-			<div class="tab">
-				<button onclick="changeTab(event, 'Add single')" class="{% if not prefill.group %}active{% endif %}">Add single</button>
-				<button onclick="changeTab(event, 'Add group')" class="{{ prefill.group }}">Add group</button>
-			</div>
-			<div class="tabContent show {% if not prefill.group %}active{% endif %}" id="Add single">
-				<form action="{% url 'crontrack:add_job' %}" method="post">
-					{% csrf_token %}
-					<input type="hidden" name="single" value="active">
-					<table class="form">
-						<tr>
-							<td><label for="name">Job name</label></td>
-							<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
-						</tr>
-						<tr>
-							<td><label for="user_group">User group</label></td>
-							<td><select name="user_group" id="user_group">
-								<option value="None">None</option>
-								{% for group in user.user_groups.all %}
-									<option value="{{ group.id }}">{{ group.name }}</option>
-								{% endfor %}
-							</select></td>
-						</tr>
-						<tr>
-							<td><label for="schedule_str">Cron schedule string</label></td>
-							<td><input type="text" name="schedule_str" id="schedule_str" value="{{ prefill.schedule_str }}"></td>
-						</tr>
-						<tr>
-							<td><label for="time_window">Time window (minutes)</label></td>
-							<td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
-						</tr>
-						<tr>
-							<td><label for="description">Description (optional)</label></td>
-							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
-							<!-- TODO: should really define maxlength as a constant somewhere -->
-						<tr>
-							<td><label>Timezone</label></td>
-							<td>{% timezone_selector user.timezone %}</td>
-						</tr>
-					</table>
-					<br><input type="submit" value="Add job">
-					{% if error_message and prefill.single %}
-						<br><p class="errorMessage">Error: {{ error_message }}.</p>
-					{% endif %}
-				</form>
-			</div>
-			<div class="tabContent show {{ prefill.group }}" id="Add group">
-				<form action="{% url 'crontrack:add_job' %}" method="post">
-					{% csrf_token %}
-					<input type="hidden" name="group" value="active">
-					<table class="form">
-						<tr>
-							<td><label for="name">Group name</label></td>
-							<td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
-						</tr>
-						<tr>
-							<td><label for="user_group">User group</label></td>
-							<td><select name="user_group" id="user_group">
-								<option value="None">None</option>
-								{% for group in user.user_groups.all %}
-									<option value="{{ group.id }}">{{ group.name }}</option>
-								{% endfor %}
-							</select></td>
-						</tr>
-						<tr>
-							<td><label for="group_schedule">Cron schedule string(s)</label></td>
-							<td><textarea name="group_schedule" id="group_schedule">{{ prefill.group_schedule }}</textarea></td>
-						</tr>
-						<tr>
-							<td><label for="time_window">Time window (minutes)</label></td>
-							<td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
-						</tr>
-						<tr>
-							<td><label for="description">Group description (optional)</label></td>
-							<td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
-							<!-- TODO: should really define maxlength as a constant somewhere -->
-						<tr>
-							<td><label>Timezone</label></td>
-							<td>{% timezone_selector user.timezone %}</td>
-						</tr>
-						<!-- TODO: make this a Django form -->
-					</table>
-					<br><input type="submit" value="Add job group">
-					{% if error_message and prefill.group %}
-						<br><p class="errorMessage">Error: {{ error_message }}.</p>
-					{% endif %}
-				</form>
-			</div>
-		{% else %}
-			<p>You are not logged in.</p>
-			<a href="{% url 'crontrack:login' %}">Log in</a>
-		{% endif %}
-	</div>
-	<script src="{% static 'crontrack/tab.js' %}"></script>
+  <div class="hcenter">
+    <h2>Add jobs</h2>
+    {% if user.is_authenticated %}
+      <div class="tab">
+        <button onclick="changeTab(event, 'Add single')" class="{% if not prefill.group %}active{% endif %}">Add single</button>
+        <button onclick="changeTab(event, 'Add group')" class="{{ prefill.group }}">Add group</button>
+      </div>
+      <div class="tabContent show {% if not prefill.group %}active{% endif %}" id="Add single">
+        <form action="{% url 'crontrack:add_job' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="single" value="active">
+          <table class="form">
+            <tr>
+              <td><label for="name">Job name</label></td>
+              <td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
+            </tr>
+            <tr>
+              <td><label for="user_group">User group</label></td>
+              <td><select name="user_group" id="user_group">
+                <option value="None">None</option>
+                {% for group in user.user_groups.all %}
+                  <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+              </select></td>
+            </tr>
+            <tr>
+              <td><label for="schedule_str">Cron schedule string</label></td>
+              <td><input type="text" name="schedule_str" id="schedule_str" value="{{ prefill.schedule_str }}"></td>
+            </tr>
+            <tr>
+              <td><label for="time_window">Time window (minutes)</label></td>
+              <td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
+            </tr>
+            <tr>
+              <td><label for="description">Description (optional)</label></td>
+              <td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
+              <!-- TODO: should really define maxlength as a constant somewhere -->
+            <tr>
+              <td><label>Timezone</label></td>
+              <td>{% timezone_selector user.timezone %}</td>
+            </tr>
+          </table>
+          <br><input type="submit" value="Add job">
+          {% if error_message and prefill.single %}
+            <br><p class="errorMessage">Error: {{ error_message }}.</p>
+          {% endif %}
+        </form>
+      </div>
+      <div class="tabContent show {{ prefill.group }}" id="Add group">
+        <form action="{% url 'crontrack:add_job' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="group" value="active">
+          <table class="form">
+            <tr>
+              <td><label for="name">Group name</label></td>
+              <td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
+            </tr>
+            <tr>
+              <td><label for="user_group">User group</label></td>
+              <td><select name="user_group" id="user_group">
+                <option value="None">None</option>
+                {% for group in user.user_groups.all %}
+                  <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+              </select></td>
+            </tr>
+            <tr>
+              <td><label for="group_schedule">Cron schedule string(s)</label></td>
+              <td><textarea name="group_schedule" id="group_schedule">{{ prefill.group_schedule }}</textarea></td>
+            </tr>
+            <tr>
+              <td><label for="time_window">Time window (minutes)</label></td>
+              <td><input type="number" name="time_window" id="time_window" value="{{ prefill.time_window }}"></td>
+            </tr>
+            <tr>
+              <td><label for="description">Group description (optional)</label></td>
+              <td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
+              <!-- TODO: should really define maxlength as a constant somewhere -->
+            <tr>
+              <td><label>Timezone</label></td>
+              <td>{% timezone_selector user.timezone %}</td>
+            </tr>
+            <!-- TODO: make this a Django form -->
+          </table>
+          <br><input type="submit" value="Add job group">
+          {% if error_message and prefill.group %}
+            <br><p class="errorMessage">Error: {{ error_message }}.</p>
+          {% endif %}
+        </form>
+      </div>
+    {% else %}
+      <p>You are not logged in.</p>
+      <a href="{% url 'crontrack:login' %}">Log in</a>
+    {% endif %}
+  </div>
+  <script src="{% static 'crontrack/tab.js' %}"></script>
 {% endblock %}

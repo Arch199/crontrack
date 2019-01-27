@@ -16,20 +16,20 @@ EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 SECRET_KEY = 'GENERATE A SECRET KEY'
 
 DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.mysql',
-		'NAME': 'crontrack',
-		'USER': 'YOUR USERNAME',
-		'PASSWORD': 'YOUR PASSWORD',
-		'HOST': 'YOUR HOST'
-	}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'crontrack',
+        'USER': 'YOUR USERNAME',
+        'PASSWORD': 'YOUR PASSWORD',
+        'HOST': 'YOUR HOST'
+    }
 }
 
 # Email with Anymail/Mailgun
 ANYMAIL = {
-	'MAILGUN_API_KEY': 'YOUR API KEY',
-	'MAILGUN_SENDER_DOMAIN': 'YOUR EMAIL DOMAIN',
-	'MAILGUN_API_URL': 'https://api.mailgun.net/v3/',
+    'MAILGUN_API_KEY': 'YOUR API KEY',
+    'MAILGUN_SENDER_DOMAIN': 'YOUR EMAIL DOMAIN',
+    'MAILGUN_API_URL': 'https://api.mailgun.net/v3/',
 }
 
 # SMS with Twilio

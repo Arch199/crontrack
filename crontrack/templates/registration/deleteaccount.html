@@ -3,30 +3,30 @@
 {% block title %} Delete account {% endblock %}
 
 {% block content %}
-	<div class="center">
-		<h1>CronTrack</h1>
-		{% if success_message %}
-			<p class="successMessage">{{ success_message }}</p>
-		{% elif user.is_authenticated %}
-			<h3>Delete your account</h3>
-			<p class="errorMessage">
-				WARNING: deleting your account will also delete all jobs and job groups you have created.
-				<br>This is permanent and cannot be undone or restored.
-			</p>
-			<form method="post" id="deleteAccount">{% csrf_token %}</form>
-			<input type="button" value="Delete account" class="danger" onclick="deleteAccountConfirm()">
-			&nbsp;<a href="{% url 'crontrack:profile' %}"><input type="button" value="Cancel"></a>
-		{% else %}
-			<p>You are not logged in.</p>
-			<a href="{% url 'crontrack:login' %}">Log in</a>
-		{% endif %}
-	</div>
-	<script>
-		function deleteAccountConfirm() {
-			var response = confirm("Do you really want to delete your account? This is PERMAMENT and cannot be undone.");
-			if (response) {
-				document.getElementById('deleteAccount').submit();
-			}
-		}
-	</script>
+  <div class="center">
+    <h1>CronTrack</h1>
+    {% if success_message %}
+      <p class="successMessage">{{ success_message }}</p>
+    {% elif user.is_authenticated %}
+      <h3>Delete your account</h3>
+      <p class="errorMessage">
+        WARNING: deleting your account will also delete all jobs and job groups you have created.
+        <br>This is permanent and cannot be undone or restored.
+      </p>
+      <form method="post" id="deleteAccount">{% csrf_token %}</form>
+      <input type="button" value="Delete account" class="danger" onclick="deleteAccountConfirm()">
+      &nbsp;<a href="{% url 'crontrack:profile' %}"><input type="button" value="Cancel"></a>
+    {% else %}
+      <p>You are not logged in.</p>
+      <a href="{% url 'crontrack:login' %}">Log in</a>
+    {% endif %}
+  </div>
+  <script>
+    function deleteAccountConfirm() {
+      var response = confirm("Do you really want to delete your account? This is PERMAMENT and cannot be undone.");
+      if (response) {
+        document.getElementById('deleteAccount').submit();
+      }
+    }
+  </script>
 {% endblock %}
