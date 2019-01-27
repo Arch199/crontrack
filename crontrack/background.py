@@ -82,10 +82,10 @@ class JobMonitor:
 			return		
 		
 		# Either send an email or text based on user preferences
-		context = {'job': job, 'domain': settings.DEFAULT_SITE_URL, 'user': user}
+		context = {'job': job, 'user': user, 'protocol': settings.SITE_PROTOCOL, 'domain': settings.SITE_DOMAIN}
 		if user.alert_method == User.EMAIL:
 			logger.debug(f"Sending user '{user}' an email at {user.email}")
-			subject = f"[CronTrack] ALERT: Job '{job.name}' failed to notify within the time window"
+			subject = f"[CronTrack] ALERT: Job '{job.name}' failed to notify in time"
 			message = render_to_string('crontrack/email/alertuser.html', context)
 			user.email_user(subject, strip_tags(message), html_message=message)
 		else:
@@ -95,7 +95,7 @@ class JobMonitor:
 			try:
 				client.messages.create(body=message, to=str(user.phone), from_=settings.TWILIO_FROM_NUMBER)
 			except TwilioRestException:
-				logger.exception("Failed to send user '{user.username}' an SMS at {user.phone}")
+				logger.exception(f"Failed to send user '{user.username}' an SMS at {user.phone}")
 		
 		JobAlert.objects.get(job=job, user=user).last_alert = timezone.now()
 		job.save()

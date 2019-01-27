@@ -294,6 +294,7 @@ def user_groups(request):
 			try:
 				with transaction.atomic():
 					group = UserGroup(name=request.POST.get('group_name'), creator=request.user)
+					group.full_clean()
 					group.save()
 					UserGroupMembership.objects.create(user=request.user, group=group)
 			except ValidationError:

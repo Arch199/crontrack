@@ -1,7 +1,7 @@
 {% extends 'crontrack/email/emailbase.html' %}
 
 {% block message %}
-	<p>Your job "{{ job.name }}" {% if job.user_group %}from user group "{{ job.user_group }}" {% endif %}has failed to notify CronTrack in time.
+	<p>Your job '{{ job.name }}' {% if job.user_group %}from user group '{{ job.user_group }}' {% endif %}has failed to notify CronTrack in time.
 	<br>Details below.</p>
 
 	<table class="form">
@@ -12,5 +12,5 @@
 	</table>
 
 	{% url 'crontrack:view_jobs' as jobs_url %}
-	<p>Go to <a href="{{ domain }}{{ jobs_url }}">{{ domain }}{{ jobs_url }}</a> for more details.</p>
+	<p>Go to <a href="{{ protocol }}://{{ domain }}{{ jobs_url }}">{{ protocol }}://{{ domain }}{{ jobs_url }}</a> for more details.</p>
 {% endblock %}

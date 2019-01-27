@@ -1,10 +1,11 @@
 import uuid
 
-from django.db import models
-from django.core.validators import MinValueValidator
+
 from django.contrib.auth.models import AbstractUser
-from timezone_field import TimeZoneField
+from django.core.validators import MinValueValidator
+from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from timezone_field import TimeZoneField
 
 class Job(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -29,7 +30,7 @@ class JobGroup(models.Model):
 	user_group = models.ForeignKey('UserGroup', models.SET_NULL, null=True, blank=True)
 	
 	def __str__(self):
-		return f'{self.user}\'s {self.name}'
+		return f'({self.user_group}) {self.user}\'s {self.name}'
 
 class JobAlert(models.Model):
 	job = models.ForeignKey('Job', models.CASCADE)

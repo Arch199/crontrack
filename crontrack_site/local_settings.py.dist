@@ -1,0 +1,38 @@
+# Local settings
+
+# DEBUG = True
+# SITE_PROTOCOL = 'http'
+# SITE_DOMAIN = 'localhost:8000'
+# ALLOWED_HOSTS = []
+# CSRF_COOKIE_SECURE = False
+# SESSION_COOKIE_SECURE = False
+
+EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # DEBUG
+
+
+# WARNING: Sensitive settings below
+
+SECRET_KEY = 'GENERATE A SECRET KEY'
+
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.mysql',
+		'NAME': 'crontrack',
+		'USER': 'YOUR USERNAME',
+		'PASSWORD': 'YOUR PASSWORD',
+		'HOST': 'YOUR HOST'
+	}
+}
+
+# Email with Anymail/Mailgun
+ANYMAIL = {
+	'MAILGUN_API_KEY': 'YOUR API KEY',
+	'MAILGUN_SENDER_DOMAIN': 'YOUR EMAIL DOMAIN',
+	'MAILGUN_API_URL': 'https://api.mailgun.net/v3/',
+}
+
+# SMS with Twilio
+TWILIO_ACCOUNT_SID = 'YOUR ACCOUNT SID'
+TWILIO_AUTH_TOKEN = 'YOUR AUTHENTICATION TOKEN'
+TWILIO_FROM_NUMBER = 'YOUR FROM NUMBER'

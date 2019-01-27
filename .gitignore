@@ -1,6 +1,4 @@
-crontrack/__pycache__/
-crontrack/migrations/__pycache__/
-crontrack/templatetags/__pycache__/
+__pycache__/
 crontrack/static/lib/
-crontrack_site/
+local_settings.py
 manage.py
