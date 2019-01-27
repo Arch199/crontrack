@@ -1,16 +1,15 @@
-<p>Hi {{ job.user.username }},</p>
-<p>Your job "{{ job.name }}" has failed to notify CronTrack in time.
-<br>Details below.</p>
+{% extends 'crontrack/email/emailbase.html' %}
 
-<table class="form">
-	<tr><th>Cron schedule string</th><td>{{ job.schedule_str }}</td></tr>
-	<tr><th>Scheduled run time</th><td>{{ job.next_run }}</td></tr>
-	<tr><th>Time window</th><td>{{ job.time_window }} minutes</td></tr>
-</table>
+{% block message %}
+	<p>Your job "{{ job.name }}" has failed to notify CronTrack in time.
+	<br>Details below.</p>
 
-{% url 'crontrack:view_jobs' as jobs_url %}
-<p>Go to <a href="{{ domain }}{{ jobs_url }}">{{ domain }}{{ jobs_url }}</a> for more details.</p>
+	<table class="form">
+		<tr><th>Cron schedule string</th><td>{{ job.schedule_str }}</td></tr>
+		<tr><th>Scheduled run time</th><td>{{ job.next_run }}</td></tr>
+		<tr><th>Time window</th><td>{{ job.time_window }} minutes</td></tr>
+	</table>
 
-<p>Sincerely,<br>CronTrack</p>
-
-<p class="note">This email was sent automatically. Please do not reply.</p>
+	{% url 'crontrack:view_jobs' as jobs_url %}
+	<p>Go to <a href="{{ domain }}{{ jobs_url }}">{{ domain }}{{ jobs_url }}</a> for more details.</p>
+{% endblock %}

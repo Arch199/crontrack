@@ -35,12 +35,16 @@ def notify_job(request, id):
 		user = authenticate(request, username=username, password=password)
 		if user is not None:
 			try:
-				job = Job.objects.get(pk=id, user=user)
+				job = Job.objects.get(pk=id)
+				if permission_denied(request.user, job.user, job.user_group):
+					logger.warning("User '{request.user}' tried to notify job {job} without permission")
+					raise Job.DoesNotExist
+				
 				job.last_notified = timezone.now()
 				job.save()
 				logger.debug(f'Notified by user "{username}", job "{id}" at {job.last_notified}')
 			except Job.DoesNotExist:
-				data['error_message'] = f"Error: job not found for UUID '{id}' and user '{username}'."
+				data['error_message'] = f"Error: job not found for UUID '{id}'."
 			finally:
 				logout(request)
 		else:
@@ -102,12 +106,15 @@ def add_job(request):
 					job_name = '[unnamed job]'
 					have_added_job = False
 					for line in request.POST['group_schedule'].split('\n'):
+						# Check if line is empty or starts with whitespace, and skip
 						if not line or line[0] in (' ', '\t', '\r'):
 							continue
+						# Interpret the line as a job name if it starts with '#'
 						if line[0] == '#':
 							job_name = line[1:].strip()
 							continue
 						
+						# Otherwise, process the line as a Cron schedule string
 						schedule_str = ' '.join(line.split(' ')[:5])
 						time_window = int(request.POST['time_window'])
 						if time_window < 0:
@@ -127,7 +134,6 @@ def add_job(request):
 					if not have_added_job:
 						# We didn't get any jobs
 						context['error_message'] = "no valid jobs entered"
-						#return HttpResponseRedirect('/crontrack/viewjobs')
 						return render(request, 'crontrack/addjob.html', context)
 					
 					# Group added successfully, open it up for editing
@@ -159,8 +165,6 @@ def add_job(request):
 		except ValueError:
 			# hopefully this can only happen for the int() call on time window
 			context['error_message'] = "invalid time window"
-		except UserGroup.DoesNotExist:
-			context['error_message'] = f"no such user group '{request.POST['user_group']}'"
 		
 		return render(request, 'crontrack/addjob.html', context)
 	else:
@@ -284,32 +288,6 @@ def delete_job(request):
 	return HttpResponseRedirect('/crontrack/viewjobs')
 
 @login_required
-def profile(request):
-	context = {}
-	if request.method == 'POST' and request.user.is_authenticated:
-		form = ProfileForm(request.POST)
-		
-		if form.is_valid():
-			# Update profile settings
-			profile = User.objects.get(pk=request.user.id).profile		
-			profile.timezone = form.cleaned_data['timezone']
-			profile.alert_method = form.cleaned_data['alert_method']
-			profile.alert_buffer = form.cleaned_data['alert_buffer']
-			profile.phone = form.cleaned_data['full_phone']
-			profile.save()
-			
-			request.user.email = form.cleaned_data['email']
-			request.user.save()
-			context['success_message'] = "Account settings updated."
-		else:
-			context['prefill'] = {'alert_method': form.data['alert_method']}
-	else:
-		form = ProfileForm()
-		
-	context['form'] = form
-	return render(request, 'registration/profile.html', context)
-	
-@login_required
 def user_groups(request):
 	context = {
 		'membership_alerts': {
@@ -362,6 +340,35 @@ def user_groups(request):
 	else:
 		return render(request, 'crontrack/usergroups.html', context)
 
+@login_required
+def profile(request):
+	context = {}
+	if request.method == 'POST' and request.user.is_authenticated:
+		form = ProfileForm(request.POST)
+		
+		if form.is_valid():
+			# Update profile settings
+			profile = User.objects.get(pk=request.user.id).profile		
+			profile.timezone = form.cleaned_data['timezone']
+			profile.alert_method = form.cleaned_data['alert_method']
+			profile.alert_buffer = form.cleaned_data['alert_buffer']
+			profile.phone = form.cleaned_data['full_phone']
+			profile.save()
+			
+			request.user.email = form.cleaned_data['email']
+			request.user.save()
+			context['success_message'] = "Account settings updated."
+		else:
+			context['prefill'] = {'alert_method': form.data['alert_method']}
+	else:
+		form = ProfileForm()
+		
+	context['form'] = form
+	return render(request, 'registration/profile.html', context)
+
+def password_reset(request):
+	return render(request, 'registration/resetpassword.html')
+		
 class Register(generic.CreateView):
 	form_class = UserCreationForm
 	success_url = '/crontrack/accounts/profile'
