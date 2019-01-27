@@ -10,6 +10,10 @@
 	<div class="hcenter">
 		{% if user.is_authenticated %}
 			<h2>{{ user.username }}'s profile</h2>
+			<p class="note">
+				<a href="{% url 'crontrack:password_change' %}">Change password</a> | 
+				<a href="{% url 'crontrack:delete_account' %}">Delete account</a>
+			</p>
 			<div class="center">
 				<h3>Account Settings</h3>
 				<form action="{% url 'crontrack:profile' %}" method="post">

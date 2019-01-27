@@ -366,8 +366,15 @@ def profile(request):
 	context['form'] = form
 	return render(request, 'registration/profile.html', context)
 
-def password_reset(request):
-	return render(request, 'registration/resetpassword.html')
+def delete_account(request):
+	context = {}
+	if request.method == 'POST' and request.user.is_authenticated:
+		logger.debug(f"Deleting user account '{request.user}'")
+		request.user.delete()
+		logout(request)
+		context['success_message'] = "Account successfully deleted."
+		
+	return render(request, 'registration/deleteaccount.html', context)
 		
 class Register(generic.CreateView):
 	form_class = UserCreationForm
