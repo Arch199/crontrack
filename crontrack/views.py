@@ -32,21 +32,19 @@ def notify_job(request, id):
 	if request.method == 'POST':
 		username = request.POST['username']
 		password = request.POST['password']
-		user = authenticate(request, username=username, password=password)
+		user = authenticate(username=username, password=password)
 		if user is not None:
 			try:
 				job = Job.objects.get(pk=id)
-				if permission_denied(request.user, job.user, job.user_group):
+				if permission_denied(user, job.user, job.user_group):
 					logger.warning("User '{request.user}' tried to notify job {job} without permission")
 					raise Job.DoesNotExist
-				
+			except Job.DoesNotExist:
+				data['error_message'] = f"Error: either no job exists with UUID '{id}' or you don't have access to it."
+			else:
 				job.last_notified = timezone.now()
 				job.save()
-				logger.debug(f'Notified by user "{username}", job "{id}" at {job.last_notified}')
-			except Job.DoesNotExist:
-				data['error_message'] = f"Error: job not found for UUID '{id}'."
-			finally:
-				logout(request)
+				logger.debug(f"Notified by user '{username}', job '{id}' at {job.last_notified}")
 		else:
 			data['error_message'] = "Error: invalid login credentials."
 	else:
