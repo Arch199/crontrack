@@ -85,12 +85,12 @@ class JobMonitor:
 		context = {'job': job, 'domain': settings.DEFAULT_SITE_URL, 'user': user}
 		if user.alert_method == User.EMAIL:
 			logger.debug(f"Sending user '{user}' an email at {user.email}")
-			subject = f"[CronTrack] ALERT: Job '{job.name}' failed to notify within time window"
+			subject = f"[CronTrack] ALERT: Job '{job.name}' failed to notify within the time window"
 			message = render_to_string('crontrack/email/alertuser.html', context)
 			user.email_user(subject, strip_tags(message), html_message=message)
 		else:
 			logger.debug(f"Sending user '{user}' an SMS at {user.phone}")
-			message = render_to_string('crontrack/sms/alertuser.html', context)
+			message = render_to_string('crontrack/sms/alertuser.txt', context)
 			client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 			try:
 				client.messages.create(body=message, to=str(user.phone), from_=settings.TWILIO_FROM_NUMBER)

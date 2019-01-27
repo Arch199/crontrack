@@ -26,15 +26,17 @@
 						<tr>
 							<td><label for="alert_method">Alert method</label></td>
 							<td>
-								<label for="alertMethodNoAlerts">No alerts</label>
 								<input type="radio" name="alert_method" id="alertMethodNoAlerts" value="{{ user.NO_ALERTS }}"
 										{% if user.alert_method == user.NO_ALERTS %}checked{% endif %}>
-								<label for="alertMethodEmail">Email</label>
+								<label for="alertMethodNoAlerts">No alerts</label>
+								
 								<input type="radio" name="alert_method" id="alertMethodEmail" value="{{ user.EMAIL }}"
 										{% if user.alert_method == user.EMAIL %}checked{% endif %}>
-								<label for="alertMethodText">Text</label>
+								<label for="alertMethodEmail">Email</label>
+								
 								<input type="radio" name="alert_method" id="alertMethodText" value="{{ user.SMS }}"
 										{% if user.alert_method == user.SMS %}checked{% endif %}>
+								<label for="alertMethodText">Text</label>
 							</td>
 						</tr>
 						<tr id="emailRow" style="display: none">

@@ -1,13 +1,14 @@
 {% extends 'crontrack/email/emailbase.html' %}
 
 {% block message %}
-	<p>Your job "{{ job.name }}" has failed to notify CronTrack in time.
+	<p>Your job "{{ job.name }}" {% if job.user_group %}from user group "{{ job.user_group }}" {% endif %}has failed to notify CronTrack in time.
 	<br>Details below.</p>
 
 	<table class="form">
-		<tr><th>Cron schedule string</th><td>{{ job.schedule_str }}</td></tr>
-		<tr><th>Scheduled run time</th><td>{{ job.next_run }}</td></tr>
-		<tr><th>Time window</th><td>{{ job.time_window }} minutes</td></tr>
+		<tr><th>Job group </th><td>{{ job.group|default:'Ungrouped' }}</td></tr>
+		<tr><th>Cron schedule string </th><td>{{ job.schedule_str }}</td></tr>
+		<tr><th>Scheduled run time </th><td>{{ job.next_run }}</td></tr>
+		<tr><th>Time window </th><td>{{ job.time_window }} minutes</td></tr>
 	</table>
 
 	{% url 'crontrack:view_jobs' as jobs_url %}

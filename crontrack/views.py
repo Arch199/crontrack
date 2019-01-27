@@ -1,5 +1,5 @@
-import re
 import logging
+import re
 from datetime import datetime
 from itertools import chain
 
@@ -7,18 +7,19 @@ import pytz
 from croniter import croniter, CroniterBadCronError  # see https://pypi.org/project/croniter/#usage
 
 from django.conf import settings
-from django.shortcuts import render
-from django.utils import timezone
-from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.views import generic
-from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils import timezone
+from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import Job, JobGroup, JobAlert, User, UserGroup, UserGroupMembership
 from .forms import ProfileForm, RegisterForm
+from .models import Job, JobGroup, JobAlert, User, UserGroup, UserGroupMembership
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ def notify_job(request, id):
 			try:
 				job = Job.objects.get(pk=id)
 				if permission_denied(user, job.user, job.user_group):
-					logger.warning("User '{request.user}' tried to notify job {job} without permission")
+					logger.warning(f"User '{request.user}' tried to notify job {job} without permission")
 					raise Job.DoesNotExist
 			except Job.DoesNotExist:
 				data['error_message'] = f"Error: either no job exists with UUID '{id}' or you don't have access to it."
@@ -65,7 +66,7 @@ def view_jobs(request):
 		else:
 			id = user_group.id
 		job_groups = [group for group in chain(ungrouped, grouped) if group is not None]
-		empty = not any((group['jobs'] for group in job_groups))
+		empty = not any(group['jobs'] for group in job_groups)
 		
 		context['user_groups'].append({'id': id, 'job_groups': job_groups, 'empty': empty})
 	
@@ -80,13 +81,13 @@ def add_job(request):
 			now = datetime.now(tz=pytz.timezone(request.POST['timezone']))
 			
 			# Determine which user group we're adding to
-			if request.POST['user_group'] == '':
+			if request.POST['user_group'] == 'None':
 				user_group = None
 			else:
 				user_group = UserGroup.objects.get(pk=request.POST['user_group'])
 				if user_group not in request.user.user_groups.all():
 					user_group = None
-					logger.warning("User {request.user} tried to access a group they\'re not in: {user_group}")
+					logger.warning(f"User {request.user} tried to access a group they\'re not in: {user_group}")
 			
 			# Check if we're adding a group
 			if 'group' in request.POST:
@@ -154,7 +155,7 @@ def add_job(request):
 				logger.debug(f'Adding new job: {job}')
 				job.save()
 
-				return HttpResponseRedirect('/crontrack/viewjobs')
+				return HttpResponseRedirect(reverse('crontrack:view_jobs'))
 		except KeyError:
 			context['error_message'] = "missing required field(s)"
 		except (CroniterBadCronError, IndexError):
@@ -240,7 +241,7 @@ def edit_group(request):
 			except ValidationError:
 				context['error_message'] = "invalid data entered in one or more fields"
 			else:
-				return HttpResponseRedirect('/crontrack/viewjobs')
+				return HttpResponseRedirect(reverse('crontrack:view_jobs'))
 			
 			return render(request, 'crontrack/editgroup.html', context)
 		else:
@@ -261,7 +262,7 @@ def delete_group(request):
 		except JobGroup.DoesNotExist:
 			logger.exception(f"Tried to delete job group with id '{request.POST['group']}' and it didn't exist")
 	
-	return HttpResponseRedirect('/crontrack/viewjobs')
+	return HttpResponseRedirect(reverse('crontrack:view_jobs'))
 	
 # Delete job with AJAX
 @login_required
@@ -282,10 +283,11 @@ def delete_job(request):
 		else:
 			return JsonResponse(data)
 	
-	return HttpResponseRedirect('/crontrack/viewjobs')
+	return HttpResponseRedirect(reverse('crontrack:view_jobs'))
 
 @login_required
 def user_groups(request):
+	context = {}
 	if request.method == 'POST' and 'type' in request.POST:
 		if request.POST['type'] == 'create_group':
 			group = None
@@ -295,7 +297,7 @@ def user_groups(request):
 					group.save()
 					UserGroupMembership.objects.create(user=request.user, group=group)
 			except ValidationError:
-				context['error_message'] = 'invalid group name'
+				context['error_message'] = 'invalid group name'				
 		elif request.POST['type'] == 'delete_group':
 			UserGroup.objects.get(pk=request.POST['group_id']).delete()
 		elif request.POST['type'] == 'toggle_alerts':
@@ -319,20 +321,18 @@ def user_groups(request):
 				if request.POST['type'] == 'add_user':
 					# Is it okay to add users to groups without them having a say?
 					# TODO: consider sending a popup etc. to the other user to confirm before adding them
-					user.user_groups.add(group)
+					UserGroupMembership.objects.create(user=user, group=group)
 				elif request.POST['type'] == 'remove_user':
 					if user.id == group.creator.id:
 						context['error_message'] = "you cannot remove yourself from a group you created"
 					else:
-						user.user_groups.remove(group)
+						UserGroupMembership.objects.get(user=user, group=group).delete()
 	
 	if request.is_ajax():
 		return JsonResponse({})
 	else:
-		context = {
-			'membership_alerts': {
-				m.group.id for m in UserGroupMembership.objects.filter(user=request.user) if m.alerts_on
-			},
+		context['membership_alerts'] = {
+			m.group.id for m in UserGroupMembership.objects.filter(user=request.user) if m.alerts_on
 		}
 		return render(request, 'crontrack/usergroups.html', context)
 

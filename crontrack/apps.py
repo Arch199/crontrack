@@ -10,5 +10,5 @@ class CronTrackConfig(AppConfig):
 		import crontrack.background
 		
 		# Only run the monitor in the main thread
-		if settings.MONITOR_ON and os.environ.get('RUN_MAIN') == 'true':
+		if settings.JOB_MONITOR_ON and os.environ.get('RUN_MAIN') == 'true':
 			monitor = crontrack.background.JobMonitor()
