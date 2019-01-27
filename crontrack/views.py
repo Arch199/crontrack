@@ -98,6 +98,7 @@ def add_job(request):
                         description=request.POST['description'],
                         user_group=user_group,
                     )
+                    group.full_clean()
                     logger.debug(f'Adding new group: {group}')
                     group.save()
                     
@@ -126,6 +127,7 @@ def add_job(request):
                             group=group,
                             user_group=user_group,
                         )
+                        job.full_clean()
                         logger.debug(f'Adding new job: {job}')
                         have_added_job = True
                         job.save()
@@ -152,6 +154,7 @@ def add_job(request):
                     next_run=croniter(request.POST['schedule_str'], now).get_next(datetime),
                     user_group=user_group,
                 )
+                job.full_clean()
                 logger.debug(f'Adding new job: {job}')
                 job.save()
 
@@ -163,6 +166,9 @@ def add_job(request):
         except ValueError:
             # hopefully this can only happen for the int() call on time window
             context['error_message'] = "invalid time window"
+        except ValidationError:
+            # TODO: replace this with form validation
+            context['error_message'] = "invalid data in one or more field(s)"
         
         return render(request, 'crontrack/addjob.html', context)
     else:
@@ -325,7 +331,7 @@ def user_groups(request):
                     UserGroupMembership.objects.create(user=user, group=group)
                 elif request.POST['type'] == 'remove_user':
                     if user.id == group.creator.id:
-                        context['error_message'] = "you cannot remove yourself from a group you created"
+                        context['error_message'] = "the group's creator cannot be removed from the group"
                     else:
                         UserGroupMembership.objects.get(user=user, group=group).delete()
     
@@ -386,7 +392,7 @@ class RegisterView(generic.CreateView):
 # --- HELPER FUNCTIONS ---
 
 # Gets a user's job group information with their corresponding jobs
-def get_job_group(user_id, job_group, user_group):
+def get_job_group(user, job_group, user_group):
     # Try to convert the user group to an object
     if type(user_group) == str: 
         if user_group == 'None':
@@ -415,8 +421,8 @@ def get_job_group(user_id, job_group, user_group):
             # Group is an ID rather than an object
             job_group = JobGroup.objects.get(pk=job_group)
             
-        # Check if the JobGroup's user_group matches the given user_group
-        if (user_group != job_group.user_group) or (job_group.user_group is None and user_id != job_group.user.id):
+        # Discard if the JobGroup's user_group doesn't match the given user_group
+        if (user_group != job_group.user_group) or (job_group.user_group is None and user != job_group.user):
             return None
         
         jobs = Job.objects.filter(group=job_group.id)

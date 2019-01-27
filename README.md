@@ -14,11 +14,12 @@ The API call can be sent with a regular POST request, including your username an
 
 ```bash
 curl https://DOMAIN_NAME*/crontrack/api/notifyjob/UUID_FOR_THE_JOB/ \
-	-X POST \
-	-d "username=YOUR_USERNAME&password=YOUR_PASSWORD"
+    -X POST \
+    -d "username=YOUR_USERNAME&password=YOUR_PASSWORD"
 ```
 
 \*CronTrack currently isn't hosted anywhere (still in development). TODO: add the domain name.
+
 
 ## Support for Teams
 
