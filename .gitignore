@@ -1,4 +1,6 @@
+.venv/
+.python-version
+
 __pycache__/
 crontrack/static/lib/
 local_settings.py
-manage.py
