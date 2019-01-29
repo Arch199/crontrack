@@ -9,8 +9,8 @@ DEBUG = False
 JOB_MONITOR_ON = True  # Whether to run the job alert monitor
 
 SITE_PROTOCOL = 'https'
-SITE_DOMAIN = 'www.crontrack.com'  # Sample domain
-ALLOWED_HOSTS = ['www.crontrack.com']
+SITE_DOMAIN = 'crontrack.com'
+ALLOWED_HOSTS = [SITE_DOMAIN, f'www.{SITE_DOMAIN}']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
