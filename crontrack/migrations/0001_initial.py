@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('alert_buffer', models.IntegerField(default=1440, verbose_name='time to wait between alerts (min)')),
                 ('personal_alerts_on', models.BooleanField(default=True, verbose_name='alerts on for jobs without a user group')),
                 ('phone', phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=128)),
-                ('email', models.EmailField(blank=True, max_length=254, null=True, unique=True)),
+                ('email', models.EmailField(blank=True, max_length=100, null=True, unique=True)),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
             ],
             options={
