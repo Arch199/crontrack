@@ -408,7 +408,7 @@ def get_job_group(user, job_group, user_group):
         name = 'Ungrouped'
         description = ''
         if user_group is None:
-            jobs = jobs.filter(user=user_id, user_group__isnull=True)
+            jobs = jobs.filter(user=user, user_group__isnull=True)
         else:
             jobs = jobs.filter(user_group=user_group)
             
