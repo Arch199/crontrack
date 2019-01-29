@@ -13,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -378,7 +378,7 @@ def delete_account(request):
         
 class RegisterView(generic.CreateView):
     form_class = RegisterForm
-    success_url = '/crontrack/accounts/profile/'
+    success_url = reverse_lazy('crontrack:profile')
     template_name = 'registration/register.html'
     
     def form_valid(self, form):
