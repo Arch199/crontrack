@@ -3,4 +3,5 @@
 
 __pycache__/
 crontrack/static/lib/
+crontrack/staticfiles
 local_settings.py
