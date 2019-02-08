@@ -1,6 +1,6 @@
 # CronTrack
 
-CronTrack is an open-source Django app for logging Cron jobs and keeping track of when they don't complete on time. 
+[CronTrack](https://crontrack.com) is an open-source Django app for logging Cron jobs and keeping track of when they don't complete on time. 
 
 One problem with having a lot of Cron jobs running continuously is that there isn't an easy way to tell when your jobs aren't completing successfully. You could have them notify you when they succeed, but that just leads to spam, and doesn't address the real problem. Ideally, you'd want to be notified only when your attention is required, i.e. when the job isn't completing successfully. Enter CronTrack, which was created to solve this exact problem.
 
