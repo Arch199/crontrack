@@ -9,12 +9,13 @@ DEBUG = False
 JOB_MONITOR_ON = True  # Whether to run the job alert monitor
 
 SITE_PROTOCOL = 'https'
-SITE_DOMAIN = 'www.crontrack.com'  # Sample domain
-ALLOWED_HOSTS = ['www.crontrack.com']
+SITE_DOMAIN = 'crontrack.com'
+ALLOWED_HOSTS = [SITE_DOMAIN, f'www.{SITE_DOMAIN}']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 AUTH_USER_MODEL = 'crontrack.User'
 
 
@@ -144,6 +145,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'crontrack', 'staticfiles')
 # TODO: Add STATIC_ROOT
 
 

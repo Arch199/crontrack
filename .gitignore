@@ -1,4 +1,6 @@
+.venv/
+.python-version
+
 __pycache__/
-crontrack/static/lib/
+crontrack/staticfiles
 local_settings.py
-manage.py

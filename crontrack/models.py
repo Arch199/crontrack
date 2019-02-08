@@ -51,7 +51,7 @@ class User(AbstractUser):
     alert_buffer = models.IntegerField('time to wait between alerts (min)', default=1440)
     personal_alerts_on = models.BooleanField('alerts on for jobs without a user group', default=True)
     phone = PhoneNumberField(blank=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, max_length=100)
     user_groups = models.ManyToManyField('UserGroup', through='UserGroupMembership')
 
 class UserGroup(models.Model):
