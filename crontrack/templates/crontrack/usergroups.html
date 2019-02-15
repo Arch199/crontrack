@@ -6,9 +6,9 @@
 
 {% block content %}
   <div class="hcenter">
-    <h2>Manage user groups</h2>
+    <h2>Manage teams</h2>
     <div class="infoBox">
-      <label for="personalAlerts">(No user group) alerts on</label>
+      <label for="personalAlerts">(No Team) alerts on</label>
       <input type="checkbox" name="alerts_on" {% if user.personal_alerts_on %} checked {% endif %}
           group-id="None" id="personalAlerts">
     </div>
@@ -16,7 +16,7 @@
       <table class="dbRows">
         <thead><tr>
           <th>Alerts</th>
-          <th>Group Name</th>
+          <th>Team Name</th>
           <th>Current Users</th>
           <th>New User</th>
         </tr></thead>
@@ -65,8 +65,8 @@
       <br><form method="post">
         {% csrf_token %}
         <input type="hidden" name="type" value="create_group">
-        <input type="text" name="group_name" placeholder="Group name">
-        &nbsp;<input type="submit" name="create_group" value="Create group">
+        <input type="text" name="group_name" placeholder="Team name">
+        &nbsp;<input type="submit" name="create_group" value="Create team">
       </form>
       {% if error_message %}
         <br><p class="errorMessage">Error: {{ error_message }}.</p>

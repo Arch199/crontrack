@@ -23,7 +23,7 @@
               <td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
             </tr>
             <tr>
-              <td><label for="user_group">User group</label></td>
+              <td><label for="user_group">Team</label></td>
               <td><select name="user_group" id="user_group">
                 <option value="None">None</option>
                 {% for group in user.user_groups.all %}
@@ -64,7 +64,7 @@
               <td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
             </tr>
             <tr>
-              <td><label for="user_group">User group</label></td>
+              <td><label for="user_group">Team</label></td>
               <td><select name="user_group" id="user_group">
                 <option value="None">None</option>
                 {% for group in user.user_groups.all %}

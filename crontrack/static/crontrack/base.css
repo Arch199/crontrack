@@ -456,6 +456,14 @@ div.tab button.active {
   background-color: #252525;
 }
 
+div.tab span {
+  float: left;
+  color: #eee;
+  font-size: 14px;
+  font-style: italic;
+  padding: 13px 16px;
+}
+
 div.tabContent.show {
   width: 540px;
   height: 435px;
