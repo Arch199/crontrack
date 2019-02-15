@@ -26,31 +26,13 @@ logger = logging.getLogger(__name__)
 def index(request):
     return render(request, 'crontrack/index.html')
 
-@csrf_exempt
 def notify_job(request, id):
-    data = {}
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            try:
-                job = Job.objects.get(pk=id)
-                if permission_denied(user, job.user, job.user_group):
-                    logger.warning(f"User '{request.user}' tried to notify job {job} without permission")
-                    raise Job.DoesNotExist
-            except Job.DoesNotExist:
-                data['error_message'] = f"Error: either no job exists with UUID '{id}' or you don't have access to it."
-            else:
-                job.last_notified = timezone.now()
-                job.save()
-                logger.debug(f"Notified by user '{username}', job '{id}' at {job.last_notified}")
-        else:
-            data['error_message'] = "Error: invalid login credentials."
-    else:
-        data['error_message'] = "Error: request must be a POST request."
+    job = Job.objects.get(pk=id)
+    job.last_notified = timezone.now()
+    job.save()
+    logger.debug(f"Notified for job '{id}' at {job.last_notified}")
     
-    return JsonResponse(data)
+    return JsonResponse({'success_message': 'Job notified successfully.'})
 
 @login_required
 def view_jobs(request):

@@ -10,12 +10,10 @@ You can input jobs either individually or in groups. Given the Cron schedule str
 
 ## Notifying CronTrack
 
-The API call can be sent with a regular POST request, including your username and password in the POST data. E.g. with cURL:
+The API call can be sent by pinging the URL `https://crontrack.com/p/UUID_FOR_THE_JOB/` with a regular GET request. The simplest way of doing this is probably using cURL, and including something like this in your crontab:
 
 ```bash
-curl https://crontrack.com/p/UUID_FOR_THE_JOB/ \
-    -X POST \
-    -d "username=YOUR_USERNAME&password=YOUR_PASSWORD"
+30 9 * * 1-5 ubuntu /PATH/TO/YOUR_SCRIPT && curl https://crontrack.com/p/UUID_FOR_THE_JOB/
 ```
 
 ## Support for Teams
