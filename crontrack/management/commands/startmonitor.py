@@ -21,7 +21,7 @@ class Command(BaseCommand):
             monitor = JobMonitor(time_limit)
             
             # Wait around to keep this thread open
-            while True:
+            while monitor.running:
                 pass
         else:
             self.stdout.write(self.style.ERROR("Argument '--run-for, -s' must be a positive number of seconds"))

@@ -7,8 +7,9 @@ from django.core import management
 class CronTrackConfig(AppConfig):
     name = 'crontrack'
     
-    def ready(self):        
+    def ready(self):
+        from .background import JobMonitor
+        
         # Only run the monitor in the main thread
         if settings.JOB_MONITOR_ON and os.environ.get('RUN_MAIN') == 'true':
-            with open(os.devnull, 'w') as devnull:
-                management.call_command('startmonitor', stdout=devnull)
+            monitor = JobMonitor()
