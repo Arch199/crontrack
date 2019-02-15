@@ -14,7 +14,7 @@ urlpatterns = [
     
     path('usergroups/', views.user_groups, name='user_groups'),
     
-    path('api/notifyjob/<uuid:id>/', views.notify_job, name='notify_job'),
+    path('p/<uuid:id>/', views.notify_job, name='notify_job'),
     
     path('accounts/profile/', views.profile, name='profile'),
     path('accounts/register/', views.RegisterView.as_view(), name='register'),

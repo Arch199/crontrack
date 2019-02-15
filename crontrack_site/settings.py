@@ -146,7 +146,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'crontrack', 'staticfiles')
-# TODO: Add STATIC_ROOT
 
 
 # Import all local settings

@@ -13,7 +13,7 @@ You can input jobs either individually or in groups. Given the Cron schedule str
 The API call can be sent with a regular POST request, including your username and password in the POST data. E.g. with cURL:
 
 ```bash
-curl https://crontrack.com/api/notifyjob/UUID_FOR_THE_JOB/ \
+curl https://crontrack.com/p/UUID_FOR_THE_JOB/ \
     -X POST \
     -d "username=YOUR_USERNAME&password=YOUR_PASSWORD"
 ```

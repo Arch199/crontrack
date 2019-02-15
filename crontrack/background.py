@@ -24,7 +24,7 @@ class JobMonitor:
         self.t = threading.Thread(target=self.monitor, name='JobMonitorThread', daemon=True)
         self.t.start()
     
-    def monitor(self):      
+    def monitor(self):
         while True:
             logger.debug(f'Starting monitor loop at {timezone.now()}')
             for job in Job.objects.all():           
@@ -79,7 +79,7 @@ class JobMonitor:
             alerts_on = UserGroupMembership.objects.get(user=user, group=job.user_group).alerts_on
         if not alerts_on:
             logger.debug(f"Not alerting user '{user}' as they have alerts for group '{job.user_group}' disabled")
-            return      
+            return
         
         # Either send an email or text based on user preferences
         context = {'job': job, 'user': user, 'protocol': settings.SITE_PROTOCOL, 'domain': settings.SITE_DOMAIN}
