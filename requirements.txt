@@ -2,7 +2,7 @@ Babel==2.6.0
 certifi==2018.11.29
 chardet==3.0.4
 croniter==0.3.26
-Django==2.1.5
+Django==2.1.7
 django-anymail==5.0
 django-phonenumber-field==2.1.0
 django-timezone-field==3.0
