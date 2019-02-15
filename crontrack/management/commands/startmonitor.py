@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-import crontrack.background as bg
+from crontrack.background import JobMonitor
 
 class Command(BaseCommand):
     help = "Start the job monitor."
@@ -18,7 +18,7 @@ class Command(BaseCommand):
         time_limit = options.get('run-for', None)
         if time_limit is None or time_limit > 0:
             self.stdout.write(self.style.SUCCESS("Successfully started the job monitor"))
-            bg.monitor_instance = bg.JobMonitor(time_limit)
+            monitor = JobMonitor(time_limit)
             
             # Wait around to keep this thread open
             while True:

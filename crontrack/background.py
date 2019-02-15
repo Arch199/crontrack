@@ -18,8 +18,6 @@ from .models import Job, JobAlert, User, UserGroupMembership
 
 logger = logging.getLogger(__name__)
 
-monitor_instance = None
-
 class JobMonitor:
     WAIT_INTERVAL = 60  # seconds for time.sleep()
     
