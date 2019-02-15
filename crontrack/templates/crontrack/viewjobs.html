@@ -34,13 +34,11 @@
               {% for job_group in user_group.job_groups %}
                 <tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
                   <span>{{ job_group.name }}</span>
-                  {% if forloop.parentloop.first %}
-                    &emsp;<span class="note small">{{ job_group.user_group|default:'(No team)' }}</span>
-                  {% endif %}
+                  &emsp;<span class="note small">{{ job_group.user_group.name|default:'(No team)' }}</span>
                   <form action="{% url 'crontrack:edit_group' %}" method="post" class="right">
                     {% csrf_token %}
                     <input type="hidden" name="group" value="{{ job_group.id|default:'None' }}">
-                    <input type="hidden" name="user_group" value="{{ user_group.id|default:'None' }}">
+                    <input type="hidden" name="user_group" value="{{ job_group.user_group.id|default:'None' }}">
                     <input type="submit" value="Edit group">
                   </form>
                 </td></tr>
