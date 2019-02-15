@@ -18,16 +18,28 @@ from .models import Job, JobAlert, User, UserGroupMembership
 
 logger = logging.getLogger(__name__)
 
+monitor_instance = None
+
 class JobMonitor:
-    def __init__(self):
-        logger.debug('Starting JobMonitor thread')
-        self.t = threading.Thread(target=self.monitor, name='JobMonitorThread', daemon=True)
-        self.t.start()
+    WAIT_INTERVAL = 60  # seconds for time.sleep()
     
-    def monitor(self):
-        while True:
+    def __init__(self, time_limit=None):
+        self.time_limit = time_limit  # maximum time to run for in seconds
+        self.start_time = timezone.now()
+        self.running = True
+    
+        logger.debug(f'Starting JobMonitor thread with time limit "{time_limit}"')
+        self.t = threading.Thread(target=self.monitor_loop, name='JobMonitorThread', daemon=True)
+        self.t.start()
+        
+    def stop(self):
+        logger.debug('Stopping JobMonitor')
+        self.running = False
+    
+    def monitor_loop(self):
+        while self.running:
             logger.debug(f'Starting monitor loop at {timezone.now()}')
-            for job in Job.objects.all():           
+            for job in Job.objects.all():
                 # Calculate the next scheduled run time + time window
                 run_by = job.next_run + timedelta(minutes=job.time_window)
                 
@@ -51,8 +63,7 @@ class JobMonitor:
                             JobAlert.objects.create(user=user, job=job, last_alert=timezone.now())
                             self.alert_user(user, job)
                         else:
-                            # Otherwise, decide whether to skip alerting 
-                            # (based on that user's alert_buffer setting and the last alert sent to them for this job)
+                            # Otherwise, decide whether to skip alerting based on the user's alert_buffer setting
                             buffer_time = timedelta(minutes=user.alert_buffer)
                             last_alert = JobAlert.objects.get(job=job, user=user).last_alert
                             if timezone.now() > last_alert + buffer_time:
@@ -65,8 +76,16 @@ class JobMonitor:
                 now = timezone.localtime(timezone.now())
                 job.next_run = croniter(job.schedule_str, now).get_next(datetime)
                 job.save()
-                
-            time.sleep(60)  # TODO: Put this back to 2*60 (2 min) or 1 min (?)
+            
+            # Check if we're due to stop running
+            if self.time_limit is not None: 
+                next_iteration = timezone.now() + timedelta(seconds=self.WAIT_INTERVAL)
+                stop_time = self.start_time + timedelta(seconds=self.time_limit)
+                if next_iteration > stop_time:
+                    self.stop()
+                    break
+            
+            time.sleep(self.WAIT_INTERVAL)
         
     def alert_user(self, user, job):        
         # Skip alerting if the user has alerts disabled (either globally or just for this user group
