@@ -56,7 +56,7 @@ def notify_job(request, id):
 def view_jobs(request):
     timezone.activate(request.user.timezone)
     
-    context = {'user_groups': []}
+    context = {'user_groups': [], 'protocol': settings.SITE_PROTOCOL, 'domain': settings.SITE_DOMAIN}
     for user_group in chain((None,), request.user.user_groups.all()):
         ungrouped = (get_job_group(request.user, None, user_group),)
         grouped = (get_job_group(request.user, g, user_group) for g in JobGroup.objects.all())

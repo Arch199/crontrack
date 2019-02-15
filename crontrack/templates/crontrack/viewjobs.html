@@ -54,8 +54,9 @@
                     <tr class="rowGroupItemInfo">
                       <td colspan="5"><p>
                         <span class="right">
-                          UUID: <input type="text" class="js-UUID" readonly value="{{ job.id }}" size="35"><!-- (hide space)
-                          --><button class="js-copyUUID">COPY</button>
+                          URL: <input type="text" class="js-UUID" readonly size="60"
+                              value="{{ protocol }}://{{ domain }}{% url 'crontrack:notify_job' job.id %}"><!--
+                            --><button class="js-copyUUID">COPY</button>
                         </span>
                         {{ job.description }}
                       </p></td>
