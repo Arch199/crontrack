@@ -38,19 +38,25 @@ def notify_job(request, id):
 def view_jobs(request):
     timezone.activate(request.user.timezone)
     
-    context = {'user_groups': [], 'protocol': settings.SITE_PROTOCOL, 'domain': settings.SITE_DOMAIN}
+    context = {
+        'user_groups': [{'id': 'All', 'job_groups': [], 'empty': True}],
+        'protocol': settings.SITE_PROTOCOL,
+        'domain': settings.SITE_DOMAIN
+    }
     for user_group in chain((None,), request.user.user_groups.all()):
         ungrouped = (get_job_group(request.user, None, user_group),)
         grouped = (get_job_group(request.user, g, user_group) for g in JobGroup.objects.all())
         
         if user_group is None:
-            id = 0
+            id = None
         else:
             id = user_group.id
         job_groups = [group for group in chain(ungrouped, grouped) if group is not None]
         empty = not any(group['jobs'] for group in job_groups)
         
         context['user_groups'].append({'id': id, 'job_groups': job_groups, 'empty': empty})
+        context['user_groups'][0]['job_groups'] += job_groups
+        context['user_groups'][0]['empty'] = empty and context['user_groups'][0]['empty']
     
     return render(request, 'crontrack/viewjobs.html', context)
 
@@ -412,7 +418,7 @@ def get_job_group(user, job_group, user_group):
         name = job_group.name
         description = job_group.description
     
-    return {'id': id, 'name': name, 'description': description, 'jobs': jobs}
+    return {'id': id, 'name': name, 'description': description, 'jobs': jobs, 'user_group': user_group}
 
 # Checks if a user shouldn't be able to access a job (i.e. if they don't own it and aren't part of the group it's in)
 def permission_denied(request_user, user, user_group):

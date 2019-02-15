@@ -9,8 +9,9 @@
     <h2>View running jobs</h2>
     {% if user.is_authenticated %}
       <div class="tab fixedWidth">
-        <span>Filter by team</span>
-        <button onclick="changeTab(event, 'ug__0')" class="active">(No team)</button>
+        <button onclick="changeTab(event, 'ug__All')" class="active">(All teams)</button>
+        <span>Filter by team:</span>
+        <button onclick="changeTab(event, 'ug__None')">(No team)</button>
         {% for user_group in user.user_groups.all %}
           <button onclick="changeTab(event, 'ug__{{ user_group.id }}')">{{ user_group }}</button>
         {% endfor %}
@@ -33,6 +34,9 @@
               {% for job_group in user_group.job_groups %}
                 <tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
                   <span>{{ job_group.name }}</span>
+                  {% if forloop.parentloop.first %}
+                    &emsp;<span class="note small">{{ job_group.user_group|default:'(No team)' }}</span>
+                  {% endif %}
                   <form action="{% url 'crontrack:edit_group' %}" method="post" class="right">
                     {% csrf_token %}
                     <input type="hidden" name="group" value="{{ job_group.id|default:'None' }}">
@@ -55,7 +59,7 @@
                     <tr class="rowGroupItemInfo">
                       <td colspan="5"><p>
                         <span class="right">
-                          URL: <input type="text" class="js-UUID" readonly size="60"
+                          <input type="text" class="js-UUID" readonly size="60" title="URL to notify job"
                               value="{{ protocol }}://{{ domain }}{% url 'crontrack:notify_job' job.id %}"><!--
                             --><button class="js-copyUUID">COPY</button>
                         </span>

@@ -323,6 +323,7 @@ table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
 table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box in job descriptions */
   float: right;
   padding: 1px;
+  margin-left: 5px;
   border: 2px groove #ccc;
 }
 
@@ -501,6 +502,11 @@ form.login {
   font-size: 14px;
 }
 
+.note.small {
+  font-size: 13px;
+  font-weight: normal;
+  font-style: italic;
+}
 
 /* --- Class overrides --- */
 
