@@ -12,7 +12,7 @@ urlpatterns = [
     path('deletegroup/', views.delete_group, name='delete_group'),
     path('deletejob/', views.delete_job, name='delete_job'),
     
-    path('teams/', views.user_groups, name='user_groups'),
+    path('teams/', views.teams, name='teams'),
     
     path('p/<uuid:id>/', views.notify_job, name='notify_job'),
     

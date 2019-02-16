@@ -19,7 +19,7 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import ProfileForm, RegisterForm
-from .models import Job, JobGroup, JobAlert, User, UserGroup, UserGroupMembership
+from .models import Job, JobGroup, JobAlert, User, Team, TeamMembership
 
 logger = logging.getLogger(__name__)
 
@@ -39,24 +39,24 @@ def view_jobs(request):
     timezone.activate(request.user.timezone)
     
     context = {
-        'user_groups': [{'id': 'All', 'job_groups': [], 'empty': True}],
+        'teams': [{'id': 'All', 'job_groups': [], 'empty': True}],
         'protocol': settings.SITE_PROTOCOL,
         'domain': settings.SITE_DOMAIN
     }
-    for user_group in chain((None,), request.user.user_groups.all()):
-        ungrouped = (get_job_group(request.user, None, user_group),)
-        grouped = (get_job_group(request.user, g, user_group) for g in JobGroup.objects.all())
+    for team in chain((None,), request.user.teams.all()):
+        ungrouped = (get_job_group(request.user, None, team),)
+        grouped = (get_job_group(request.user, g, team) for g in JobGroup.objects.all())
         
-        if user_group is None:
+        if team is None:
             id = None
         else:
-            id = user_group.id
+            id = team.id
         job_groups = [group for group in chain(ungrouped, grouped) if group is not None]
         empty = not any(group['jobs'] for group in job_groups)
         
-        context['user_groups'].append({'id': id, 'job_groups': job_groups, 'empty': empty})
-        context['user_groups'][0]['job_groups'] += job_groups
-        context['user_groups'][0]['empty'] = empty and context['user_groups'][0]['empty']
+        context['teams'].append({'id': id, 'job_groups': job_groups, 'empty': empty})
+        context['teams'][0]['job_groups'] += job_groups
+        context['teams'][0]['empty'] = empty and context['teams'][0]['empty']
     
     return render(request, 'crontrack/viewjobs.html', context)
 
@@ -68,14 +68,14 @@ def add_job(request):
         try:
             now = datetime.now(tz=pytz.timezone(request.POST['timezone']))
             
-            # Determine which user group we're adding to
-            if request.POST['user_group'] == 'None':
-                user_group = None
+            # Determine which team we're adding to
+            if request.POST['team'] == 'None':
+                team = None
             else:
-                user_group = UserGroup.objects.get(pk=request.POST['user_group'])
-                if user_group not in request.user.user_groups.all():
-                    user_group = None
-                    logger.warning(f"User {request.user} tried to access a group they\'re not in: {user_group}")
+                team = Team.objects.get(pk=request.POST['team'])
+                if team not in request.user.teams.all():
+                    team = None
+                    logger.warning(f"User {request.user} tried to access a group they\'re not in: {team}")
             
             # Check if we're adding a group
             if 'group' in request.POST:
@@ -84,7 +84,7 @@ def add_job(request):
                         user=request.user,
                         name=request.POST['name'],
                         description=request.POST['description'],
-                        user_group=user_group,
+                        team=team,
                     )
                     group.full_clean()
                     logger.debug(f'Adding new group: {group}')
@@ -113,7 +113,7 @@ def add_job(request):
                             time_window=time_window,
                             next_run=croniter(schedule_str, now).get_next(datetime),
                             group=group,
-                            user_group=user_group,
+                            team=team,
                         )
                         job.full_clean()
                         logger.debug(f'Adding new job: {job}')
@@ -125,7 +125,7 @@ def add_job(request):
                         return render(request, 'crontrack/addjob.html', context)
                     
                     # Group added successfully, open it up for editing
-                    context = {'group': get_job_group(request.user, group, user_group)}
+                    context = {'group': get_job_group(request.user, group, team)}
                     return render(request, 'crontrack/editgroup.html', context)
             
             # Otherwise, just add the single job
@@ -140,7 +140,7 @@ def add_job(request):
                     time_window=time_window,
                     description=request.POST['description'],
                     next_run=croniter(request.POST['schedule_str'], now).get_next(datetime),
-                    user_group=user_group,
+                    team=team,
                 )
                 job.full_clean()
                 logger.debug(f'Adding new job: {job}')
@@ -170,18 +170,18 @@ def edit_group(request):
     if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
         timezone.activate(request.user.timezone)
         context = {
-            'group': get_job_group(request.user, request.POST['group'], request.POST['user_group']),
-            'user_group': request.POST['user_group'],
+            'group': get_job_group(request.user, request.POST['group'], request.POST['team']),
+            'team': request.POST['team'],
         }
         if 'edited' in request.POST:
             # Submission after editing the group
             # Process the edit then return to view all jobs
             
-            # Find user group
-            if request.POST['user_group'] == 'None':
-                user_group = None
+            # Find team
+            if request.POST['team'] == 'None':
+                team = None
             else:
-                user_group = UserGroup.objects.get(pk=request.POST['user_group'])
+                team = Team.objects.get(pk=request.POST['team'])
             
             # Rename the job group / modify its description
             if request.POST['group'] == 'None':
@@ -189,7 +189,7 @@ def edit_group(request):
             else:
                 try:
                     group = JobGroup.objects.get(pk=request.POST['group'])
-                    if permission_denied(request.user, group.user, group.user_group):
+                    if permission_denied(request.user, group.user, group.team):
                         logger.warning(f"User {request.user} tried to modify job group {group} without permission")
                         return render(request, 'crontrack/editgroup.html')
                     with transaction.atomic():
@@ -211,11 +211,11 @@ def edit_group(request):
                             job_id = match.group(1)
                             # Check if we're adding a new job (with a single number for its temporary ID)
                             if job_id.isdigit():
-                                job = Job(user=request.user, group=group, user_group=user_group)
+                                job = Job(user=request.user, group=group, team=team)
                             # Otherwise, find the existing job to edit
                             else:
                                 job = Job.objects.get(id=job_id)
-                                if permission_denied(request.user, job.user, job.user_group):
+                                if permission_denied(request.user, job.user, job.team):
                                     logger.warning(f"User {request.user} tried to access job {job} without permission")
                                     return render(request, 'crontrack/editgroup.html')
                 
@@ -249,7 +249,7 @@ def delete_group(request):
     if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
         try:
             group = JobGroup.objects.get(pk=request.POST['group'])
-            if permission_denied(request.user, group.user, group.user_group):
+            if permission_denied(request.user, group.user, group.team):
                 logger.warning(f"User {request.user} tried to delete job group {group} without permission")
             else:
                 group.delete()
@@ -265,7 +265,7 @@ def delete_job(request):
     if request.method == 'POST' and request.user.is_authenticated and 'itemID' in request.POST:
         try:
             job = Job.objects.get(pk=request.POST['itemID'])
-            if permission_denied(request.user, job.user, job.user_group):
+            if permission_denied(request.user, job.user, job.team):
                 logger.warning(f"User {request.user} tried to delete job {job} without permission")
             else:
                 job.delete()
@@ -280,56 +280,56 @@ def delete_job(request):
     return HttpResponseRedirect(reverse('crontrack:view_jobs'))
 
 @login_required
-def user_groups(request):
+def teams(request):
     context = {}
     if request.method == 'POST' and 'type' in request.POST:
-        if request.POST['type'] == 'create_group':
-            group = None
+        if request.POST['type'] == 'create_team':
+            team = None
             try:
                 with transaction.atomic():
-                    group = UserGroup(name=request.POST.get('group_name'), creator=request.user)
-                    group.full_clean()
-                    group.save()
-                    UserGroupMembership.objects.create(user=request.user, group=group)
+                    team = Team(name=request.POST.get('team_name'), creator=request.user)
+                    team.full_clean()
+                    team.save()
+                    TeamMembership.objects.create(user=request.user, team=team)
             except ValidationError:
-                context['error_message'] = 'invalid group name'             
-        elif request.POST['type'] == 'delete_group':
-            UserGroup.objects.get(pk=request.POST['group_id']).delete()
+                context['error_message'] = 'invalid team name'             
+        elif request.POST['type'] == 'delete_team':
+            Team.objects.get(pk=request.POST['team_id']).delete()
         elif request.POST['type'] == 'toggle_alerts':
-            if request.POST['group_id'] == 'None':
+            if request.POST['team_id'] == 'None':
                 request.user.personal_alerts_on = request.POST['alerts_on'] == 'true'
                 request.user.save()
             else:
-                group = UserGroup.objects.get(pk=request.POST['group_id'])
-                membership = UserGroupMembership.objects.get(group=group, user=request.user)
+                team = Team.objects.get(pk=request.POST['team_id'])
+                membership = TeamMembership.objects.get(team=team, user=request.user)
                 membership.alerts_on = request.POST['alerts_on'] == 'true'
                 membership.save()
         else:
             try:
                 user = User.objects.get(username=request.POST['username'])
-                group = UserGroup.objects.get(pk=request.POST['group_id'])
+                team = Team.objects.get(pk=request.POST['team_id'])
             except User.DoesNotExist:
                 context['error_message'] = f"no user found with username '{request.POST['username']}'"
-            except UserGroup.DoesNotExist:
+            except Team.DoesNotExist:
                 pass
             else:
                 if request.POST['type'] == 'add_user':
-                    # Is it okay to add users to groups without them having a say?
+                    # Is it okay to add users to teams without them having a say?
                     # TODO: consider sending a popup etc. to the other user to confirm before adding them
-                    UserGroupMembership.objects.create(user=user, group=group)
+                    TeamMembership.objects.create(user=user, team=team)
                 elif request.POST['type'] == 'remove_user':
-                    if user.id == group.creator.id:
-                        context['error_message'] = "the group's creator cannot be removed from the group"
+                    if user.id == team.creator.id:
+                        context['error_message'] = "the team's creator cannot be removed from the team"
                     else:
-                        UserGroupMembership.objects.get(user=user, group=group).delete()
+                        TeamMembership.objects.get(user=user, team=team).delete()
     
     if request.is_ajax():
         return JsonResponse({})
     else:
         context['membership_alerts'] = {
-            m.group.id for m in UserGroupMembership.objects.filter(user=request.user) if m.alerts_on
+            m.team.id for m in TeamMembership.objects.filter(user=request.user) if m.alerts_on
         }
-        return render(request, 'crontrack/usergroups.html', context)
+        return render(request, 'crontrack/teams.html', context)
 
 @login_required
 def profile(request):
@@ -380,14 +380,14 @@ class RegisterView(generic.CreateView):
 # --- HELPER FUNCTIONS ---
 
 # Gets a user's job group information with their corresponding jobs
-def get_job_group(user, job_group, user_group):
-    # Try to convert the user group to an object
-    if type(user_group) == str: 
-        if user_group == 'None':
-            user_group = None
-        elif user_group.isdigit():
-            # User group is an ID rather than an object
-            user_group = UserGroup.objects.get(pk=user_group)
+def get_job_group(user, job_group, team):
+    # Try to convert the team to an object
+    if type(team) == str: 
+        if team == 'None':
+            team = None
+        elif team.isdigit():
+            # team is an ID rather than an object
+            team = Team.objects.get(pk=team)
     
     # Check if we're looking at a real job group or the 'Ungrouped' group
     if job_group is None or job_group == 'None':
@@ -395,10 +395,10 @@ def get_job_group(user, job_group, user_group):
         id = None
         name = 'Ungrouped'
         description = ''
-        if user_group is None:
-            jobs = jobs.filter(user=user, user_group__isnull=True)
+        if team is None:
+            jobs = jobs.filter(user=user, team__isnull=True)
         else:
-            jobs = jobs.filter(user_group=user_group)
+            jobs = jobs.filter(team=team)
             
         # Skip showing the 'Ungrouped' group if it's empty
         if not jobs:
@@ -409,8 +409,8 @@ def get_job_group(user, job_group, user_group):
             # Group is an ID rather than an object
             job_group = JobGroup.objects.get(pk=job_group)
             
-        # Discard if the JobGroup's user_group doesn't match the given user_group
-        if (user_group != job_group.user_group) or (job_group.user_group is None and user != job_group.user):
+        # Discard if the JobGroup's team doesn't match the given team
+        if (team != job_group.team) or (job_group.team is None and user != job_group.user):
             return None
         
         jobs = Job.objects.filter(group=job_group.id)
@@ -418,8 +418,8 @@ def get_job_group(user, job_group, user_group):
         name = job_group.name
         description = job_group.description
     
-    return {'id': id, 'name': name, 'description': description, 'jobs': jobs, 'user_group': user_group}
+    return {'id': id, 'name': name, 'description': description, 'jobs': jobs, 'team': team}
 
-# Checks if a user shouldn't be able to access a job (i.e. if they don't own it and aren't part of the group it's in)
-def permission_denied(request_user, user, user_group):
-    return request_user != user and user_group not in request_user.user_groups.all()
+# Checks if a user shouldn't be able to access a job (i.e. if they don't own it and aren't part of the team it's in)
+def permission_denied(request_user, user, team):
+    return request_user != user and team not in request_user.teams.all()

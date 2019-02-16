@@ -21,7 +21,7 @@
           {% csrf_token %}
           <input type="hidden" name="edited">
           <input type="hidden" name="group" value="{{ group.id|default:'None' }}">
-          <input type="hidden" name="user_group" value="{{ user_group|default:'None' }}">
+          <input type="hidden" name="team" value="{{ team|default:'None' }}">
           <table class="dbRows">
             <thead><tr>
               <th>Name</th>

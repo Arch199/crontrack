@@ -1,7 +1,7 @@
 {% extends 'crontrack/email/emailbase.html' %}
 
 {% block message %}
-  <p>Your job '{{ job.name }}' {% if job.user_group %}from user group '{{ job.user_group }}' {% endif %}has failed to notify CronTrack in time.
+  <p>Your job '{{ job.name }}' {% if job.team %}from team '{{ job.team }}' {% endif %}has failed to notify CronTrack in time.
   <br>Details below.</p>
 
   <table class="form">

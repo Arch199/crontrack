@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %} Manage user groups {% endblock %}
+{% block title %} Manage teams {% endblock %}
 
 {% block content %}
   <div class="hcenter">
@@ -10,9 +10,9 @@
     <div class="infoBox">
       <label for="personalAlerts">(No Team) alerts on</label>
       <input type="checkbox" name="alerts_on" {% if user.personal_alerts_on %} checked {% endif %}
-          group-id="None" id="personalAlerts">
+          team-id="None" id="personalAlerts">
     </div>
-    {% if user.is_authenticated %}
+    {% if user.teams.exists %}
       <table class="dbRows">
         <thead><tr>
           <th>Alerts</th>
@@ -21,20 +21,20 @@
           <th>New User</th>
         </tr></thead>
         <tbody>
-          {% for group in user.user_groups.all %}
+          {% for team in user.teams.all %}
             <tr>
               <td>
-                <input type="checkbox" name="alerts_on" {% if group.id in membership_alerts %} checked {% endif %}
-                    group-id="{{ group.id }}">
+                <input type="checkbox" name="alerts_on" {% if team.id in membership_alerts %} checked {% endif %}
+                    team-id="{{ team.id }}">
               </td>
-              <td><b>{{ group.name }}</b></td>
+              <td><b>{{ team.name }}</b></td>
               <td>
                 <form method="post">
                   {% csrf_token %}
                   <input type="hidden" name="type" value="remove_user">
-                  <input type="hidden" name="group_id" value="{{ group.id }}">
+                  <input type="hidden" name="team_id" value="{{ team.id }}">
                   <select name="username">
-                    {% for u in group.user_set.all %}
+                    {% for u in team.user_set.all %}
                       <option value="{{ u }}">{{ u }}</option>
                     {% endfor %}
                   </select>
@@ -45,35 +45,34 @@
                 <form method="post">
                   {% csrf_token %}
                   <input type="hidden" name="type" value="add_user">
-                  <input type="hidden" name="group_id" value="{{ group.id }}">
+                  <input type="hidden" name="team_id" value="{{ team.id }}">
                   <input type="text" name="username" placeholder="Username">
                   <input type="submit" value="Add">
                 </form>
                 
-                <input type="button" value=" X " onclick="deleteGroup('{{ group.id }}')" class="danger float right">
-                <form id="deleteGroup{{ group.id }}" method="post">
+                <input type="button" value=" X " onclick="deleteTeam('{{ team.id }}')" class="danger float right">
+                <form id="deleteTeam{{ team.id }}" method="post">
                   {% csrf_token %}
-                  <input type="hidden" name="type" value="delete_group">
-                  <input type="hidden" name="group_id" value="{{ group.id }}">
-                  <input type="hidden" name="group_name" value="{{ group.name }}">
+                  <input type="hidden" name="type" value="delete_team">
+                  <input type="hidden" name="team_id" value="{{ team.id }}">
+                  <input type="hidden" name="team_name" value="{{ team.name }}">
                 </form>
               </td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
-      <br><form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="type" value="create_group">
-        <input type="text" name="group_name" placeholder="Team name">
-        &nbsp;<input type="submit" name="create_group" value="Create team">
-      </form>
-      {% if error_message %}
-        <br><p class="errorMessage">Error: {{ error_message }}.</p>
-      {% endif %}
     {% else %}
-      <p>You are not logged in.</p>
-      <a href="{% url 'crontrack:login' %}">Log in</a>
+      <p class="note">No teams to display.</p>
+    {% endif %}
+    <br><form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="create_team">
+      <input type="text" name="team_name" placeholder="Team name">
+      &nbsp;<input type="submit" name="create_team" value="Create team">
+    </form>
+    {% if error_message %}
+      <br><p class="errorMessage">Error: {{ error_message }}.</p>
     {% endif %}
   </div>
   {% include 'crontrack/js/jquery.html' %}
@@ -88,7 +87,7 @@
           url: window.location.href,
           data: {
             'type': 'toggle_alerts',
-            'group_id': $(this).attr('group-id'),
+            'team_id': $(this).attr('team-id'),
             'alerts_on': this.checked
           },
           dataType: 'json'
@@ -96,10 +95,10 @@
       });
     });
     
-    function deleteGroup(groupID) {
-      form = document.getElementById('deleteGroup' + groupID);
-      groupName = form.lastElementChild.value;
-      response = confirm('Are you sure you want to delete the group "' + groupName + '"?\nThis cannot be undone.');
+    function deleteTeam(teamID) {
+      form = document.getElementById('deleteTeam' + teamID);
+      teamName = form.lastElementChild.value;
+      response = confirm('Are you sure you want to delete the team "' + teamName + '"?\nThis cannot be undone.');
       if (response) {
         form.submit();
       }

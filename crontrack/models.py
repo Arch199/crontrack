@@ -16,20 +16,20 @@ class Job(models.Model):
     description = models.CharField(max_length=200, blank=True, default='')
     user = models.ForeignKey('User', models.CASCADE)
     group = models.ForeignKey('JobGroup', models.CASCADE, null=True, blank=True)
-    user_group = models.ForeignKey('UserGroup', models.SET_NULL, null=True, blank=True)
+    team = models.ForeignKey('Team', models.SET_NULL, null=True, blank=True)
     alerted_users = models.ManyToManyField('User', through='JobAlert', related_name='job_alert_set')
     
     def __str__(self):
-        return f'({self.user_group}) {self.user}\'s {self.name}: "{self.schedule_str}"'
+        return f'({self.team}) {self.user}\'s {self.name}: "{self.schedule_str}"'
         
 class JobGroup(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=200, blank=True, default='')
     user = models.ForeignKey('User', models.CASCADE)
-    user_group = models.ForeignKey('UserGroup', models.SET_NULL, null=True, blank=True)
+    team = models.ForeignKey('Team', models.SET_NULL, null=True, blank=True)
     
     def __str__(self):
-        return f'({self.user_group}) {self.user}\'s {self.name}'
+        return f'({self.team}) {self.user}\'s {self.name}'
 
 class JobAlert(models.Model):
     job = models.ForeignKey('Job', models.CASCADE)
@@ -48,19 +48,19 @@ class User(AbstractUser):
     timezone = TimeZoneField(default='UTC')
     alert_method = models.CharField(max_length=1, choices=ALERT_METHOD_CHOICES, default=NO_ALERTS)
     alert_buffer = models.IntegerField('time to wait between alerts (min)', default=1440)
-    personal_alerts_on = models.BooleanField('alerts on for jobs without a user group', default=True)
+    personal_alerts_on = models.BooleanField('alerts on for jobs without a team', default=True)
     phone = PhoneNumberField(blank=True)
     email = models.EmailField(unique=True, max_length=100)
-    user_groups = models.ManyToManyField('UserGroup', through='UserGroupMembership')
+    teams = models.ManyToManyField('Team', through='TeamMembership')
 
-class UserGroup(models.Model):
+class Team(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey('User', models.CASCADE)
     
     def __str__(self):
         return self.name
     
-class UserGroupMembership(models.Model):
+class TeamMembership(models.Model):
     user = models.ForeignKey('User', models.CASCADE)
-    group = models.ForeignKey('UserGroup', models.CASCADE)
+    team = models.ForeignKey('Team', models.CASCADE)
     alerts_on = models.BooleanField(default=True)

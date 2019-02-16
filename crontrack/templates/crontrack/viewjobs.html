@@ -12,17 +12,17 @@
         <button onclick="changeTab(event, 'ug__All')" class="active">(All teams)</button>
         <span>Filter by team:</span>
         <button onclick="changeTab(event, 'ug__None')">(No team)</button>
-        {% for user_group in user.user_groups.all %}
-          <button onclick="changeTab(event, 'ug__{{ user_group.id }}')">{{ user_group }}</button>
+        {% for team in user.teams.all %}
+          <button onclick="changeTab(event, 'ug__{{ team.id }}')">{{ team }}</button>
         {% endfor %}
       </div>
       <p class="note">
         Currently displaying in timezone "{{ user.timezone }}."
         (<a href="{% url 'crontrack:profile' %}">change</a>)
       </p>
-      {% for user_group in user_groups %}
-        <div class="tabContent{% if forloop.first %} active{% endif %}" id="ug__{{ user_group.id }}">
-          {% if not user_group.empty %}
+      {% for team in teams %}
+        <div class="tabContent{% if forloop.first %} active{% endif %}" id="ug__{{ team.id }}">
+          {% if not team.empty %}
             <table class="dbRows">
               <thead><tr>
                 <th>Name</th>
@@ -31,19 +31,19 @@
                 <th>Next Run Time</th>
                 <th>Last Notified</th>
               </tr></thead>
-              {% for job_group in user_group.job_groups %}
+              {% for job_group in team.job_groups %}
                 <tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
                   <span>{{ job_group.name }}</span>
-                  &emsp;<span class="note small">{{ job_group.user_group.name|default:'(No team)' }}</span>
+                  &emsp;<span class="note small">{{ job_group.team.name|default:'(No team)' }}</span>
                   <form action="{% url 'crontrack:edit_group' %}" method="post" class="right">
                     {% csrf_token %}
                     <input type="hidden" name="group" value="{{ job_group.id|default:'None' }}">
-                    <input type="hidden" name="user_group" value="{{ job_group.user_group.id|default:'None' }}">
+                    <input type="hidden" name="team" value="{{ job_group.team.id|default:'None' }}">
                     <input type="submit" value="Edit group">
                   </form>
                 </td></tr>
                 <tbody class="rowGroupContent open">
-                  {% if group.description %}
+                  {% if job_group.description %}
                     <tr><td colspan="5" class="rowGroupInfo"><p>{{ job_group.description }}</p></td></tr>
                   {% endif %}
                   {% for job in job_group.jobs %}

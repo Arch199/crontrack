@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 
-from .models import Job, JobAlert, User, UserGroupMembership
+from .models import Job, JobAlert, User, TeamMembership
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +50,11 @@ class JobMonitor:
                     # Error condition: the job did not send a notification
                     logger.debug(f"Alert! Job: {job} failed to notify in the time window")
                     
-                    # Try alerting users in the relevant user group
-                    if job.user_group is None:
+                    # Try alerting users in the relevant team
+                    if job.team is None:
                         users = (job.user,)
                     else:
-                        users = job.user_group.user_set.all()
+                        users = job.team.user_set.all()
                     for user in users:
                         if user not in job.alerted_users.all():
                             # Send an alert if it's our first
@@ -86,16 +86,16 @@ class JobMonitor:
             time.sleep(self.WAIT_INTERVAL)
         
     def alert_user(self, user, job):        
-        # Skip alerting if the user has alerts disabled (either globally or just for this user group
+        # Skip alerting if the user has alerts disabled (either globally or just for this team
         if user.alert_method == User.NO_ALERTS:
             logger.debug(f"Not alerting user '{user}' as they have all alerts disabled")
             return
-        if job.user_group is None:
+        if job.team is None:
             alerts_on = user.personal_alerts_on
         else:
-            alerts_on = UserGroupMembership.objects.get(user=user, group=job.user_group).alerts_on
+            alerts_on = TeamMembership.objects.get(user=user, team=job.team).alerts_on
         if not alerts_on:
-            logger.debug(f"Not alerting user '{user}' as they have alerts for group '{job.user_group}' disabled")
+            logger.debug(f"Not alerting user '{user}' as they have alerts for team '{job.team}' disabled")
             return
         
         # Either send an email or text based on user preferences

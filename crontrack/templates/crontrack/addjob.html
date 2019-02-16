@@ -23,11 +23,11 @@
               <td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
             </tr>
             <tr>
-              <td><label for="user_group">Team</label></td>
-              <td><select name="user_group" id="user_group">
+              <td><label for="team">Team</label></td>
+              <td><select name="team" id="team">
                 <option value="None">None</option>
-                {% for group in user.user_groups.all %}
-                  <option value="{{ group.id }}">{{ group.name }}</option>
+                {% for team in user.teams.all %}
+                  <option value="{{ team.id }}">{{ team.name }}</option>
                 {% endfor %}
               </select></td>
             </tr>
@@ -64,11 +64,11 @@
               <td><input type="text" name="name" id="name" value="{{ prefill.name }}"></td>
             </tr>
             <tr>
-              <td><label for="user_group">Team</label></td>
-              <td><select name="user_group" id="user_group">
+              <td><label for="team">Team</label></td>
+              <td><select name="team" id="team">
                 <option value="None">None</option>
-                {% for group in user.user_groups.all %}
-                  <option value="{{ group.id }}">{{ group.name }}</option>
+                {% for team in user.teams.all %}
+                  <option value="{{ team.id }}">{{ team.name }}</option>
                 {% endfor %}
               </select></td>
             </tr>

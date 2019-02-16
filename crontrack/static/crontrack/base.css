@@ -329,7 +329,7 @@ table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box 
 
 table.dbRows .rowGroupItemInfo .right input {
   font-family: 'Courier New', monospace;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 /* dropdown triangle (closed) */
