@@ -320,7 +320,7 @@ table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
   display: table-row;
 }
 
-table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box in job descriptions */
+table.dbRows .rowGroupItemInfo span.right { /* currently just used for the UUID box in job descriptions */
   float: right;
   padding: 1px;
   margin-left: 5px;
@@ -330,6 +330,11 @@ table.dbRows .rowGroupItemInfo .right { /* currently just used for the UUID box 
 table.dbRows .rowGroupItemInfo .right input {
   font-family: 'Courier New', monospace;
   font-size: 12px;
+}
+
+table.dbRows .rowGroupItemInfo .float.right {
+  top: 30%;
+  left: 101%;
 }
 
 /* dropdown triangle (closed) */

@@ -55,14 +55,21 @@
                       <td>{{ job.last_notified|default:'-' }}</td>
                     </tr>
                     <tr class="rowGroupItemInfo">
-                      <td colspan="5"><p>
-                        <span class="right">
-                          <input type="text" class="js-UUID" readonly size="60" title="URL to notify job"
-                              value="{{ protocol }}://{{ domain }}{% url 'crontrack:notify_job' job.id %}"><!--
-                            --><button class="js-copyUUID">COPY</button>
-                        </span>
-                        {{ job.description }}
-                      </p></td>
+                      <td colspan="5">
+                        <p>
+                          <span class="right">
+                            <input type="text" class="js-UUID" readonly size="63" title="URL to notify job"
+                                value="{{ protocol }}://{{ domain }}{% url 'crontrack:notify_job' job.id %}"><!--
+                              --><button class="js-copyUUID">COPY</button>
+                          </span>
+                          {{ job.description }}
+                        </p>
+                        <form action="{% url 'crontrack:edit_job' %}" method="post">
+                          {% csrf_token %}
+                          <input type="hidden" name="job" value="{{ job.id }}">
+                          <input type="submit" value="Edit job" class="float right">
+                        </form>
+                      </td>
                     </tr>
                   {% endfor %}
                 </tbody>

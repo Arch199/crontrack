@@ -1,0 +1,72 @@
+{% extends 'crontrack/base.html' %}
+
+{% load static %}
+
+{% block title %} Edit a job {% endblock %}
+
+{% block content %}
+  <div class="hcenter">
+    <h2>Edit job</h2>
+      {% if job %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="edited">
+          <input type="hidden" name="job" value="{{ job.id }}">
+          <table class="dbRows">
+            <thead><tr>
+              <th>Name</th>
+              <th>Cron Schedule String</th>
+              <th>Time Window (min)</th>
+            </tr></thead>
+            <tbody class="rowGroupContent open">
+              <tr class="rowGroupItem open" id="{{ job.id }}">
+                <td><input name="name" value="{{ job.name }}"></td>
+                <td><input name="schedule_str" value="{{ job.schedule_str }}"></td>
+                <td>
+                  <input name="time_window" value="{{ job.time_window }}">
+                  <input type="button" value=" X " onclick="deleteRowGroupItem(event,'{{ job.name }}')"
+                      my-url="{% url 'crontrack:delete_job' %}" class="danger float right">
+                </td>
+              </tr>
+              <tr class="rowGroupItemInfo">
+                <td colspan="3">
+                  <textarea name="description" maxlength="200"
+                      placeholder="Job description">{{ job.description }}</textarea>
+                  <!-- WARNING: MAGIC NUMBER -->
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+          <div class="dbRows">
+            <input type="submit" value="Confirm">
+          </div>
+        </form>
+      {% else %}
+        <p class="errorMessage">Error: the selected job does not exist</p>
+        <a href="{% url 'crontrack:view_jobs' %}">Return to viewing jobs</a>
+      {% endif %}
+  </div>
+  {% include 'crontrack/js/jquery.html' %}
+  {% include 'crontrack/js/js-cookie.html' %}
+  <script src="{% static 'crontrack/setup.js' %}"></script>
+  <script src="{% static 'crontrack/rowgroup.js' %}"></script>
+  <script>
+    $(document).ready(function() {
+      // Define a remove event
+      // https://stackoverflow.com/questions/2200494/jquery-trigger-event-when-an-element-is-removed-from-the-dom
+      $.event.special.destroyed = {
+        remove: function(o) {
+          if (o.handler) {
+            o.handler();
+          }
+        }
+      }
+      
+      // Redirect when job is removed
+      $('#{{ job.id }}').on('destroyed', function() {
+        $(location).attr('href', '{% url "crontrack:view_jobs" %}');
+      });
+    });
+  </script>
+{% endblock %}

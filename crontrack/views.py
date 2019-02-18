@@ -75,7 +75,7 @@ def add_job(request):
                 team = Team.objects.get(pk=request.POST['team'])
                 if team not in request.user.teams.all():
                     team = None
-                    logger.warning(f"User {request.user} tried to access a group they\'re not in: {team}")
+                    logger.warning(f"User {request.user} tried to access a team they're not in: {team}")
             
             # Check if we're adding a group
             if 'group' in request.POST:
@@ -164,6 +164,42 @@ def add_job(request):
         
 # ---- TODO: convert the context/error_message system to use django messages (?)
 # Also make sure to redirect after successfully dealing with post data to prevent duplicates
+
+@login_required
+def edit_job(request):
+    if request.method == 'POST':
+        job = Job.objects.get(pk=request.POST['job'])
+        if 'edited' in request.POST:
+            # Edit the job
+            context = {'prefill': request.POST}
+            try:
+                with transaction.atomic():
+                    job.name = request.POST['name']
+                    job.schedule_str = request.POST['schedule_str']
+                    job.time_window = request.POST['time_window']
+                    job.description = request.POST['description']
+                    
+                    timezone.activate(request.user.timezone)
+                    now = timezone.localtime(timezone.now())
+                    job.next_run = croniter(job.schedule_str, now).get_next(datetime)
+                    
+                    job.full_clean()
+                    job.save()
+            except CroniterBadCronError:
+                context['error_message'] = "invalid cron schedule string"
+            except ValueError:
+                context['error_message'] = "please enter a valid whole number for the time window"
+            except ValidationError:
+                context['error_message'] = "invalid data entered in one or more fields"
+            else:
+                return HttpResponseRedirect(reverse('crontrack:view_jobs'))
+                
+            # ^ copied code feels bad. TODO: draw this out into a helper function
+            return render(request, 'crontrack/editjob.html', context)
+        else:
+            return render(request, 'crontrack/editjob.html', {'job': job})
+    else:
+        return render(request, 'crontrack/editjob.html')
 
 @login_required
 def edit_group(request):
@@ -271,8 +307,9 @@ def delete_job(request):
                 job.delete()
             data = {'itemID': request.POST['itemID']}
         except Job.DoesNotExist:
-            print(f"ERROR: Tried to delete job with id '{request.POST['itemID']}' and it didn't exist " +
-                f"(or didn't belong to the user '{request.user.username}')"
+            logger.debug(
+                f"Tried to delete job with id '{request.POST['itemID']}' and it didn't exist " +
+                f"(or didn't belong to the user '{request.user}')"
             )
         else:
             return JsonResponse(data)
