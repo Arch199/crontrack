@@ -337,6 +337,19 @@ table.dbRows .rowGroupItemInfo .float.right {
   left: 101%;
 }
 
+/* Danger coloring (used for showing jobs that have failed, etc.) */
+table.dbRows .rowGroupItem.danger {
+  background-color: #e06666; /* #ccc */
+}
+
+table.dbRows .rowGroupItem.danger:hover {
+  background-color: #c64d4d; /* #999 */
+}
+
+table.dbRows .rowGroupItem.danger + .rowGroupItemInfo {
+  background-color: #ea7a7a; /* #dfdfdf */
+}
+
 /* dropdown triangle (closed) */
 table.dbRows .rowGroupHeader::before,
 table.dbRows .rowGroupItem td:first-child::before {

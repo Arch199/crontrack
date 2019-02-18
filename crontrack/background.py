@@ -48,6 +48,7 @@ class JobMonitor:
                 # Check if a notification was not received in the time window
                 if job.last_notified is None or not (job.next_run <= job.last_notified <= run_by):
                     # Error condition: the job did not send a notification
+                    job.last_failed = timezone.now()
                     logger.debug(f"Alert! Job: {job} failed to notify in the time window")
                     
                     # Try alerting users in the relevant team

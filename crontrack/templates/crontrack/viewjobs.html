@@ -26,13 +26,14 @@
             <table class="dbRows">
               <thead><tr>
                 <th>Name</th>
-                <th>Cron Schedule String</th>
+                <th>Cron Schedule</th>
                 <th>Time Window (min)</th>
                 <th>Next Run Time</th>
+                <th>Last Failed</th>
                 <th>Last Notified</th>
               </tr></thead>
               {% for job_group in team.job_groups %}
-                <tr><td colspan="5" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
+                <tr><td colspan="6" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
                   <span>{{ job_group.name }}</span>
                   &emsp;<span class="note small">{{ job_group.team.name|default:'(No team)' }}</span>
                   <form action="{% url 'crontrack:edit_group' %}" method="post" class="right">
@@ -44,18 +45,22 @@
                 </td></tr>
                 <tbody class="rowGroupContent open">
                   {% if job_group.description %}
-                    <tr><td colspan="5" class="rowGroupInfo"><p>{{ job_group.description }}</p></td></tr>
+                    <tr><td colspan="6" class="rowGroupInfo"><p>{{ job_group.description }}</p></td></tr>
                   {% endif %}
                   {% for job in job_group.jobs %}
-                    <tr class="rowGroupItem" onclick="toggleRowGroupItem(event)">
-                      <td>{{ job.name }}</td>
-                      <td>{{ job.schedule_str }}</td>
-                      <td>{{ job.time_window }}</td>
-                      <td>{{ job.next_run }}</td>
-                      <td>{{ job.last_notified|default:'-' }}</td>
-                    </tr>
+                    {% with fail=job.last_failed noti=job.last_notified %}
+                      <tr class="rowGroupItem{% if fail %}{% if not noti or fail > noti %} danger{% endif %}{% endif %}"
+                            onclick="toggleRowGroupItem(event)">
+                        <td>{{ job.name }}</td>
+                        <td>{{ job.schedule_str }}</td>
+                        <td>{{ job.time_window }}</td>
+                        <td>{{ job.next_run }}</td>
+                        <td>{{ job.last_failed|default:'-' }}</td>
+                        <td>{{ job.last_notified|default:'-' }}</td>
+                      </tr>
+                    {% endwith %}
                     <tr class="rowGroupItemInfo">
-                      <td colspan="5">
+                      <td colspan="6">
                         <p>
                           <span class="right">
                             <input type="text" class="js-UUID" readonly size="63" title="URL to notify job"
