@@ -329,7 +329,7 @@ def teams(request):
                     team.save()
                     TeamMembership.objects.create(user=request.user, team=team)
             except ValidationError:
-                context['error_message'] = 'invalid team name'             
+                context['error_message'] = 'invalid team name'
         elif request.POST['type'] == 'delete_team':
             Team.objects.get(pk=request.POST['team_id']).delete()
         elif request.POST['type'] == 'toggle_alerts':

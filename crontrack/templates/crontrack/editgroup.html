@@ -29,7 +29,8 @@
               <th>Time Window (min)</th>
             </tr></thead>
             <tr><td colspan="3" class="rowGroupHeader open" onclick="toggleRowGroup(event)">
-              <span><input type="text" name="group_name" value="{{ group.name }}" size="50" maxlength="50"></span>
+              <input type="text" name="group_name" value="{{ group.name }}" size="50" maxlength="50"
+                  {% if not group.id %}readonly{% endif %}>
               
               <!-- ^THIS 50 is a magic number and should be burnt with fire
                 TODO: I need to make a constants field and pass it into the template -->
