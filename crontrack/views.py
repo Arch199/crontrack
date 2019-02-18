@@ -29,6 +29,7 @@ def index(request):
 def notify_job(request, id):
     job = Job.objects.get(pk=id)
     job.last_notified = timezone.now()
+    job.last_failed = None
     job.save()
     logger.debug(f"Notified for job '{id}' at {job.last_notified}")
     

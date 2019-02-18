@@ -37,7 +37,7 @@ class JobMonitor:
     def monitor_loop(self):
         while self.running:
             logger.debug(f"Starting monitor loop at {timezone.now()}")
-            for job in Job.objects.all():
+            for job in Job.objects.running():
                 # Calculate the next scheduled run time + time window
                 run_by = job.next_run + timedelta(minutes=job.time_window)
                 

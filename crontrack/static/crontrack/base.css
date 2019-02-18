@@ -351,6 +351,19 @@ table.dbRows .rowGroupItem.danger + .rowGroupItemInfo {
   background-color: #ea7474; /* #dfdfdf */
 }
 
+/* Warning coloring (used for showing jobs that are behind on notifications) */
+table.dbRows .rowGroupItem.warning {
+  background-color: #e0e000;
+}
+
+table.dbRows .rowGroupItem.warning:hover {
+  background-color: #f0f000;
+}
+
+table.dbRows .rowGroupItem.warning + .rowGroupItemInfo {
+  background-color: #f0f000;
+}
+
 /* dropdown triangle (closed) */
 table.dbRows .rowGroupHeader::before,
 table.dbRows .rowGroupItem td:first-child::before {

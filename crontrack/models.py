@@ -1,3 +1,4 @@
+from datetime import timedelta
 import uuid
 
 from django.contrib.auth.models import AbstractUser
@@ -5,6 +6,15 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from timezone_field import TimeZoneField
+
+
+class JobManager(models.Manager):
+    def running(self):
+        return self.get_queryset().filter(last_failed__isnull=True)
+
+    def failed(self):
+        return self.get_queryset().filter(last_failed__isnull=False)
+
 
 class Job(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -19,10 +29,23 @@ class Job(models.Model):
     group = models.ForeignKey('JobGroup', models.CASCADE, null=True, blank=True)
     team = models.ForeignKey('Team', models.SET_NULL, null=True, blank=True)
     alerted_users = models.ManyToManyField('User', through='JobAlert', related_name='job_alert_set')
+
+    objects = JobManager()
     
     def __str__(self):
         return f'({self.team}) {self.user}\'s {self.name}: "{self.schedule_str}"'
-        
+
+    @property
+    def failed(self):
+        return bool(self.last_failed)
+
+    @property
+    def failing(self):
+        # TODO: Once issue #3 is fixed, re-check this logic to identify jobs who missed a notify, but
+        #       have not yet reached full failed status.
+        return not self.failed and self.last_notified < self.next_run + timedelta(minutes=self.time_window)
+
+
 class JobGroup(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=200, blank=True, default='')

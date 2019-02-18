@@ -48,8 +48,7 @@
                     <tr><td colspan="6" class="rowGroupInfo"><p>{{ job_group.description }}</p></td></tr>
                   {% endif %}
                   {% for job in job_group.jobs %}
-                    {% with fail=job.last_failed noti=job.last_notified %}
-                      <tr class="rowGroupItem{% if fail %}{% if not noti or fail > noti %} danger{% endif %}{% endif %}"
+                      <tr class="rowGroupItem{% if job.failed %} danger{% elif job.failing %} warning{% endif %}"
                             onclick="toggleRowGroupItem(event)">
                         <td>{{ job.name }}</td>
                         <td>{{ job.schedule_str }}</td>
@@ -58,7 +57,6 @@
                         <td>{{ job.last_failed|default:'-' }}</td>
                         <td>{{ job.last_notified|default:'-' }}</td>
                       </tr>
-                    {% endwith %}
                     <tr class="rowGroupItemInfo">
                       <td colspan="6">
                         <p>
