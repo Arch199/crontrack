@@ -186,7 +186,8 @@ div.dbRows { /* for aligning below a dbRows table */
 }
 
 div.dbRows .float.right {
-  left: 90%;
+  left: initial;
+  right: 1%;
 }
 
 table.dbRows tbody {
