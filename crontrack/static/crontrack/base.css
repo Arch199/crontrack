@@ -177,12 +177,12 @@ table.dbRows, table.dbRows td, table.dbRows th {
 
 table.dbRows {
   border-collapse: collapse;
-  width: 65em;
+  width: 70em;
 }
 
 div.dbRows { /* for aligning below a dbRows table */
   position: relative;
-  width: 65em;
+  width: 70em;
 }
 
 div.dbRows .float.right {
@@ -339,15 +339,15 @@ table.dbRows .rowGroupItemInfo .float.right {
 
 /* Danger coloring (used for showing jobs that have failed, etc.) */
 table.dbRows .rowGroupItem.danger {
-  background-color: #e06666; /* #ccc */
+  background-color: #e06060; /* #ccc */
 }
 
 table.dbRows .rowGroupItem.danger:hover {
-  background-color: #c64d4d; /* #999 */
+  background-color: #c64747; /* #999 */
 }
 
 table.dbRows .rowGroupItem.danger + .rowGroupItemInfo {
-  background-color: #ea7a7a; /* #dfdfdf */
+  background-color: #ea7474; /* #dfdfdf */
 }
 
 /* dropdown triangle (closed) */
@@ -526,10 +526,11 @@ form.login {
   font-style: italic;
 }
 
+
 /* --- Class overrides --- */
 
 .fixedWidth {
-  width: 65em; /* intended to match table.dbRows */
+  width: 70em; /* intended to match table.dbRows */
 }
 
 /* TODO: remove this (not currently in use) */
