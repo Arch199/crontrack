@@ -1,22 +1,26 @@
 {% extends 'crontrack/base.html' %}
 
+{% load static %}
+
 {% block title %} Home {% endblock %}
 
 {% block content %}
   <div class="center round">
     <h1>CronTrack</h1>
-    <p>An open-source web service for tracking Cron jobs.</p>
+    <p>An open-source web service for keeping track of Cron jobs.</p>
     <p>
       {% if not user.is_authenticated %}
-        <a href="{% url 'crontrack:login' %}">Log in</a> | 
-        <a href="{% url 'crontrack:register' %}">Register</a> | 
+        <a href="{% url 'crontrack:login' %}">Log in</a> |
+        <a href="{% url 'crontrack:register' %}">Register</a>
       {% else %}
         <a href="{% url 'crontrack:view_jobs' %}">View jobs</a> |
         <a href="{% url 'crontrack:add_job' %}">Add job</a> |
-        <a href="{% url 'crontrack:profile' %}">Profile</a> | 
-        <a href="{% url 'crontrack:teams' %}">Teams</a> | 
+        <a href="{% url 'crontrack:profile' %}">Profile</a> |
+        <a href="{% url 'crontrack:teams' %}">Teams</a>
       {% endif %}
-      <a href="https://github.com/Arch199/crontrack/">Github repo</a>
     </p>
+    Check out the source on <a href="https://github.com/Arch199/crontrack/">
+      Github<img style="margin-left: 2px" src="{% static 'crontrack/img/external-link.png' %}">
+    </a>
   </div>
 {% endblock %}

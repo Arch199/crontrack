@@ -86,6 +86,12 @@ form {
   display: inline-block;
 }
 
+hr {
+  border-color: #aaa;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+}
+
 
 /* --- Site page top bar --- */
 .topBar {
