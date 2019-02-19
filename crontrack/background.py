@@ -26,17 +26,17 @@ class JobMonitor:
         self.start_time = timezone.now()
         self.running = True
     
-        logger.debug(f'Starting JobMonitor thread with time limit "{time_limit}"')
+        logger.debug(f"Starting JobMonitor thread with time limit '{time_limit}'")
         self.t = threading.Thread(target=self.monitor_loop, name='JobMonitorThread', daemon=True)
         self.t.start()
         
     def stop(self):
-        logger.debug('Stopping JobMonitor')
+        logger.debug("Stopping JobMonitor")
         self.running = False
     
     def monitor_loop(self):
         while self.running:
-            logger.debug(f'Starting monitor loop at {timezone.now()}')
+            logger.debug(f"Starting monitor loop at {timezone.now()}")
             for job in Job.objects.all():
                 # Calculate the next scheduled run time + time window
                 run_by = job.next_run + timedelta(minutes=job.time_window)
@@ -44,6 +44,9 @@ class JobMonitor:
                 # Skip if this run time is in the future
                 if run_by > timezone.now():
                     continue
+                
+                # Change to local time (for alerts / calculating next run time)
+                timezone.activate(job.user.timezone)
                 
                 # Check if a notification was not received in the time window
                 if job.last_notified is None or not (job.next_run <= job.last_notified <= run_by):
@@ -71,7 +74,6 @@ class JobMonitor:
                                 logger.debug(f"Skipped alerting user '{user}' of failed job {job}")
                 
                 # Calculate the new next run time
-                timezone.activate(job.user.timezone)
                 now = timezone.localtime(timezone.now())
                 job.next_run = croniter(job.schedule_str, now).get_next(datetime)
                 job.save()
@@ -87,7 +89,7 @@ class JobMonitor:
             time.sleep(self.WAIT_INTERVAL)
         
     def alert_user(self, user, job):        
-        # Skip alerting if the user has alerts disabled (either globally or just for this team
+        # Skip alerting if the user has alerts disabled (either globally or just for this team)
         if user.alert_method == User.NO_ALERTS:
             logger.debug(f"Not alerting user '{user}' as they have all alerts disabled")
             return
