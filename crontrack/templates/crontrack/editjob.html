@@ -40,7 +40,9 @@
           <br>
           <div class="dbRows">
             <a class="button float right" href="{% url 'crontrack:view_jobs' %}">Cancel</a>
-            <input type="submit" value="Confirm">
+            <input type="submit" name="save" value="Save" title="Save changes and update the next run time only">
+            &nbsp;<input type="submit" name="save_reset" value="Save & Reset"
+                title="Save changes and reset job status (notification/failure timestamps)">
           </div>
         </form>
       {% else %}

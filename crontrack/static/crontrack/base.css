@@ -323,17 +323,18 @@ table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
 
 table.dbRows .rowGroupItemInfo span.right { /* currently just used for the UUID box in job descriptions */
   float: right;
+  background-color: #dfdfdf; /* from .rowGroupItemInfo */
   padding: 1px;
   margin-left: 10px;
   border: 2px groove #ccc;
 }
 
-table.dbRows .rowGroupItemInfo .right input {
+table.dbRows .rowGroupItemInfo span.right input {
   font-family: 'Courier New', monospace;
   font-size: 12px;
 }
 
-table.dbRows .rowGroupItemInfo .float.right {
+table.dbRows .rowGroupItemInfo .float.right { /* Edit job button */
   top: 30%;
   left: 101%;
 }

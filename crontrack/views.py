@@ -172,33 +172,41 @@ def add_job(request):
 @login_required
 def edit_job(request):
     if request.method == 'POST':
-        job = Job.objects.get(pk=request.POST['job'])
+        job = Job.objects.get(pk=request.POST['job'])            
         if 'edited' in request.POST:
             # Edit the job
             context = {'prefill': request.POST}
-            try:
-                with transaction.atomic():
-                    job.name = request.POST['name']
-                    job.schedule_str = request.POST['schedule_str']
-                    job.time_window = request.POST['time_window']
-                    job.description = request.POST['description']
-                    
-                    timezone.activate(request.user.timezone)
-                    now = timezone.localtime(timezone.now())
-                    job.next_run = croniter(job.schedule_str, now).get_next(datetime)
-                    
-                    job.full_clean()
-                    job.save()
-            except CroniterBadCronError:
-                context['error_message'] = "invalid cron schedule string"
-            except ValueError:
-                context['error_message'] = "please enter a valid whole number for the time window"
-            except ValidationError:
-                context['error_message'] = "invalid data entered in one or more fields"
+            if permission_denied(request.user, job.user, job.team):
+                logger.warning("User {user} tried to edit job {job} without permission")
             else:
-                return HttpResponseRedirect(reverse('crontrack:view_jobs'))
+                try:
+                    with transaction.atomic():
+                        job.name = request.POST['name']
+                        job.schedule_str = request.POST['schedule_str']
+                        job.time_window = request.POST['time_window']
+                        job.description = request.POST['description']
+                        
+                        now = timezone.localtime(timezone.now(), request.user.timezone)
+                        job.next_run = croniter(job.schedule_str, now).get_next(datetime)
+                        
+                        job.full_clean()
+                        job.save()
+                except CroniterBadCronError:
+                    context['error_message'] = "invalid cron schedule string"
+                except ValueError:
+                    context['error_message'] = "please enter a valid whole number for the time window"
+                except ValidationError:
+                    context['error_message'] = "invalid data entered in one or more fields"
+                else:
+                    if 'save_reset' in request.POST:
+                        # Reset all status fields (notification and fail timestamps)
+                        job.last_notified = None
+                        job.last_failed = None
+                        job.save()
                 
-            # ^ copied code feels bad. TODO: draw this out into a helper function
+                    return HttpResponseRedirect(reverse('crontrack:view_jobs'))
+                
+            # ^ copied code feels bad. TODO: draw this out into a helper function (or just use a form)
             return render(request, 'crontrack/editjob.html', context)
         else:
             return render(request, 'crontrack/editjob.html', {'job': job})
