@@ -27,11 +27,14 @@ def index(request):
     return render(request, 'crontrack/index.html')
 
 def notify_job(request, id):
+    # Update last_notified, last_failed, and next_run
     job = Job.objects.get(pk=id)
     job.last_notified = timezone.now()
     job.last_failed = None
+    now = timezone.localtime(timezone.now(), job.user.timezone)
+    job.next_run = croniter(job.schedule_str, now).get_next(datetime)
     job.save()
-    logger.debug(f"Notified for job '{id}' at {job.last_notified}")
+    logger.debug(f"Notified for job '{job}' at {job.last_notified}")
     
     return JsonResponse({'success_message': 'Job notified successfully.'})
 

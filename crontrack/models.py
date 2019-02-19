@@ -4,6 +4,7 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 from timezone_field import TimeZoneField
 
@@ -41,9 +42,14 @@ class Job(models.Model):
 
     @property
     def failing(self):
+        # Checks if next_run has passed and a notification was not received, but it is still within the time window
         # TODO: Once issue #3 is fixed, re-check this logic to identify jobs who missed a notify, but
         #       have not yet reached full failed status.
-        return not self.failed and self.last_notified < self.next_run + timedelta(minutes=self.time_window)
+        return (
+            not self.failed and
+            self.next_run < timezone.now() and
+            (self.last_notified is None or self.last_notified < self.next_run)
+        )
 
 
 class JobGroup(models.Model):
@@ -55,10 +61,12 @@ class JobGroup(models.Model):
     def __str__(self):
         return f'({self.team}) {self.user}\'s {self.name}'
 
+
 class JobAlert(models.Model):
     job = models.ForeignKey('Job', models.CASCADE)
     user = models.ForeignKey('User', models.CASCADE)
     last_alert = models.DateTimeField('last time alert sent', null=True, blank=True)
+
     
 class User(AbstractUser):
     EMAIL = 'E'
@@ -77,13 +85,15 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, max_length=100)
     teams = models.ManyToManyField('Team', through='TeamMembership')
 
+
 class Team(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey('User', models.CASCADE)
     
     def __str__(self):
         return self.name
-    
+
+
 class TeamMembership(models.Model):
     user = models.ForeignKey('User', models.CASCADE)
     team = models.ForeignKey('Team', models.CASCADE)

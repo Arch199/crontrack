@@ -324,7 +324,7 @@ table.dbRows .rowGroupItem.open + .rowGroupItemInfo {
 table.dbRows .rowGroupItemInfo span.right { /* currently just used for the UUID box in job descriptions */
   float: right;
   padding: 1px;
-  margin-left: 5px;
+  margin-left: 10px;
   border: 2px groove #ccc;
 }
 
@@ -353,15 +353,15 @@ table.dbRows .rowGroupItem.danger + .rowGroupItemInfo {
 
 /* Warning coloring (used for showing jobs that are behind on notifications) */
 table.dbRows .rowGroupItem.warning {
-  background-color: #e0e000;
+  background-color: #e6e660;
 }
 
 table.dbRows .rowGroupItem.warning:hover {
-  background-color: #f0f000;
+  background-color: #b0b047;
 }
 
 table.dbRows .rowGroupItem.warning + .rowGroupItemInfo {
-  background-color: #f0f000;
+  background-color: #f0e674;
 }
 
 /* dropdown triangle (closed) */
