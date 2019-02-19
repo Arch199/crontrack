@@ -79,7 +79,7 @@
   {% include 'crontrack/js/js-cookie.html' %}
   <script src="{% static 'crontrack/setup.js' %}"></script>
   <script>
-    $(document).ready(function() {
+    $(function() {
       $('input[name="alerts_on"]').on('change', function() {
         $.ajax({
           beforeSend: setToken,

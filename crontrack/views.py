@@ -45,7 +45,8 @@ def view_jobs(request):
     context = {
         'teams': [{'id': 'All', 'job_groups': [], 'empty': True}],
         'protocol': settings.SITE_PROTOCOL,
-        'domain': settings.SITE_DOMAIN
+        'domain': settings.SITE_DOMAIN,
+        'tab': request.COOKIES.get('tab', None),
     }
     for team in chain((None,), request.user.teams.all()):
         ungrouped = (get_job_group(request.user, None, team),)
@@ -66,8 +67,9 @@ def view_jobs(request):
 
 @login_required
 def add_job(request):
+    context = {'tab': request.COOKIES.get('tab', None)}
     if request.method == 'POST':
-        context = {'prefill': request.POST}
+        context['prefill'] = request.POST
         # Logic to add the job
         try:
             now = datetime.now(tz=pytz.timezone(request.POST['timezone']))
@@ -162,9 +164,7 @@ def add_job(request):
             # TODO: replace this with form validation
             context['error_message'] = "invalid data in one or more field(s)"
         
-        return render(request, 'crontrack/addjob.html', context)
-    else:
-        return render(request, 'crontrack/addjob.html')
+    return render(request, 'crontrack/addjob.html', context)
         
 # ---- TODO: convert the context/error_message system to use django messages (?)
 # Also make sure to redirect after successfully dealing with post data to prevent duplicates

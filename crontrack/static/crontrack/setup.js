@@ -1,3 +1,5 @@
+// Requires JSCookie
+
 // Set up JQuery AJAX to include CSRF tokens
 // more info here: https://docs.djangoproject.com/en/2.1/ref/csrf/#ajax
 

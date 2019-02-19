@@ -9,11 +9,13 @@
     <h2>View running jobs</h2>
     {% if user.is_authenticated %}
       <div class="tab fixedWidth">
-        <button onclick="changeTab(event, 'ug__All')" class="active">(All teams)</button>
+        <button js-target="All" class="{% if not tab or tab == 'All' %}active{% endif %}">(All teams)</button>
         <span>Filter by team:</span>
-        <button onclick="changeTab(event, 'ug__None')">(No team)</button>
+        <button js-target="None" class="{% if tab == 'None' %}active{% endif %}">(No team)</button>
         {% for team in user.teams.all %}
-          <button onclick="changeTab(event, 'ug__{{ team.id }}')">{{ team }}</button>
+          <button js-target="{{ team.id }}" class="{% if tab|slugify == team.id|slugify %}active{% endif %}">
+            {{ team }}
+          </button>
         {% endfor %}
       </div>
       <p class="note">
@@ -21,7 +23,8 @@
         (<a href="{% url 'crontrack:profile' %}">change</a>)
       </p>
       {% for team in teams %}
-        <div class="tabContent{% if forloop.first %} active{% endif %}" id="ug__{{ team.id }}">
+        <div id="{{ team.id }}"
+            class="tabContent{% if forloop.first and not tab or tab|slugify == team.id|slugify %} active{% endif %}">
           {% if not team.empty %}
             <table class="dbRows">
               <thead><tr>
@@ -90,10 +93,11 @@
     {% endif %}
   </div>
   {% include 'crontrack/js/jquery.html' %}
+  {% include 'crontrack/js/js-cookie.html' %}
   <script src="{% static 'crontrack/rowgroup.js' %}"></script>
   <script src="{% static 'crontrack/tab.js' %}"></script>
   <script>
-    $(document).ready(function() {
+    $(function() {
       // Add copy function to "COPY UUID" button
       $('.js-copyUUID').on('click', function() {
         $(this).prev('.js-UUID').select();

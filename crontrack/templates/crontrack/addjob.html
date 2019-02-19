@@ -10,13 +10,15 @@
     <h2>Add jobs</h2>
     {% if user.is_authenticated %}
       <div class="tab">
-        <button onclick="changeTab(event, 'Add single')" class="{% if not prefill.group %}active{% endif %}">Add single</button>
-        <button onclick="changeTab(event, 'Add group')" class="{{ prefill.group }}">Add group</button>
+        <button js-target="addSingle" class="{% if not tab or tab == 'addSingle' %}active{% endif %}">
+          Add single
+        </button>
+        <button js-target="addGroup" class="{% if tab == 'addGroup' %}active{% endif %}">Add group</button>
       </div>
-      <div class="tabContent show {% if not prefill.group %}active{% endif %}" id="Add single">
+      <div id="addSingle" class="tabContent show{% if not tab or tab == 'addSingle' %} active{% endif %}">
         <form action="{% url 'crontrack:add_job' %}" method="post">
           {% csrf_token %}
-          <input type="hidden" name="single" value="active">
+          <input type="hidden" name="single">
           <table class="form">
             <tr>
               <td><label for="name">Job name</label></td>
@@ -41,7 +43,9 @@
             </tr>
             <tr>
               <td><label for="description">Description (optional)</label></td>
-              <td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
+              <td>
+                <textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea>
+              </td>
               <!-- TODO: should really define maxlength as a constant somewhere -->
             <tr>
               <td><label>Timezone</label></td>
@@ -54,10 +58,10 @@
           {% endif %}
         </form>
       </div>
-      <div class="tabContent show {{ prefill.group }}" id="Add group">
+      <div id="addGroup" class="tabContent show{% if tab == 'addGroup' %} active{% endif %}">
         <form action="{% url 'crontrack:add_job' %}" method="post">
           {% csrf_token %}
-          <input type="hidden" name="group" value="active">
+          <input type="hidden" name="group">
           <table class="form">
             <tr>
               <td><label for="name">Group name</label></td>
@@ -82,7 +86,9 @@
             </tr>
             <tr>
               <td><label for="description">Group description (optional)</label></td>
-              <td><textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea></td>
+              <td>
+                <textarea name="description" id="description" maxlength="200">{{ prefill.description }}</textarea>
+              </td>
               <!-- TODO: should really define maxlength as a constant somewhere -->
             <tr>
               <td><label>Timezone</label></td>
@@ -101,5 +107,7 @@
       <a href="{% url 'crontrack:login' %}">Log in</a>
     {% endif %}
   </div>
+  {% include 'crontrack/js/jquery.html' %}
+  {% include 'crontrack/js/js-cookie.html' %}
   <script src="{% static 'crontrack/tab.js' %}"></script>
 {% endblock %}
