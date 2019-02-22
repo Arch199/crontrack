@@ -12,7 +12,7 @@
       Currently displaying in timezone "{{ user.timezone }}."
       (<a href="{% url 'crontrack:profile' %}">change</a>)
     </p>
-    <div class="tab">
+    <div class="tab mediumWidth">
       <span>
         <select id="perPage">
           {% for size in size_options %}
@@ -30,16 +30,15 @@
       {% endfor %}
     </div>
     {% for page in pages %}
-      <div class="tabContent messageHolder mediumWidth show{% if forloop.first %} active{% endif %}"
-          id="page{{ forloop.counter }}">
+      <div id="page{{ forloop.counter }}" class="tabContent messageHolder show{% if forloop.first %} active{% endif %}">
       {% for event in page %}
         {% if event.type == event.FAILURE %}
-            <div class="message danger{% if not event.job.seen %} highlight{% endif %}">
+            <div id="{{ event.id }}" class="message danger{% if not event.seen %} highlight{% endif %}">
               Job <a href="{% url 'crontrack:view_jobs' %}#{{ event.job.id }}"><b>{{ event.job.name }}</b></a>
               failed at <i>{{ event.time }}</i>
             </div>
         {% else %}
-          <div class="message warning{% if not event.job.seen %} highlight{% endif %}">
+          <div id="{{ event.id }}" class="message warning{% if not event.seen %} highlight{% endif %}">
               Waiting for a notification from job
               <a href="{% url 'crontrack:view_jobs' %}#{{ event.job.id }}"><b>{{ event.job.name }}</b></a>
               at <i>{{ event.time }}</i>
@@ -64,20 +63,24 @@
       location.href = '{% url "crontrack:dashboard" %}' + this.value + '/';
     });
     
-    function markSeen(pageNum) {
-      // Mark all events on the page as seen
+    // Mark all events on the page as seen
+    function markSeen(page) {
+      var messages = $('#' + page + ' .message');
+      var ids = messages.map((i, obj) => obj.id).get().join(',');
+      
       quickAjax({
         data: {
-          
-        },
-        success: data => {
-          // TODO
+          ids: ids
         }
       });
     }
     
     $(function() {
-      //markSeen(1);  
+      $('div.tab button').on('click', function() {
+        markSeen($(this).attr('js-target'))
+      });
+      
+      markSeen('page1');
     });
   </script>
 {% endblock %}

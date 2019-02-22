@@ -53,8 +53,11 @@ class JobMonitor:
                 # Calculate the next scheduled run time + time window
                 run_by = job.next_run + timedelta(minutes=job.time_window)
                 
-                # Skip if this run time is in the future
+                # If this run time is in the future, check if we need to issue a warning, then move on
                 if run_by > now:
+                    if job.failing:
+                        JobEvent.objects.create(job=job, type=JobEvent.WARNING, time=job.next_run)
+                        logger.debug(f"Warning created: job {job} is failing")
                     continue
                 
                 # Change to local time (for alerts / calculating next run time)
@@ -84,11 +87,7 @@ class JobMonitor:
                             if now > last_alert + buffer_time:
                                 self.alert_user(user, job)
                             else:
-                                logger.debug(f"Skipped alerting user '{user}' of failed job {job}")
-                # Otherwise, check if the job is failing and a warning should be issued
-                elif job.failing:
-                    JobEvent.objects.create(job=job, type=JobEvent.WARNING, time=job.next_run)
-                    logger.debug(f"Warning created: job {job} is failing")
+                                logger.debug(f"Skipped alerting user '{user}' of failed job {job}")                    
                 
                 # Calculate the new next run time
                 job.next_run = croniter(job.schedule_str, timezone.localtime(now)).get_next(datetime)

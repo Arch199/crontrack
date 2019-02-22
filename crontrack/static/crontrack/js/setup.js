@@ -17,6 +17,9 @@ function setToken(xhr, settings) {
 }
 
 function quickAjax(obj) {
+    if (obj.success === undefined) {
+        obj.success = () => {};
+    }
     if (obj.url === undefined) {
         obj.url = $(location).attr('href');
     }

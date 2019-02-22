@@ -3,7 +3,7 @@ body {
   font-family: Arial, sans-serif;
   background-color: #505058;
   margin: 0;
-  margin-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 h1, h2, h3, h4 {
@@ -556,6 +556,7 @@ form.login {
 
 /* --- Message box --- */
 .messageHolder {
+  width: 45em !important;
   height: auto !important;
   border: 1px solid black;
   padding: 5px;
@@ -568,7 +569,7 @@ form.login {
   text-align: left;
   font-size: 14px;
   background-color: #e5e5e5;
-  padding: 20px;
+  padding: 15px;
   padding-left: 50px;
   margin: 10px;
 }
@@ -636,9 +637,9 @@ a.floatingAnchor {
 /* --- Class overrides --- */
 
 .fixedWidth {
-  width: 70em !important; /* intended to match table.dbRows */
+  width: 70em; /* intended to match table.dbRows */
 }
 
 .mediumWidth {
-  width: 57em !important; /* max width of event on dashboard */
+  width: calc(45em + 40px); /* max width of event on dashboard */
 }

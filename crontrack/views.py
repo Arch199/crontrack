@@ -11,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
@@ -37,7 +36,7 @@ def notify_job(request, id):
     job.last_notified = timezone.now()
     job.last_failed = None
     now = timezone.localtime(timezone.now(), job.user.timezone)
-    job.next_run = croniter(job.schedule_str, now).get_next(datetime)
+    job.next_run = croniter(job.schedule_str, now).get_next(datetime) # This breaks job.failed! TODO: fix
     job.save()
     
     # Delete the JobEvent warning
@@ -49,18 +48,27 @@ def notify_job(request, id):
 
 
 @login_required
-def dashboard(request, per_page=20):    
-    timezone.activate(request.user.timezone)
-    my_jobs = Job.objects.filter(Q(user=request.user) | Q(team__in=request.user.teams.all()))
-    events = JobEvent.objects.filter(job__in=my_jobs)
-    pages = [events[i*per_page:(i+1)*per_page] for i in range(math.ceil(events.count() / per_page))]
-    
-    context = {
-        'pages': pages,
-        'per_page': per_page,
-        'size_options': (10, 20, 50, 100),
-    }
-    return render(request, 'crontrack/dashboard.html', context)
+def dashboard(request, per_page=20):
+    if request.is_ajax():
+        for id in request.POST['ids'].split(','):
+            if id.isdigit():
+                event = JobEvent.objects.get(pk=id)
+                event.seen = True
+                event.save()
+        
+        return JsonResponse({})
+    else:
+        timezone.activate(request.user.timezone)
+        my_jobs = Job.objects.filter(Q(user=request.user) | Q(team__in=request.user.teams.all()))
+        events = JobEvent.objects.filter(job__in=my_jobs)
+        pages = [events[i*per_page:(i+1)*per_page] for i in range(math.ceil(events.count() / per_page))]
+        
+        context = {
+            'pages': pages,
+            'per_page': per_page,
+            'size_options': (10, 20, 50, 100),
+        }
+        return render(request, 'crontrack/dashboard.html', context)
 
 
 @login_required
