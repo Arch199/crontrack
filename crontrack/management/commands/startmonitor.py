@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from crontrack.background import JobMonitor
 
@@ -11,17 +11,11 @@ class Command(BaseCommand):
             type=int,
             default=None,
             dest='run-for',
-            help='Time to run for in seconds. Defaults to forever.'
+            help="Time to run for in seconds. Defaults to forever.",
         )
         
     def handle(self, *args, **options):
-        time_limit = options.get('run-for', None)
-        if time_limit is None or time_limit > 0:
-            self.stdout.write(self.style.SUCCESS("Successfully started the job monitor"))
-            monitor = JobMonitor(time_limit)
-            
-            # Wait around to keep this thread open
-            while monitor.running:
-                pass
-        else:
-            self.stdout.write(self.style.ERROR("Argument '--run-for, -s' must be a positive number of seconds"))
+        try:
+            monitor = JobMonitor(options['run-for'])
+        except ValueError as e:
+            raise CommandError(str(e))

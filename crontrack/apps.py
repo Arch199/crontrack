@@ -12,4 +12,4 @@ class CronTrackConfig(AppConfig):
         
         # Only run the monitor in the main thread
         if settings.JOB_MONITOR_ON and os.environ.get('RUN_MAIN') == 'true':
-            monitor = JobMonitor()
+            monitor = JobMonitor(threaded=True)

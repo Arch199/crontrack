@@ -21,14 +21,22 @@ logger = logging.getLogger(__name__)
 class JobMonitor:
     WAIT_INTERVAL = 60  # seconds for time.sleep()
     
-    def __init__(self, time_limit=None):
+    def __init__(self, time_limit=None, threaded=False):
         self.time_limit = time_limit  # maximum time to run for in seconds
+        if time_limit is not None and time_limit <= 0:
+            raise ValueError("Time limit must be a positive number of seconds or None")
+        
         self.start_time = timezone.now()
         self.running = True
-    
-        logger.debug(f"Starting JobMonitor thread with time limit '{time_limit}'")
-        self.t = threading.Thread(target=self.monitor_loop, name='JobMonitorThread', daemon=True)
-        self.t.start()
+        
+        if threaded:
+            logger.debug(f"Starting JobMonitor on a separate thread with time limit '{time_limit}'")
+            self.t = threading.Thread(target=self.monitor_loop, name='JobMonitorThread', daemon=True)
+            self.t.start()
+        else:
+            logger.debug(f"Starting JobMonitor on main thread with time limit '{time_limit}'")
+            self.t = None
+            self.monitor_loop()
         
     def stop(self):
         logger.debug("Stopping JobMonitor")
