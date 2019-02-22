@@ -43,6 +43,7 @@ class Job(models.Model):
     @property
     def failing(self):
         # Checks if next_run has passed and a notification was not received, but it is still within the time window
+        # Note: requires the job monitor to update last_failed to work correctly
         return (
             not self.failed and
             self.next_run < timezone.now() and

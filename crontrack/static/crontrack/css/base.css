@@ -553,9 +553,3 @@ form.login {
 .fixedWidth {
   width: 70em; /* intended to match table.dbRows */
 }
-
-/* TODO: remove this (not currently in use) */
-.dark, .dark a {
-  background-color: #393946; /* #444; for non-blue gray */
-  color: white;
-}  /* same as one of the global styles (for buttons, input, textarea, etc.) */

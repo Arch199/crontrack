@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class JobMonitor:
     WAIT_INTERVAL = 60  # seconds for time.sleep()
     
-    def __init__(self, time_limit=None, threaded=False):
+    def __init__(self, time_limit=None, threaded=True):
         self.time_limit = time_limit  # maximum time to run for in seconds
         if time_limit is not None and time_limit <= 0:
             raise ValueError("Time limit must be a positive number of seconds or None")
