@@ -1,7 +1,9 @@
-// Requires JQuery, JSCookie
+// Requires jQuery, JSCookie
+
+var TAB_COOKIE = true;
 
 // Change which tab of content is currently being displayed
-function changeTab(ev, tabName, setCookie=true) {
+function changeTab(ev, tabName) {
     // Check if this is on page load (needs to be faster and not set a cookie)
     if (event === undefined) {
         // An event hasn't been triggered; find the button before activating it
@@ -10,7 +12,7 @@ function changeTab(ev, tabName, setCookie=true) {
         var button = $(ev.target);
     }
     
-    if (setCookie) {
+    if (TAB_COOKIE) {
         Cookies.set('tab', tabName, {path: ''});
     }
     
@@ -24,14 +26,7 @@ function changeTab(ev, tabName, setCookie=true) {
     $('#' + button.attr('js-target')).addClass('active');
 }
 
-$(function() {
-    // Check for a cookie set from a previous visit
-    /*var tabName = Cookies.get('tab');
-    if (tabName !== undefined) {
-        // Change to the saved tab
-        changeTab(undefined, tabName, false);
-    }*/
-    
+$(function() {    
     $('div.tab button').on('click', function(ev) {
         changeTab(ev, $(this).attr('js-target'));
     });
