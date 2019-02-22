@@ -7,6 +7,7 @@ app_name = 'crontrack'
 urlpatterns = [
     path('', views.index, name='index'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/<int:per_page>/', views.dashboard, name='dashboard'),
     path('viewjobs/', views.view_jobs, name='view_jobs'),
     path('addjob/', views.add_job, name='add_job'),
     path('editjob/', views.edit_job, name='edit_job'),

@@ -1,4 +1,5 @@
 import logging
+import math
 import re
 from datetime import datetime
 from itertools import chain
@@ -10,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
@@ -30,31 +32,33 @@ def index(request):
 
 
 def notify_job(request, id):
-    # Update last_notified, last_failed, and next_run
+    # Update job's last_notified, last_failed, and next_run
     job = Job.objects.get(pk=id)
     job.last_notified = timezone.now()
     job.last_failed = None
     now = timezone.localtime(timezone.now(), job.user.timezone)
     job.next_run = croniter(job.schedule_str, now).get_next(datetime)
     job.save()
+    
+    # Delete the JobEvent warning
+    JobEvent.objects.get(job=job, type=JobEvent.WARNING).delete()
+    
     logger.debug(f"Notified for job '{job}' at {job.last_notified}")
     
     return JsonResponse({'success_message': "Job notified successfully."})
 
 
 @login_required
-def dashboard(request):
+def dashboard(request, per_page=20):    
     timezone.activate(request.user.timezone)
-    jobs = Job.objects.filter(Q(user=request.user) | Q(team__in=request.user.teams.all()))
-    events = JobEvent.objects.filter(job__in=jobs)
-    warnings = [JobEvent(type=JobEvent.WARNING, job=job, time=job.next_run) for job in jobs if job.failing]
+    my_jobs = Job.objects.filter(Q(user=request.user) | Q(team__in=request.user.teams.all()))
+    events = JobEvent.objects.filter(job__in=my_jobs)
+    pages = [events[i*per_page:(i+1)*per_page] for i in range(math.ceil(events.count() / per_page))]
     
     context = {
-        'events': {
-            'all': chain(warnings, events),
-            'failures': events,
-            'warnings': warnings,
-        },
+        'pages': pages,
+        'per_page': per_page,
+        'size_options': (10, 20, 50, 100),
     }
     return render(request, 'crontrack/dashboard.html', context)
 
@@ -332,22 +336,21 @@ def delete_group(request):
 # Delete job with AJAX
 @login_required
 def delete_job(request):
-    # Delete job and return to editing group
+    # Delete job and return to editing job/job group
     if request.method == 'POST' and request.user.is_authenticated and 'itemID' in request.POST:
         try:
             job = Job.objects.get(pk=request.POST['itemID'])
             if permission_denied(request.user, job.user, job.team):
                 logger.warning(f"User {request.user} tried to delete job {job} without permission")
+                return JsonResponse({})
             else:
                 job.delete()
-            data = {'itemID': request.POST['itemID']}
-        except Job.DoesNotExist:
-            logger.debug(
-                f"Tried to delete job with id '{request.POST['itemID']}' and it didn't exist " +
-                f"(or didn't belong to the user '{request.user}')"
-            )
-        else:
-            return JsonResponse(data)
+        except ValidationError:
+            # This was a newly created job and the ID wasn't a valid UUID
+            pass
+        
+        data = {'itemID': request.POST['itemID']}
+        return JsonResponse(data)
     
     return HttpResponseRedirect(reverse('crontrack:view_jobs'))
 

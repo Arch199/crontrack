@@ -71,10 +71,10 @@ class JobAlert(models.Model):
 
 class JobEvent(models.Model):
     FAILURE = 'F'
-    WARNING = 'W'  # not stored in the database; instead generated on the fly for the dashboard
+    WARNING = 'W'
     TYPE_CHOICES = (
         (FAILURE, 'Failure'),
-        # WARNING is deliberately excluded so that it will fail validation
+        (WARNING, 'Warning'),
     )
     job = models.ForeignKey('Job', models.CASCADE, related_name='events')
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=FAILURE)

@@ -504,6 +504,12 @@ div.tab span {
   padding: 13px 16px;
 }
 
+div.tab span * {
+  margin-bottom: -6px;
+  margin-top: -6px;
+  margin-right: 6px;
+}
+
 .tabContent {
   display: none;
 }
@@ -550,7 +556,6 @@ form.login {
 
 /* --- Message box --- */
 .messageHolder {
-  width: auto !important;
   height: auto !important;
   border: 1px solid black;
   padding: 5px;
@@ -561,6 +566,7 @@ form.login {
   position: relative;
   border: 1px solid black;
   text-align: left;
+  font-size: 14px;
   background-color: #e5e5e5;
   padding: 20px;
   padding-left: 50px;
@@ -599,6 +605,26 @@ form.login {
   color: #e6b660;
 }
 
+/* Highlighting unseen messages */
+.message.highlight {
+  box-shadow: 0px 0px 4px 2px black;
+  -webkit-box-shadow: 0px 0px 4px 2px black;
+  -moz-box-shadow: 0px 0px 4px 2px black;
+}
+
+.message.highlight.danger {
+  background-color: #e06060;
+}
+
+.message.highlight.warning {
+  background-color: #e6b660;
+}
+
+.message.highlight:before {
+  color: black;
+  text-shadow: none;
+}
+
 
 /* --- Invisible anchor --- */
 a.floatingAnchor {
@@ -610,5 +636,9 @@ a.floatingAnchor {
 /* --- Class overrides --- */
 
 .fixedWidth {
-  width: 70em; /* intended to match table.dbRows */
+  width: 70em !important; /* intended to match table.dbRows */
+}
+
+.mediumWidth {
+  width: 57em !important; /* max width of event on dashboard */
 }

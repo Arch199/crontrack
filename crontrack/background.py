@@ -85,6 +85,10 @@ class JobMonitor:
                                 self.alert_user(user, job)
                             else:
                                 logger.debug(f"Skipped alerting user '{user}' of failed job {job}")
+                # Otherwise, check if the job is failing and a warning should be issued
+                elif job.failing:
+                    JobEvent.objects.create(job=job, type=JobEvent.WARNING, time=job.next_run)
+                    logger.debug(f"Warning created: job {job} is failing")
                 
                 # Calculate the new next run time
                 job.next_run = croniter(job.schedule_str, timezone.localtime(now)).get_next(datetime)

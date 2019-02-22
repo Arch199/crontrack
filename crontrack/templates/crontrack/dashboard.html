@@ -8,25 +8,38 @@
   <div class="hcenter">
     <h2>Dashboard</h2>
     <h3>Event log</h3>
-    <!-- TODO: make a template tag/include thing for tab button -->
+    <p class="note">
+      Currently displaying in timezone "{{ user.timezone }}."
+      (<a href="{% url 'crontrack:profile' %}">change</a>)
+    </p>
     <div class="tab">
-      {% for type in events %}
-        <button class="{% if forloop.first and not tab or tab == type %}active{% endif %}" js-target="{{ type }}">
-          {{ type|capfirst }}
+      <span>
+        <select id="perPage">
+          {% for size in size_options %}
+            <option{% if per_page == size %} selected{% endif %}>{{ size }}</option>
+          {% endfor %}
+        </select>
+        items per page.
+      </span>
+      <span>Page:</span>
+      {% for page in pages %}
+        <button js-target="page{{ forloop.counter }}" class="{% if forloop.first %}active{% endif %}"
+            onclick="markSeen({{ forloop.counter }})">
+          {{ forloop.counter }}
         </button>
       {% endfor %}
     </div>
-    {% for type, log in events.items %}
-      <div id="{{ type }}"
-          class="tabContent messageHolder show{% if forloop.first and not tab or tab == type %} active{% endif %}">
-      {% for event in log %}
+    {% for page in pages %}
+      <div class="tabContent messageHolder mediumWidth show{% if forloop.first %} active{% endif %}"
+          id="page{{ forloop.counter }}">
+      {% for event in page %}
         {% if event.type == event.FAILURE %}
-            <div class="message danger">
+            <div class="message danger{% if not event.job.seen %} highlight{% endif %}">
               Job <a href="{% url 'crontrack:view_jobs' %}#{{ event.job.id }}"><b>{{ event.job.name }}</b></a>
               failed at <i>{{ event.time }}</i>
             </div>
         {% else %}
-          <div class="message warning">
+          <div class="message warning{% if not event.job.seen %} highlight{% endif %}">
               Waiting for a notification from job
               <a href="{% url 'crontrack:view_jobs' %}#{{ event.job.id }}"><b>{{ event.job.name }}</b></a>
               at <i>{{ event.time }}</i>
@@ -41,5 +54,30 @@
   </div>
   {% include 'crontrack/js/jquery.html' %}
   {% include 'crontrack/js/js-cookie.html' %}
+  <script src="{% static 'crontrack/js/setup.js' %}"></script>
   <script src="{% static 'crontrack/js/tab.js' %}"></script>
+  <script>
+    TAB_COOKIE = false; // disable saving the selected tab in a cookie for this page
+    
+    // Update items per page
+    $('#perPage').on('change', function() {
+      location.href = '{% url "crontrack:dashboard" %}' + this.value + '/';
+    });
+    
+    function markSeen(pageNum) {
+      // Mark all events on the page as seen
+      quickAjax({
+        data: {
+          
+        },
+        success: data => {
+          // TODO
+        }
+      });
+    }
+    
+    $(function() {
+      //markSeen(1);  
+    });
+  </script>
 {% endblock %}
