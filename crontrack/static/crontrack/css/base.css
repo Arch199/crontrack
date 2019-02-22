@@ -3,7 +3,7 @@ body {
   font-family: Arial, sans-serif;
   background-color: #505058;
   margin: 0;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
 }
 
 h1, h2, h3, h4 {
@@ -504,6 +504,10 @@ div.tab span {
   padding: 13px 16px;
 }
 
+.tabContent {
+  display: none;
+}
+
 div.tabContent.show {
   width: 540px;
   height: 435px;
@@ -517,15 +521,9 @@ div.tabContent.show.active {
   display: block;
 }
 
-.tabContent {
-  display: none;
-}
-
 .tabContent.active {
   display: initial;
 }
-
-/* TODO: get rid of the show class (can't remember why I made it in the first place) */
 
 
 /* --- Login --- */
@@ -557,7 +555,6 @@ form.login {
   border: 1px solid black;
   padding: 5px;
   background-color: #d0d0d0;
-  margin-bottom: 20px;
 }
 
 .message {
@@ -601,6 +598,14 @@ form.login {
 .message.warning:before {
   color: #e6b660;
 }
+
+
+/* --- Invisible anchor --- */
+a.floatingAnchor {
+  position: absolute;
+  top: -50px;
+}
+
 
 /* --- Class overrides --- */
 

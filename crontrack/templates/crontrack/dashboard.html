@@ -21,12 +21,15 @@
           class="tabContent messageHolder show{% if forloop.first and not tab or tab == type %} active{% endif %}">
       {% for event in log %}
         {% if event.type == event.FAILURE %}
-          <div class="message danger">
-            Job <b>{{ event.job.name }}</b> failed at <i>{{ event.time }}</i>
-          </div>
+            <div class="message danger">
+              Job <a href="{% url 'crontrack:view_jobs' %}#{{ event.job.id }}"><b>{{ event.job.name }}</b></a>
+              failed at <i>{{ event.time }}</i>
+            </div>
         {% else %}
           <div class="message warning">
-              Waiting for a notification from job <b>{{ event.job.name }}</b> at <i>{{ event.time }}</i>
+              Waiting for a notification from job
+              <a href="{% url 'crontrack:view_jobs' %}#{{ event.job.id }}"><b>{{ event.job.name }}</b></a>
+              at <i>{{ event.time }}</i>
               <br>(Time window is <b>{{ event.job.time_window }}</b> minutes)
           </div>
         {% endif %}

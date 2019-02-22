@@ -53,7 +53,12 @@
                   {% for job in job_group.jobs %}
                       <tr class="rowGroupItem{% if job.failed %} danger{% elif job.failing %} warning{% endif %}"
                             onclick="toggleRowGroupItem(event)">
-                        <td>{{ job.name }}</td>
+                        <td>
+                          {% if team.id == 'All' %}
+                            <a id="{{ job.id }}" class="floatingAnchor"></a>
+                          {% endif %}
+                          {{ job.name }}
+                        </td>
                         <td>{{ job.schedule_str }}</td>
                         <td>{{ job.time_window }}</td>
                         <td>{{ job.next_run }}</td>
