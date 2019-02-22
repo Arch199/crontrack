@@ -81,20 +81,9 @@ class JobEvent(models.Model):
     time = models.DateTimeField()
     seen = models.BooleanField(default=False)
     
-    def __str__(self):
-        if self.type == self.FAILURE:
-            return f"Job \"{self.job.name}\" failed at {date(self.time)}, {time(self.time)}"
-        elif self.type == self.WARNING:
-            return (
-                f"Waiting for a notification from job \"{self.job.name}\" at {date(self.job.next_run)}, "
-                f"{time(self.job.next_run)} (time window is {self.job.time_window} minutes)"
-            )
-    
-    @property
-    def type_name(self):
-        # Corresponds to the CSS class for rendering the message
-        names = {self.FAILURE: 'danger', self.WARNING: 'warning'}
-        return names[self.type]
+    class Meta:
+        ordering = ['-time']
+
 
 class User(AbstractUser):
     EMAIL = 'E'

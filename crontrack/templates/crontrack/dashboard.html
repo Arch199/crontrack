@@ -1,15 +1,42 @@
 {% extends 'crontrack/base.html' %}
 
+{% load static %}
+
 {% block title %} Dashboard {% endblock %}
 
 {% block content %}
   <div class="hcenter">
     <h2>Dashboard</h2>
     <h3>Event log</h3>
-    {% for event in events %}
-      <div class="message {{ event.type_name }}">{{ event }}</div>
-    {% empty %}
-      <p class="note">No events to display.</p>
+    <!-- TODO: make a template tag/include thing for tab button -->
+    <div class="tab">
+      {% for type in events %}
+        <button class="{% if forloop.first and not tab or tab == type %}active{% endif %}" js-target="{{ type }}">
+          {{ type|capfirst }}
+        </button>
+      {% endfor %}
+    </div>
+    {% for type, log in events.items %}
+      <div id="{{ type }}"
+          class="tabContent messageHolder show{% if forloop.first and not tab or tab == type %} active{% endif %}">
+      {% for event in log %}
+        {% if event.type == event.FAILURE %}
+          <div class="message danger">
+            Job <b>{{ event.job.name }}</b> failed at <i>{{ event.time }}</i>
+          </div>
+        {% else %}
+          <div class="message warning">
+              Waiting for a notification from job <b>{{ event.job.name }}</b> at <i>{{ event.time }}</i>
+              <br>(Time window is <b>{{ event.job.time_window }}</b> minutes)
+          </div>
+        {% endif %}
+      {% empty %}
+        <p class="note">No events to display.</p>
+      {% endfor %}
+      </div>
     {% endfor %}
   </div>
+  {% include 'crontrack/js/jquery.html' %}
+  {% include 'crontrack/js/js-cookie.html' %}
+  <script src="{% static 'crontrack/js/tab.js' %}"></script>
 {% endblock %}

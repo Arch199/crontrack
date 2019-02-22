@@ -47,9 +47,15 @@ def dashboard(request):
     timezone.activate(request.user.timezone)
     jobs = Job.objects.filter(Q(user=request.user) | Q(team__in=request.user.teams.all()))
     events = JobEvent.objects.filter(job__in=jobs)
-    warnings = (JobEvent(type=JobEvent.WARNING, job=job) for job in jobs if job.failing)
+    warnings = [JobEvent(type=JobEvent.WARNING, job=job, time=job.next_run) for job in jobs if job.failing]
     
-    context = {'events': chain(events, warnings)}
+    context = {
+        'events': {
+            'all': chain(warnings, events),
+            'failures': events,
+            'warnings': warnings,
+        },
+    }
     return render(request, 'crontrack/dashboard.html', context)
 
 

@@ -525,6 +525,8 @@ div.tabContent.show.active {
   display: initial;
 }
 
+/* TODO: get rid of the show class (can't remember why I made it in the first place) */
+
 
 /* --- Login --- */
 form.login {
@@ -549,27 +551,41 @@ form.login {
 
 
 /* --- Message box --- */
+.messageHolder {
+  width: auto !important;
+  height: auto !important;
+  border: 1px solid black;
+  padding: 5px;
+  background-color: #d0d0d0;
+  margin-bottom: 20px;
+}
+
 .message {
+  position: relative;
+  border: 1px solid black;
   text-align: left;
-  background-color: #ccc;
-  color: #111;
-  padding: 10px;
+  background-color: #e5e5e5;
+  padding: 20px;
+  padding-left: 50px;
   margin: 10px;
 }
 
 .message:before {
   content: "\26a0"; /* caution icon */
-  font-size: 20px;
-  margin: 5px;
-  margin-right: 20px;
+  display: block;
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 25px;
   text-shadow: 1px 0px black;
   font-weight: 1000;
 }
 
 .message.danger {
-  -webkit-box-shadow: inset 0px 0px 0px 3px #e06060;
-  -moz-box-shadow: inset 0px 0px 0px 3px #e06060;
-  box-shadow: inset 0px 0px 0px 3px #e06060;
+  box-shadow: inset 0px 0px 0px 4px #e06060;
+  -webkit-box-shadow: inset 0px 0px 0px 4px #e06060;
+  -moz-box-shadow: inset 0px 0px 0px 4px #e06060;
 }
 
 .message.danger:before {
@@ -577,9 +593,9 @@ form.login {
 }
 
 .message.warning {
-  -webkit-box-shadow: inset 0px 0px 0px 3px #e6b660;
-  -moz-box-shadow: inset 0px 0px 0px 3px #e6b660;
-  box-shadow: inset 0px 0px 0px 3px #e6b660;
+  box-shadow: inset 0px 0px 0px 4px #e6b660;
+  -webkit-box-shadow: inset 0px 0px 0px 4px #e6b660;
+  -moz-box-shadow: inset 0px 0px 0px 4px #e6b660;
 }
 
 .message.warning:before {

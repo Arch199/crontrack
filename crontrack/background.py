@@ -46,7 +46,7 @@ class JobMonitor:
     def monitor_loop(self):
         while self.running:
             logger.debug(f"Starting monitor loop at {timezone.now()}")
-            for job in Job.objects.running():
+            for job in Job.objects.all():
                 # Set now to a constant time for this iteration
                 now = timezone.now()
             
