@@ -55,7 +55,7 @@ class JobMonitor:
                 
                 # If this run time is in the future, check if we need to issue a warning, then move on
                 if run_by > now:
-                    if job.failing:
+                    if job.failing and not JobEvent.objects.filter(job=job, type=JobEvent.WARNING).exists():
                         JobEvent.objects.create(job=job, type=JobEvent.WARNING, time=job.next_run)
                         logger.debug(f"Warning created: job {job} is failing")
                     continue

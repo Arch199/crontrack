@@ -36,10 +36,10 @@ def notify_job(request, id):
     job.last_notified = timezone.now()
     job.last_failed = None
     now = timezone.localtime(timezone.now(), job.user.timezone)
-    job.next_run = croniter(job.schedule_str, now).get_next(datetime) # This breaks job.failed! TODO: fix
+    job.next_run = croniter(job.schedule_str, now).get_next(datetime)
     job.save()
     
-    # Delete the JobEvent warning
+    # Delete the JobEvent warning(s)
     JobEvent.objects.get(job=job, type=JobEvent.WARNING).delete()
     
     logger.debug(f"Notified for job '{job}' at {job.last_notified}")
