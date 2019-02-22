@@ -360,15 +360,15 @@ table.dbRows .rowGroupItem.danger + .rowGroupItemInfo {
 
 /* Warning coloring (used for showing jobs that are behind on notifications) */
 table.dbRows .rowGroupItem.warning {
-  background-color: #e6e660;
+  background-color: #e6b660;
 }
 
 table.dbRows .rowGroupItem.warning:hover {
-  background-color: #b0b047;
+  background-color: #b08047;
 }
 
 table.dbRows .rowGroupItem.warning + .rowGroupItemInfo {
-  background-color: #f0e674;
+  background-color: #f0b674;
 }
 
 /* dropdown triangle (closed) */
@@ -547,6 +547,44 @@ form.login {
   font-style: italic;
 }
 
+
+/* --- Message box --- */
+.message {
+  text-align: left;
+  background-color: #ccc;
+  color: #111;
+  padding: 10px;
+  margin: 10px;
+}
+
+.message:before {
+  content: "\26a0"; /* caution icon */
+  font-size: 20px;
+  margin: 5px;
+  margin-right: 20px;
+  text-shadow: 1px 0px black;
+  font-weight: 1000;
+}
+
+.message.danger {
+  -webkit-box-shadow: inset 0px 0px 0px 3px #e06060;
+  -moz-box-shadow: inset 0px 0px 0px 3px #e06060;
+  box-shadow: inset 0px 0px 0px 3px #e06060;
+}
+
+.message.danger:before {
+  color: #e06060;
+}
+
+.message.warning {
+  -webkit-box-shadow: inset 0px 0px 0px 3px #e6b660;
+  -moz-box-shadow: inset 0px 0px 0px 3px #e6b660;
+  box-shadow: inset 0px 0px 0px 3px #e6b660;
+}
+
+.message.warning:before {
+  color: #e6b660;
+}
 
 /* --- Class overrides --- */
 

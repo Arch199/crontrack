@@ -14,9 +14,10 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 
-from .models import Job, JobAlert, User, TeamMembership
+from .models import Job, JobAlert, JobEvent, User, TeamMembership
 
 logger = logging.getLogger(__name__)
+
 
 class JobMonitor:
     WAIT_INTERVAL = 60  # seconds for time.sleep()
@@ -46,11 +47,14 @@ class JobMonitor:
         while self.running:
             logger.debug(f"Starting monitor loop at {timezone.now()}")
             for job in Job.objects.running():
+                # Set now to a constant time for this iteration
+                now = timezone.now()
+            
                 # Calculate the next scheduled run time + time window
                 run_by = job.next_run + timedelta(minutes=job.time_window)
                 
                 # Skip if this run time is in the future
-                if run_by > timezone.now():
+                if run_by > now:
                     continue
                 
                 # Change to local time (for alerts / calculating next run time)
@@ -59,7 +63,8 @@ class JobMonitor:
                 # Check if a notification was not received in the time window
                 if job.last_notified is None or not (job.next_run <= job.last_notified <= run_by):
                     # Error condition: the job did not send a notification
-                    job.last_failed = timezone.now()
+                    job.last_failed = now
+                    JobEvent.objects.create(job=job, type=JobEvent.FAILURE, time=now)
                     logger.debug(f"Alert! Job: {job} failed to notify in the time window")
                     
                     # Try alerting users in the relevant team
@@ -70,20 +75,19 @@ class JobMonitor:
                     for user in users:
                         if user not in job.alerted_users.all():
                             # Send an alert if it's our first
-                            JobAlert.objects.create(user=user, job=job, last_alert=timezone.now())
+                            JobAlert.objects.create(user=user, job=job, last_alert=now)
                             self.alert_user(user, job)
                         else:
                             # Otherwise, decide whether to skip alerting based on the user's alert_buffer setting
                             buffer_time = timedelta(minutes=user.alert_buffer)
                             last_alert = JobAlert.objects.get(job=job, user=user).last_alert
-                            if timezone.now() > last_alert + buffer_time:
+                            if now > last_alert + buffer_time:
                                 self.alert_user(user, job)
                             else:
                                 logger.debug(f"Skipped alerting user '{user}' of failed job {job}")
                 
                 # Calculate the new next run time
-                now = timezone.localtime(timezone.now())
-                job.next_run = croniter(job.schedule_str, now).get_next(datetime)
+                job.next_run = croniter(job.schedule_str, timezone.localtime(now)).get_next(datetime)
                 job.save()
             
             # Check if we're due to stop running

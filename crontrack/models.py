@@ -4,6 +4,7 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.template.defaultfilters import date, time
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 from timezone_field import TimeZoneField
@@ -21,11 +22,12 @@ class Job(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     schedule_str = models.CharField('cron schedule string', max_length=100)
     name = models.CharField(max_length=50)
-    time_window = models.IntegerField('time window (minutes)', default=0, validators=[MinValueValidator(0)])
+    description = models.CharField(max_length=200, blank=True, default='')
+    time_window = models.PositiveIntegerField('time window (minutes)', default=0)
     next_run = models.DateTimeField('next time to run')
     last_failed = models.DateTimeField('last time job failed to notify', null=True, blank=True)
     last_notified = models.DateTimeField('last time notification received', null=True, blank=True)
-    description = models.CharField(max_length=200, blank=True, default='')
+    
     user = models.ForeignKey('User', models.CASCADE)
     group = models.ForeignKey('JobGroup', models.CASCADE, null=True, blank=True)
     team = models.ForeignKey('Team', models.SET_NULL, null=True, blank=True)
@@ -34,7 +36,7 @@ class Job(models.Model):
     objects = JobManager()
     
     def __str__(self):
-        return f'({self.team}) {self.user}\'s {self.name}: "{self.schedule_str}"'
+        return f"({self.team}) {self.user}'s {self.name}: '{self.schedule_str}'"
 
     @property
     def failed(self):
@@ -58,7 +60,7 @@ class JobGroup(models.Model):
     team = models.ForeignKey('Team', models.SET_NULL, null=True, blank=True)
     
     def __str__(self):
-        return f'({self.team}) {self.user}\'s {self.name}'
+        return f"({self.team}) {self.user}'s {self.name}"
 
 
 class JobAlert(models.Model):
@@ -66,7 +68,34 @@ class JobAlert(models.Model):
     user = models.ForeignKey('User', models.CASCADE)
     last_alert = models.DateTimeField('last time alert sent', null=True, blank=True)
 
+
+class JobEvent(models.Model):
+    FAILURE = 'F'
+    WARNING = 'W'  # not stored in the database; instead generated on the fly for the dashboard
+    TYPE_CHOICES = (
+        (FAILURE, 'Failure'),
+        # WARNING is deliberately excluded so that it will fail validation
+    )
+    job = models.ForeignKey('Job', models.CASCADE, related_name='events')
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=FAILURE)
+    time = models.DateTimeField()
+    seen = models.BooleanField(default=False)
     
+    def __str__(self):
+        if self.type == self.FAILURE:
+            return f"Job \"{self.job.name}\" failed at {date(self.time)}, {time(self.time)}"
+        elif self.type == self.WARNING:
+            return (
+                f"Waiting for a notification from job \"{self.job.name}\" at {date(self.job.next_run)}, "
+                f"{time(self.job.next_run)} (time window is {self.job.time_window} minutes)"
+            )
+    
+    @property
+    def type_name(self):
+        # Corresponds to the CSS class for rendering the message
+        names = {self.FAILURE: 'danger', self.WARNING: 'warning'}
+        return names[self.type]
+
 class User(AbstractUser):
     EMAIL = 'E'
     SMS = 'T'

@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -19,12 +20,14 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import ProfileForm, RegisterForm
-from .models import Job, JobGroup, JobAlert, User, Team, TeamMembership
+from .models import Job, JobGroup, JobAlert, JobEvent, User, Team, TeamMembership
 
 logger = logging.getLogger(__name__)
 
+
 def index(request):
     return render(request, 'crontrack/index.html')
+
 
 def notify_job(request, id):
     # Update last_notified, last_failed, and next_run
@@ -36,7 +39,19 @@ def notify_job(request, id):
     job.save()
     logger.debug(f"Notified for job '{job}' at {job.last_notified}")
     
-    return JsonResponse({'success_message': 'Job notified successfully.'})
+    return JsonResponse({'success_message': "Job notified successfully."})
+
+
+@login_required
+def dashboard(request):
+    timezone.activate(request.user.timezone)
+    jobs = Job.objects.filter(Q(user=request.user) | Q(team__in=request.user.teams.all()))
+    events = JobEvent.objects.filter(job__in=jobs)
+    warnings = (JobEvent(type=JobEvent.WARNING, job=job) for job in jobs if job.failing)
+    
+    context = {'events': chain(events, warnings)}
+    return render(request, 'crontrack/dashboard.html', context)
+
 
 @login_required
 def view_jobs(request):
@@ -64,6 +79,7 @@ def view_jobs(request):
         context['teams'][0]['empty'] = empty and context['teams'][0]['empty']
     
     return render(request, 'crontrack/viewjobs.html', context)
+
 
 @login_required
 def add_job(request):
@@ -165,9 +181,7 @@ def add_job(request):
             context['error_message'] = "invalid data in one or more field(s)"
         
     return render(request, 'crontrack/addjob.html', context)
-        
-# ---- TODO: convert the context/error_message system to use django messages (?)
-# Also make sure to redirect after successfully dealing with post data to prevent duplicates
+
 
 @login_required
 def edit_job(request):
@@ -212,6 +226,7 @@ def edit_job(request):
             return render(request, 'crontrack/editjob.html', {'job': job})
     else:
         return render(request, 'crontrack/editjob.html')
+
 
 @login_required
 def edit_group(request):
@@ -292,6 +307,7 @@ def edit_group(request):
     
     return render(request, 'crontrack/editgroup.html')  
 
+
 @login_required
 def delete_group(request):
     if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
@@ -305,7 +321,8 @@ def delete_group(request):
             logger.exception(f"Tried to delete job group with id '{request.POST['group']}' and it didn't exist")
     
     return HttpResponseRedirect(reverse('crontrack:view_jobs'))
-    
+
+
 # Delete job with AJAX
 @login_required
 def delete_job(request):
@@ -327,6 +344,7 @@ def delete_job(request):
             return JsonResponse(data)
     
     return HttpResponseRedirect(reverse('crontrack:view_jobs'))
+
 
 @login_required
 def teams(request):
@@ -380,6 +398,7 @@ def teams(request):
         }
         return render(request, 'crontrack/teams.html', context)
 
+
 @login_required
 def profile(request):
     context = {}
@@ -403,6 +422,7 @@ def profile(request):
     context['form'] = form
     return render(request, 'registration/profile.html', context)
 
+
 def delete_account(request):
     context = {}
     if request.method == 'POST' and request.user.is_authenticated:
@@ -412,7 +432,8 @@ def delete_account(request):
         context['success_message'] = "Account successfully deleted."
         
     return render(request, 'registration/deleteaccount.html', context)
-        
+
+
 class RegisterView(generic.CreateView):
     form_class = RegisterForm
     success_url = reverse_lazy('crontrack:profile')
@@ -468,6 +489,7 @@ def get_job_group(user, job_group, team):
         description = job_group.description
     
     return {'id': id, 'name': name, 'description': description, 'jobs': jobs, 'team': team}
+
 
 # Checks if a user shouldn't be able to access a job (i.e. if they don't own it and aren't part of the team it's in)
 def permission_denied(request_user, user, team):

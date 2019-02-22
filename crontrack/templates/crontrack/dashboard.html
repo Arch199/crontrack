@@ -1,0 +1,15 @@
+{% extends 'crontrack/base.html' %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+  <div class="hcenter">
+    <h2>Dashboard</h2>
+    <h3>Event log</h3>
+    {% for event in events %}
+      <div class="message {{ event.type_name }}">{{ event }}</div>
+    {% empty %}
+      <p class="note">No events to display.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -13,6 +13,7 @@
         <a href="{% url 'crontrack:login' %}">Log in</a> |
         <a href="{% url 'crontrack:register' %}">Register</a>
       {% else %}
+        <a href="{% url 'crontrack:dashboard' %}">Dashboard</a> |
         <a href="{% url 'crontrack:view_jobs' %}">View jobs</a> |
         <a href="{% url 'crontrack:add_job' %}">Add job</a> |
         <a href="{% url 'crontrack:profile' %}">Profile</a> |
