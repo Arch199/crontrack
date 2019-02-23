@@ -4,16 +4,10 @@ var TAB_COOKIE = true;
 
 // Change which tab of content is currently being displayed
 function changeTab(ev, tabName) {
-    // Check if this is on page load (needs to be faster and not set a cookie)
-    if (event === undefined) {
-        // An event hasn't been triggered; find the button before activating it
-        var button = $('div.tab button[js-target="' + tabName + '"]');
-    } else {
-        var button = $(ev.target);
-    }
+    var button = $(ev.target);
     
     if (TAB_COOKIE) {
-        Cookies.set('tab', tabName, {path: ''});
+        Cookies.set('tab', tabName, {path: location.pathname});
     }
     
     // Hide all tab content + deactivate all buttons

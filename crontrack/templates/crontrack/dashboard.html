@@ -76,11 +76,17 @@
     }
     
     $(function() {
+      // Mark messages as seen when each page is in focus
       $('div.tab button').on('click', function() {
-        markSeen($(this).attr('js-target'))
+        markSeen($(this).attr('js-target'));
       });
       
       markSeen('page1');
+      
+      // Reset tab cookie
+      $('.message a').on('click', function() {
+        Cookies.set('tab', 'All', { path: '{% url "crontrack:view_jobs" %}' });
+      });
     });
   </script>
 {% endblock %}
