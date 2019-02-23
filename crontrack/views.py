@@ -102,6 +102,7 @@ def add_job(request):
     context = {'tab': request.COOKIES.get('tab', None)}
     if request.method == 'POST':
         context['prefill'] = request.POST
+        
         # Logic to add the job
         try:
             now = datetime.now(tz=pytz.timezone(request.POST['timezone']))
@@ -116,7 +117,7 @@ def add_job(request):
                     logger.warning(f"User {request.user} tried to access a team they're not in: {team}")
             
             # Check if we're adding a group
-            if 'group' in request.POST:
+            if request.POST['type'] == 'group':
                 with transaction.atomic():
                     group = JobGroup(
                         user=request.user,
@@ -129,7 +130,6 @@ def add_job(request):
                     group.save()
                     
                     job_name = '[unnamed job]'
-                    have_added_job = False
                     for line in request.POST['group_schedule'].split('\n'):
                         # Check if line is empty or starts with whitespace, and skip
                         if not line or line[0] in (' ', '\t', '\r'):
@@ -155,12 +155,10 @@ def add_job(request):
                         )
                         job.full_clean()
                         logger.debug(f'Adding new job: {job}')
-                        have_added_job = True
                         job.save()
-                    if not have_added_job:
+                    else:
                         # We didn't get any jobs
-                        context['error_message'] = "no valid jobs entered"
-                        return render(request, 'crontrack/addjob.html', context)
+                        raise ValueError("no valid jobs entered")
                     
                     # Group added successfully, open it up for editing
                     context = {'group': get_job_group(request.user, group, team)}
@@ -189,9 +187,11 @@ def add_job(request):
             context['error_message'] = "missing required field(s)"
         except (CroniterBadCronError, IndexError):
             context['error_message'] = "invalid cron schedule string"
-        except ValueError:
-            # hopefully this can only happen for the int() call on time window
-            context['error_message'] = "invalid time window"
+        except ValueError as e:
+            if str(e) == "no valid jobs entered":
+                context['error_message'] = str(e)
+            else:
+                context['error_message'] = "invalid time window"
         except ValidationError:
             # TODO: replace this with form validation
             context['error_message'] = "invalid data in one or more field(s)"
@@ -206,9 +206,7 @@ def edit_job(request):
         if 'edited' in request.POST:
             # Edit the job
             context = {'prefill': request.POST}
-            if permission_denied(request.user, job.user, job.team):
-                logger.warning("User {user} tried to edit job {job} without permission")
-            else:
+            if request.user.can_access(job):
                 try:
                     with transaction.atomic():
                         job.name = request.POST['name']
@@ -235,6 +233,8 @@ def edit_job(request):
                         job.save()
                 
                     return HttpResponseRedirect(reverse('crontrack:view_jobs'))
+            else:
+                logger.warning("User {user} tried to edit job {job} without permission")
                 
             # ^ copied code feels bad. TODO: draw this out into a helper function (or just use a form)
             return render(request, 'crontrack/editjob.html', context)
@@ -268,7 +268,7 @@ def edit_group(request):
             else:
                 try:
                     group = JobGroup.objects.get(pk=request.POST['group'])
-                    if permission_denied(request.user, group.user, group.team):
+                    if not request.user.can_access(group):
                         logger.warning(f"User {request.user} tried to modify job group {group} without permission")
                         return render(request, 'crontrack/editgroup.html')
                     with transaction.atomic():
@@ -294,7 +294,7 @@ def edit_group(request):
                             # Otherwise, find the existing job to edit
                             else:
                                 job = Job.objects.get(id=job_id)
-                                if permission_denied(request.user, job.user, job.team):
+                                if not request.user.can_access(job):
                                     logger.warning(f"User {request.user} tried to access job {job} without permission")
                                     return render(request, 'crontrack/editgroup.html')
                 
@@ -329,10 +329,10 @@ def delete_group(request):
     if request.method == 'POST' and request.user.is_authenticated and 'group' in request.POST:
         try:
             group = JobGroup.objects.get(pk=request.POST['group'])
-            if permission_denied(request.user, group.user, group.team):
-                logger.warning(f"User {request.user} tried to delete job group {group} without permission")
-            else:
+            if request.user.can_access(group):
                 group.delete()
+            else:
+                logger.warning(f"User {request.user} tried to delete job group {group} without permission")
         except JobGroup.DoesNotExist:
             logger.exception(f"Tried to delete job group with id '{request.POST['group']}' and it didn't exist")
     
@@ -346,11 +346,11 @@ def delete_job(request):
     if request.method == 'POST' and request.user.is_authenticated and 'itemID' in request.POST:
         try:
             job = Job.objects.get(pk=request.POST['itemID'])
-            if permission_denied(request.user, job.user, job.team):
+            if request.user.can_access(job):
+                job.delete()
+            else:
                 logger.warning(f"User {request.user} tried to delete job {job} without permission")
                 return JsonResponse({})
-            else:
-                job.delete()
         except ValidationError:
             # This was a newly created job and the ID wasn't a valid UUID
             pass
@@ -366,7 +366,6 @@ def teams(request):
     context = {}
     if request.method == 'POST' and 'type' in request.POST:
         if request.POST['type'] == 'create_team':
-            team = None
             try:
                 with transaction.atomic():
                     team = Team(name=request.POST.get('team_name'), creator=request.user)
@@ -504,8 +503,3 @@ def get_job_group(user, job_group, team):
         description = job_group.description
     
     return {'id': id, 'name': name, 'description': description, 'jobs': jobs, 'team': team}
-
-
-# Checks if a user shouldn't be able to access a job (i.e. if they don't own it and aren't part of the team it's in)
-def permission_denied(request_user, user, team):
-    return request_user != user and team not in request_user.teams.all()

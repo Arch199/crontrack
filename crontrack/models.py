@@ -103,6 +103,11 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, max_length=100)
     teams = models.ManyToManyField('Team', through='TeamMembership')
     
+    # Check if this user has access to an instance of a model (either Job or JobGroup)
+    def can_access(self, instance):
+        return instance.user == self or instance.team in self.teams.all()
+    
+    # Get all instances of a model this user has access to
     def all_accessible(self, model):
         try:
             return model.objects.filter(Q(user=self) | Q(team__in=self.teams.all()))

@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import timedelta
 from io import StringIO
 
@@ -8,7 +9,7 @@ from django.test import TestCase, SimpleTestCase
 from django.utils import timezone
 
 from .background import JobMonitor
-from .models import Job
+from .models import Job, User, Team, TeamMembership
 
 logging.disable(logging.INFO)
 
@@ -31,7 +32,7 @@ class JobTestCase(SimpleTestCase):
             self.assertEqual(job.failing, True)
 
 
-class JobMonitorCase(TestCase):
+class JobMonitorTestCase(TestCase):
     def test_validation(self):
         self.assertRaises(ValueError, JobMonitor, time_limit=0)
         self.assertRaises(ValueError, JobMonitor, time_limit=-5)
@@ -48,3 +49,30 @@ class JobMonitorCase(TestCase):
         self.assertEqual(monitor.running, True)
         monitor.stop()
         self.assertEqual(monitor.running, False)
+        
+
+class UserTestCase(TestCase):
+    def setup(self):
+        users = {
+            'alice': User.objects.create(username='alice'),
+            'bob': User.objects.create(username='bob'),
+            'carl': User.objects.create(username='carl'),
+        }
+        teams = (
+            Team.objects.create(name='generic name', creator=alice),
+            Team.objects.create(name='the sequel', creator=bob),
+            Team.objects.create(name='headless chicken', creator=None),
+        )
+        TeamMembership.objects.create(user=alice, team=teams[0])
+        TeamMembership.objects.create(user=bob, team=teams[0])
+        TeamMembership.objects.create(user=bob, team=team[1])
+        
+        for i in range(10):
+            Job.objects.create(user=random.choice(users), team=random.choice(teams))
+        
+    def test_job_access(self):
+        for user in User.objects.all():
+            my_jobs = user.all_accessible(Job)
+            for job in Job.objects.all():
+                self.assertEqual(user.can_access(job), job in my_jobs) 
+        

@@ -16,9 +16,9 @@
         <button js-target="addGroup" class="{% if tab == 'addGroup' %}active{% endif %}">Add group</button>
       </div>
       <div id="addSingle" class="tabContent show{% if not tab or tab == 'addSingle' %} active{% endif %}">
-        <form action="{% url 'crontrack:add_job' %}" method="post">
+        <form method="post">
           {% csrf_token %}
-          <input type="hidden" name="single">
+          <input type="hidden" name="type" value="single">
           <table class="form">
             <tr>
               <td><label for="name">Job name</label></td>
@@ -48,20 +48,20 @@
               </td>
               <!-- TODO: should really define maxlength as a constant somewhere -->
             <tr>
-              <td><label>Timezone</label></td>
+              <td><label for="timezone">Timezone</label></td>
               <td>{% timezone_selector user.timezone %}</td>
             </tr>
           </table>
           <br><input type="submit" value="Add job">
-          {% if error_message and prefill.single %}
+          {% if error_message and prefill.type == 'single' %}
             <br><p class="errorMessage">Error: {{ error_message }}.</p>
           {% endif %}
         </form>
       </div>
       <div id="addGroup" class="tabContent show{% if tab == 'addGroup' %} active{% endif %}">
-        <form action="{% url 'crontrack:add_job' %}" method="post">
+        <form method="post">
           {% csrf_token %}
-          <input type="hidden" name="group">
+          <input type="hidden" name="type" value="group">
           <table class="form">
             <tr>
               <td><label for="name">Group name</label></td>
@@ -91,13 +91,13 @@
               </td>
               <!-- TODO: should really define maxlength as a constant somewhere -->
             <tr>
-              <td><label>Timezone</label></td>
+              <td><label for="timezone">Timezone</label></td>
               <td>{% timezone_selector user.timezone %}</td>
             </tr>
             <!-- TODO: make this a Django form -->
           </table>
           <br><input type="submit" value="Add job group">
-          {% if error_message and prefill.group %}
+          {% if error_message and prefill.type == 'group' %}
             <br><p class="errorMessage">Error: {{ error_message }}.</p>
           {% endif %}
         </form>
