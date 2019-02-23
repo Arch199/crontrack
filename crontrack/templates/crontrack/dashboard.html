@@ -8,6 +8,7 @@
   <div class="hcenter">
     <h2>Dashboard</h2>
     <h3>Event log</h3>
+    <i class="bottomRight fas fa-arrow-alt-circle-up fa-2x"></i>
     <p class="note">
       Currently displaying in timezone "{{ user.timezone }}."
       (<a href="{% url 'crontrack:profile' %}">change</a>)
@@ -86,6 +87,11 @@
       // Reset tab cookie
       $('.message a').on('click', function() {
         Cookies.set('tab', 'All', { path: '{% url "crontrack:view_jobs" %}' });
+      });
+      
+      // Add scroll-up feature to bottom right arrow button
+      $('i.bottomRight').on('click', function() {
+        $("html, body").animate({ scrollTop: 0 });
       });
     });
   </script>

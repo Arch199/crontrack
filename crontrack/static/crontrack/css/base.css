@@ -436,7 +436,7 @@ table.form {
 }
 
 table.form td {
-  padding: 10px;
+  padding: 8px;
   vertical-align: middle;
 }
 
@@ -631,6 +631,20 @@ form.login {
 a.floatingAnchor {
   position: absolute;
   top: -50px;
+}
+
+
+/* --- Icons/buttons hovering in the bottom right --- */
+.bottomRight {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  transition-duration: 0.2s;
+  cursor: pointer;
+}
+
+.bottomRight:hover {
+  color: white;
 }
 
 
