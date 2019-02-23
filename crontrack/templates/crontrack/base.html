@@ -1,4 +1,5 @@
 {% load static %}
+{% load utils %}
 
 <!doctype html>
 <html>
@@ -15,7 +16,7 @@
       <span>
         {% if user.is_authenticated %}
           Logged in as <b>{{ user.username }}</b>.
-          <a href="{% url 'crontrack:dashboard' %}">Dashboard</a> |
+          <a href="{% url 'crontrack:dashboard' %}">Dashboard <b>({% unseen_event_count request.user %})</b></a> |
           <a href="{% url 'crontrack:view_jobs' %}">View jobs</a> |
           <a href="{% url 'crontrack:add_job' %}">Add job</a> |
           <a href="{% url 'crontrack:profile' %}">Profile</a> |

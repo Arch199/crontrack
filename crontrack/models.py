@@ -2,8 +2,9 @@ from datetime import timedelta
 import uuid
 
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator
+from django.core.exceptions import FieldError
 from django.db import models
+from django.db.models import Q
 from django.template.defaultfilters import date, time
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
@@ -101,6 +102,13 @@ class User(AbstractUser):
     phone = PhoneNumberField(blank=True)
     email = models.EmailField(unique=True, max_length=100)
     teams = models.ManyToManyField('Team', through='TeamMembership')
+    
+    def all_accessible(self, model):
+        try:
+            return model.objects.filter(Q(user=self) | Q(team__in=self.teams.all()))
+        except FieldError:
+            # The model is connected to the user indirectly e.g. through a job like JobEvent
+            return model.objects.filter(Q(job__user=self) | Q(job__team__in=self.teams.all()))
 
 
 class Team(models.Model):

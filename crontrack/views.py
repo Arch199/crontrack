@@ -12,7 +12,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -59,8 +58,7 @@ def dashboard(request, per_page=20):
         return JsonResponse({})
     else:
         timezone.activate(request.user.timezone)
-        my_jobs = Job.objects.filter(Q(user=request.user) | Q(team__in=request.user.teams.all()))
-        events = JobEvent.objects.filter(job__in=my_jobs)
+        events = request.user.all_accessible(JobEvent)
         pages = [events[i*per_page:(i+1)*per_page] for i in range(math.ceil(events.count() / per_page))]
         
         context = {
@@ -83,7 +81,7 @@ def view_jobs(request):
     }
     for team in chain((None,), request.user.teams.all()):
         ungrouped = (get_job_group(request.user, None, team),)
-        grouped = (get_job_group(request.user, g, team) for g in JobGroup.objects.all())
+        grouped = (get_job_group(request.user, g, team) for g in request.user.all_accessible(JobGroup))
         
         if team is None:
             id = None

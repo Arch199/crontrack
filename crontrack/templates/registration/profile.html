@@ -1,7 +1,7 @@
 {% extends 'crontrack/base.html' %}
 
 {% load static %}
-{% load timezones %}
+{% load utils %}
 
 {% block title %} {{ user.username }}'s profile {% endblock %}
 {% block head_extra %} {% include 'crontrack/js/intl-tel-input.html' with type='css' %} {% endblock %}
