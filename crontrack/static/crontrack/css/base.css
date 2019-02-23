@@ -150,16 +150,17 @@ hr {
 
 
 /* --- Error/success message text --- */
-.errorMessage {
-  color: red;
+.errorMessage, .successMessage {
   font-weight: bold;
   text-shadow: 1px 1px #222;
 }
 
+.errorMessage {
+  color: red;
+}
+
 .successMessage {
   color: green;
-  font-weight: bold;
-  text-shadow: 1px 1px #222;
 }
 
 
@@ -510,6 +511,10 @@ div.tab span * {
   margin-right: 6px;
 }
 
+/* `active` toggles display;
+  `show` determines whether the tabContent itself
+  should be visible or if it's just for structure
+ */
 .tabContent {
   display: none;
 }

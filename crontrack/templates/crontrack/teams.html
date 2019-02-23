@@ -74,6 +74,9 @@
     {% if error_message %}
       <br><p class="errorMessage">Error: {{ error_message }}.</p>
     {% endif %}
+    {% if success_message %}
+      <br><p class="successMessage">{{ success_message }}</p>
+    {% endif %}
   </div>
   {% include 'crontrack/js/jquery.html' %}
   {% include 'crontrack/js/js-cookie.html' %}

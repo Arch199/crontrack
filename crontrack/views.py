@@ -202,7 +202,7 @@ def add_job(request):
 @login_required
 def edit_job(request):
     if request.method == 'POST':
-        job = Job.objects.get(pk=request.POST['job'])            
+        job = Job.objects.get(pk=request.POST['job'])
         if 'edited' in request.POST:
             # Edit the job
             context = {'prefill': request.POST}
@@ -391,18 +391,18 @@ def teams(request):
                 team = Team.objects.get(pk=request.POST['team_id'])
             except User.DoesNotExist:
                 context['error_message'] = f"no user found with username '{request.POST['username']}'"
-            except Team.DoesNotExist:
-                pass
             else:
                 if request.POST['type'] == 'add_user':
                     # Is it okay to add users to teams without them having a say?
                     # TODO: consider sending a popup etc. to the other user to confirm before adding them
                     TeamMembership.objects.create(user=user, team=team)
+                    context['success_message'] = f"User '{user}' successfully added to team '{team}'"
                 elif request.POST['type'] == 'remove_user':
                     if user.id == team.creator.id:
-                        context['error_message'] = "the team's creator cannot be removed from the team"
+                        context['error_message'] = "a team's creator cannot be removed from their own team"
                     else:
                         TeamMembership.objects.get(user=user, team=team).delete()
+                        context['success_message'] = f"User '{user}' successfully removed from team '{team}'"
     
     if request.is_ajax():
         return JsonResponse({})
