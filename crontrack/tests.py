@@ -59,13 +59,13 @@ class UserTestCase(TestCase):
             'carl': User.objects.create(username='carl'),
         }
         teams = (
-            Team.objects.create(name='generic name', creator=alice),
-            Team.objects.create(name='the sequel', creator=bob),
+            Team.objects.create(name='generic name', creator=users['alice']),
+            Team.objects.create(name='the sequel', creator=users['bob']),
             Team.objects.create(name='headless chicken', creator=None),
         )
-        TeamMembership.objects.create(user=alice, team=teams[0])
-        TeamMembership.objects.create(user=bob, team=teams[0])
-        TeamMembership.objects.create(user=bob, team=team[1])
+        TeamMembership.objects.create(user=users['alice'], team=teams[0])
+        TeamMembership.objects.create(user=users['bob'], team=teams[0])
+        TeamMembership.objects.create(user=users['bob'], team=team[1])
         
         for i in range(10):
             Job.objects.create(user=random.choice(users), team=random.choice(teams))

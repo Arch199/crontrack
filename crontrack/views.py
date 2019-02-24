@@ -38,7 +38,7 @@ def notify_job(request, id):
     job.next_run = croniter(job.schedule_str, now).get_next(datetime)
     job.save()
     
-    # Delete the JobEvent warning(s)
+    # Delete the JobEvent warning
     JobEvent.objects.get(job=job, type=JobEvent.WARNING).delete()
     
     logger.debug(f"Notified for job '{job}' at {job.last_notified}")
