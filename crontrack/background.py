@@ -66,28 +66,33 @@ class JobMonitor:
                 # Check if a notification was not received in the time window
                 if job.last_notified is None or not (job.next_run <= job.last_notified <= run_by):
                     # Error condition: the job did not send a notification
-                    job.last_failed = now
-                    JobEvent.objects.create(job=job, type=JobEvent.FAILURE, time=now)
                     logger.debug(f"Alert! Job: {job} failed to notify in the time window")
                     
-                    # Try alerting users in the relevant team
-                    if job.team is None:
-                        users = (job.user,)
+                    # Check if the job has already failed to avoid sending multiple notifications
+                    if job.failed:
+                        logger.debug(f"Skipped sending another alert for continually failing job {job}")
                     else:
-                        users = job.team.user_set.all()
-                    for user in users:
-                        if user not in job.alerted_users.all():
-                            # Send an alert if it's our first
-                            JobAlert.objects.create(user=user, job=job, last_alert=now)
-                            self.alert_user(user, job)
+                        # Try alerting users in the relevant team
+                        if job.team is None:
+                            users = (job.user,)
                         else:
-                            # Otherwise, decide whether to skip alerting based on the user's alert_buffer setting
-                            buffer_time = timedelta(minutes=user.alert_buffer)
-                            last_alert = JobAlert.objects.get(job=job, user=user).last_alert
-                            if now > last_alert + buffer_time:
+                            users = job.team.user_set.all()
+                        for user in users:
+                            if user not in job.alerted_users.all():
+                                # Send an alert if it's our first
+                                JobAlert.objects.create(user=user, job=job, last_alert=now)
                                 self.alert_user(user, job)
                             else:
-                                logger.debug(f"Skipped alerting user '{user}' of failed job {job}")                    
+                                # Otherwise, decide whether to skip alerting based on the user's alert_buffer setting
+                                buffer_time = timedelta(minutes=user.alert_buffer)
+                                last_alert = JobAlert.objects.get(job=job, user=user).last_alert
+                                if now > last_alert + buffer_time:
+                                    self.alert_user(user, job)
+                                else:
+                                    logger.debug(f"Skipped alerting user '{user}' of failed job {job}")
+
+                    job.last_failed = now
+                    JobEvent.objects.create(job=job, type=JobEvent.FAILURE, time=now)
                 
                 # Calculate the new next run time
                 job.next_run = croniter(job.schedule_str, timezone.localtime(now)).get_next(datetime)
